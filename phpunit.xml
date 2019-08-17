@@ -1,0 +1,16 @@
+<phpunit bootstrap="./vendor/autoload.php" colors="true">
+    <testsuites>
+
+        <testsuite name="DoctrineQueryFilter">
+            <directory>./test</directory>
+        </testsuite>
+
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+
+</phpunit>
