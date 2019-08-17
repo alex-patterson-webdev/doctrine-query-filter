@@ -56,16 +56,16 @@ this new `$queryBuilder` instance in a very similar way to the existing `Doctrin
    
     $results = $query->execute(['name' => 'Test']);
     
-Although possible, this simple query construction offers no real benefit over the shipped Doctrine Query Builder. The true power of 
-this module lies with the ability to compose many `QueryFilterInterface` instances, encapsulating them as self contained query filters.
+Although possible, this simple query construction offers no real benefit over the Doctrine Query Builder. The true power of 
+this module lies with the ability to compose many `QueryFilterInterface` instances, encapsulating them as self contained query expressions.
     
 ## What are Query Filters?    
              
 Query Filters are classes that implement `Arp\DoctrineQueryFilter\Service\QueryFilterInterface`. We use Query Filters to create DQL strings. 
-These strings can include the entire DQL query or just small expressions of a bigger one. 
+These strings can include the entire DQL string or just small expressions that form a small part of a bigger query. 
 
-The interface requires the implementation of one method, `build(QueryBuilderInterface $queryBuilder) : string`. This method provides the
-query builder that can then be modified by adding criteria.
+The interface requires the implementation of a single method, `build(QueryBuilderInterface $queryBuilder) : string`. This method provides the
+query builder which can then be modified by adding filter criteria.
  
 ## Example 
     
@@ -75,53 +75,49 @@ We create a new query filter, implementing `QueryFilterInterface::build()` for t
 
     class ProductName implements QueryFilterInterface
     {
-        protected $name;
-        
-        protected $alias;
+        protected $fieldName = 'productName';
     
-        public function __construct(string $name, string $alias = null)
+        public function __construct(string $name, string $fieldName = '')
         {
             $this->name = $name;
-            if ($alias) {
-                $this->alias = $alias;
+        
+            if (! empty($fieldName)) {
+                $this->fieldName = $fieldName;
             }
         }
     
         public function build(QueryBuilderInterface $queryBuilder) : string
         {
-            $alias = isset($this->alias) ? $this->alias : $queryBuilder->getAlias();
-    
-            $factory = $queryBuilder->factory();
-    
-            $queryBuilder->andWhere($factory->eq($alias . 'name', $this->name));
+            $queryBuilder->andWhere(
+                $queryBuilder->factory()->eq($this->fieldName, $this->name)
+            );
         }
     }
     
-And another query filter for the 'deleted' where criteria.
+And another query filter for the 'not deleted' where criteria.
 
-    class IsDeleted implements QueryFilterInterface
+    class IsNotDeleted implements QueryFilterInterface
     {
-        protected $deleted;
+        protected $fieldName = 'deleted';
+        
+        protected $deleted = false;
     
-        protected $alias;
-    
-        public function __construct(bool $deleted, string $alias = null)
+        public function __construct(string $fieldName = '')
         {
-            $this->deleted = $deleted;
-            $this->alias   = $alias;
+            if (! empty($fieldName)) {
+                $this->fieldName = $fieldName;
+            }
         }
     
         public function build(QueryBuilderInterface $queryBuilder) : string
         {
-            $alias = isset($this->alias) ? $this->alias : $queryBuilder->getAlias();
-    
-            $factory = $queryBuilder->factory();
-    
-            $queryBuilder->andWhere($factory->eq($alias . '.deleted', $this->deleted));
+            $queryBuilder->andWhere(
+                $queryBuilder->factory()->eq($this->fieldName, $this->deleted)
+            );
         }
     }
     
-We now have filters that can be reused in any future queries! Simply compose them together using the pre-existing filters.
+We can then combine these filters together within another Query Filter using logical operators `$factory->andX()`. The `andX()` and related `orX()`.
 
     class ProductNameSearch implements QueryFilterInterface
     {    
@@ -137,25 +133,28 @@ We now have filters that can be reused in any future queries! Simply compose the
             );
         }
     }
-
-In the above example we composed both the `ProductName` and `IsDeleted` Query Filters to create one, `ProductNameSearch`.
-The example shows that we can access our custom filters via the `QueryBuilderFactory` via `$queryBuilder->factory()`.
     
-Ensure that we now register our custom filters with the `QueryFilterManager` by passing the required configuration.
+The example shows that we can access our custom filters form the `QueryFilterFactory` via `QueryBuilderFactory::create($queryFilterName, $arguments)`.
 
+This factory internally uses a service container to find the required factories. We must provide configuration 
+to ensure that they can be created. Unless you require dependency injection into your filters, you can use
+the included `FilterFactory`.
+
+    use \Arp\DoctrineQueryFilter\Factory\Service\QueryFilterFactory;
     use \Arp\DoctrineQueryFilter\Service\QueryFilterManager;
    
     $config = [
         'factories' => [
-            ProductNameSearch::class => FilterFactory::class,
-            ProductName::class       => FilterFactory::class,
-            IsDeleted::class         => FilterFactory::class,
+            ProductNameSearch::class => QueryFilterFactory::class,
+            ProductName::class       => QueryFilterFactory::class,
+            IsDeleted::class         => QueryFilterFactory::class,
         ]
     ];
     
     $container = new QueryFilterManager(null, $config);
+    $factory   = new QueryFilterFactory($container);
     
-We can now reference just the compose filter `ProductNameSearch` where we need to query.
+We can now reference just the `ProductNameSearch` filter where we need to query.
 
     $queryBuilder->andWhere(
         $factory->create(ProductNameSearch::class)
@@ -163,35 +162,33 @@ We can now reference just the compose filter `ProductNameSearch` where we need t
 
 ## QueryBuilderFactory
 
-The `QueryBuilderFactory` has a number of convenient methods to return Query Filters already provided by this module.
+The `QueryBuilderFactory` has a number of other convenience methods to return Query Filters included by this module.
 
-#### Arp\DoctrineQueryFilter\Equal
+#### \Arp\DoctrineQueryFilter\Equal
 
 `$factory->eq(1, 1)` will produce DQL string `1 = 1`.
 
-#### Arp\DoctrineQueryFilter\NotEqual
+#### \Arp\DoctrineQueryFilter\NotEqual
 
 `$factory->neq(1, 1)` will produce DQL string `1 <> 1`.
 
-#### `\Arp\DoctrineQueryFilter\GreaterThan`
+#### \Arp\DoctrineQueryFilter\GreaterThan
  
 `$factory->gt(2, 1)` will produce DQL string `2 > 1`.
 
-#### `\Arp\DoctrineQueryFilter\LessThan` 
+#### \Arp\DoctrineQueryFilter\LessThan
 
 `$factory->ln(1, 2)` will produce DQL string `1 < 2`.
 
-#### `\Arp\DoctrineQueryFilter\IsNull` 
+#### \Arp\DoctrineQueryFilter\IsNull
 
 `$factory->isNull('a.foo')` will produce DQL string `1 IS NULL`.
 
-There are also composite query filters to join expressions together
-
-#### `\Arp\DoctrineQueryFilter\AndX` 
+#### \Arp\DoctrineQueryFilter\AndX 
 
 `$factory->andX($filter1, $filter2, $filter3)` will produce DQL string `f1 AND f2 AND f3`.
 
-#### `\Arp\DoctrineQueryFilter\Orx` 
+#### \Arp\DoctrineQueryFilter\Orx 
 
 `$factory->orX($filter1, $filter2, $filter3)` will produce DQL string `f1 OR f2 OR f3`.
 
