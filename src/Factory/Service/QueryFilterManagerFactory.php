@@ -3,7 +3,9 @@
 namespace Arp\DoctrineQueryFilter\Factory\Service;
 
 use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
-use Zend\Mvc\Service\AbstractPluginManagerFactory;
+use Arp\Stdlib\Exception\ServiceNotCreatedException;
+use Arp\Stdlib\Factory\AbstractServiceFactory;
+use Interop\Container\ContainerInterface;
 
 /**
  * QueryFilterManagerFactory
@@ -11,11 +13,30 @@ use Zend\Mvc\Service\AbstractPluginManagerFactory;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Factory\Service
  */
-class QueryFilterManagerFactory extends AbstractPluginManagerFactory
+class QueryFilterManagerFactory extends AbstractServiceFactory
 {
     /**
-     * @const
+     * $defaultClassName
+     *
+     * @var string
      */
-    const PLUGIN_MANAGER_CLASS = QueryFilterManager::class;
+    protected $defaultClassName = QueryFilterManager::class;
+
+    /**
+     * create
+     *
+     * @param ContainerInterface $container     The dependency injection container.
+     * @param string             $requestedName The name of the service requested to the container.
+     * @param array              $config        The optional factory configuration options.
+     * @param string|null        $className     The name of the class that is being created.
+     *
+     * @return QueryFilterManager
+     *
+     * @throws ServiceNotCreatedException  If the service cannot be created.
+     */
+    public function create(ContainerInterface $container, $requestedName, array $config = [], $className = null)
+    {
+        return new $className($container, $config);
+    }
 
 }

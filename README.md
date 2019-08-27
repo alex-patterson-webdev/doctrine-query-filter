@@ -2,21 +2,18 @@
 
 ## About
 
-This module provides a wrapper around the [Doctrine ORM](https://github.com/doctrine/orm) `QueryBuilder` that allows developers to create object based query filters 
-that promote flexibility and reusability.
+This module provides a wrapper around the [Doctrine ORM](https://github.com/doctrine/orm) `QueryBuilder` that allows developers to create object based DQL query components which aims to promote flexibility, reusability and testability.
 
 ## Why?
 
-The [Doctrine ORM](https://github.com/doctrine/orm) `QueryBuilder` is an already powerful *method* based abstraction of constructing `DQL` (which is itself an abstraction of SQL). 
+The [Doctrine ORM](https://github.com/doctrine/orm) `QueryBuilder` is an already powerful *method* based abstraction of constructing `DQL`.
 
 Building queries using the `QueryBuilder` however can quickly become repetitive and inflexible in larger applications. The implementation often results in 
 custom `EntityRepository` classes defining a long list of similar `findByFoo()` or `findOneByBar()` methods. These methods can take complex optional
  arguments in order to filter for a collection of entities. When client requirements change, you might find yourself coping boilerplate query building methods for very minor changes or
- manually constructing sections of DQL repetitively. 
+ manually constructing sections of DQL repetitively. Such a "copy-pasting" approach can bloat code and cause additional head aches when queries need to be modified.
  
-## How? 
- 
- This module solves these issues by allowing developers to encapsulate sections of `DQL` as objects and compose these together to form complex queries.
+The `Arp\DoctrineQueryFilter` module solves these issues by allowing developers to create a simple object that  encapsulates sections of `DQL`.
  
 ## Installation
 
@@ -27,51 +24,56 @@ custom `EntityRepository` classes defining a long list of similar `findByFoo()` 
 ## The QueryBuilder
 
 In order to start constructing and executing queries, we must create a `Arp\DoctrineQueryFilter\Service\QueryBuilder` instance and
-provide it both a `QueryFilterFactory` and a Doctrine `QueryBuilder` instance.
+provide it with both a `Arp\DoctrineQueryFilter\Service\QueryFilterFactory` and a Doctrine `Doctrine\ORM\QueryBuilder` instance.
  
     use \Arp\DoctrineQueryFilter\Service\QueryBuilder;
     use \Arp\DoctrineQueryFilter\Service\QueryFilterFactory;
     use \Arp\DoctrineQueryFilter\Service\QueryFilterManager;
    
+    $config = [];
+   
     // Dependency injection container for QueryFilter instances.
-    $container = new QueryFilterManager();
+    $container = new QueryFilterManager($config);
    
     // Factory to create query filters, can be reused in other query builders
     $queryFilterFactory = new QueryFilterFactory($container);
-
+    
+    // Assuming $entityManager is a Doctirne\ORM\EntityManager.
     $queryBuilder = new QueryBuilder(
-        $entityManager->createQueryBuilder(), // Assuming $entityManager is a Doctirne\ORM\EntityManager.
+        $entityManager->createQueryBuilder(), 
         $queryFilterFactory 
     );
-
-As our new query builder is simply a wrapper around the injected Doctrine instance, we can interact with 
-this new `$queryBuilder` instance in a very similar way to the existing `Doctrine` implementation.
+ 
+The new `$queryBuilder` instance has a *similar* API to the internal `Doctrine` implementation most Doctrine users are familiar with. For instance, a simple DQL
+query can be created as below.
 
     $queryBuilder->select('p.id, p.name')
                  ->from('Products', 'p')
-                 ->where('p.deleted = 0 AND p.name = :name');
+                 ->where('p.deleted = 0 AND p.productName = :name');
     
     // Arp\DoctrineQueryFilter\Service\QueryInterface
     $query = $queryBuilder->getQuery(); 
    
-    $results = $query->execute(['name' => 'Test']);
+    $results = $query->execute(['productName' => 'Test']);
     
 Although possible, this simple query construction offers no real benefit over the Doctrine Query Builder. The true power of 
 this module lies with the ability to compose many `QueryFilterInterface` instances, encapsulating them as self contained query expressions.
     
 ## What are Query Filters?    
-             
-Query Filters are classes that implement `Arp\DoctrineQueryFilter\Service\QueryFilterInterface`. We use Query Filters to create DQL strings. 
-These strings can include the entire DQL string or just small expressions that form a small part of a bigger query. 
+           
+Query Filters are classes that implement `Arp\DoctrineQueryFilter\Service\QueryFilterInterface`. We use Query Filters to create DQL expressions. 
+These 'expressions' and simply strings that can include just small parts of a bigger query that can be added together. 
 
-The interface requires the implementation of a single method, `build(QueryBuilderInterface $queryBuilder) : string`. This method provides the
-query builder which can then be modified by adding filter criteria.
+The interface requires the implementation of a single method, `build(QueryBuilderInterface $queryBuilder) : string`.
  
-## Example 
+## A Simple Example 
     
-Consider if we re-wrote out earlier query using QueryFilter instances as reusable expressions; for example :
+Consider if we re-wrote out earlier DQL query using QueryFilter instances as reusable expressions. 
+The brackets `[]` indicate our desired QueryFilter objects and how we intent to compose them. 
 
-We create a new query filter, implementing `QueryFilterInterface::build()` for the 'product name' filtering.
+    [SELECT p.id, p.name FROM \Foo\Entity\Products as p WHERE [[p.deleted = 0] AND [p.productName = :productName]]]
+
+We create a new query filter, implementing `QueryFilterInterface::build()` for the `p.productName = :productName` filtering.
 
     class ProductName implements QueryFilterInterface
     {
@@ -94,19 +96,18 @@ We create a new query filter, implementing `QueryFilterInterface::build()` for t
         }
     }
     
-And another query filter for the 'not deleted' where criteria.
+And another query filter for the 'not deleted' where criteria. It might be more useful to negate a "IsDeleted" query filter
 
-    class IsNotDeleted implements QueryFilterInterface
+    class IsDeleted implements QueryFilterInterface
     {
-        protected $fieldName = 'deleted';
+        protected $fieldName;
         
-        protected $deleted = false;
+        protected $deleted;
     
-        public function __construct(string $fieldName = '')
+        public function __construct(bool $deleted = true, string $fieldName = 'deleted')
         {
-            if (! empty($fieldName)) {
-                $this->fieldName = $fieldName;
-            }
+            $this->fieldName = $fieldName;
+            $this->deleted   = $deleted;
         }
     
         public function build(QueryBuilderInterface $queryBuilder) : string
@@ -123,22 +124,25 @@ We can then combine these filters together within another Query Filter using log
     {    
         public function build(QueryBuilderInterface $queryBuilder) : string
         {
+            // Instance of Arp\DoctrineQueryFilter\Service\
             $factory = $queryBuilder->factory();
     
             $queryBuilder->andWhere(
                 $factory->andX(
-                    $factory->create(ProductName::class),
-                    $factory->create(IsDeleted::class, [false]) // We pass arguments to the construtor
+                    $factory->create(ProductName::class, ['Hot Dog']),
+                    $factory->create(IsDeleted::class, [false])
                 )
             );
         }
-    }
+    }  
     
 The example shows that we can access our custom filters form the `QueryFilterFactory` via `QueryBuilderFactory::create($queryFilterName, $arguments)`.
 
-This factory internally uses a service container to find the required factories. We must provide configuration 
-to ensure that they can be created. Unless you require dependency injection into your filters, you can use
-the included `FilterFactory`.
+This factory internally uses a Zend Framework 3 [PluginManager](https://docs.zendframework.com/zend-servicemanager/plugin-managers/); so we can create
+ query filters with factory classes and use the container to inject dependencies.
+ 
+By default all `$filterName` arguments that map **directly** to fully qualified class names of the filter will be created
+by the `QueryFilterFactory`; if 
 
     use \Arp\DoctrineQueryFilter\Factory\Service\QueryFilterFactory;
     use \Arp\DoctrineQueryFilter\Service\QueryFilterManager;
@@ -151,8 +155,7 @@ the included `FilterFactory`.
         ]
     ];
     
-    $container = new QueryFilterManager(null, $config);
-    $factory   = new QueryFilterFactory($container);
+    $container = new QueryFilterManager($config);
     
 We can now reference just the `ProductNameSearch` filter where we need to query.
 

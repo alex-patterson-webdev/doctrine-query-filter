@@ -1,17 +1,17 @@
 <?php
 
-namespace Arp\DoctrineQueryFilter\Factory;
+namespace Arp\DoctrineQueryFilter\Factory\Service;
 
 use Arp\DoctrineQueryFilter\QueryFilterInterface;
-use Arp\Stdlib\Factory\AbstractFactory;
 use Arp\Stdlib\Exception\ServiceNotCreatedException;
+use Arp\Stdlib\Factory\AbstractFactory;
 use Interop\Container\ContainerInterface;
 
 /**
  * QueryFilterFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Factory
+ * @package Arp\DoctrineQueryFilter\Factory\Service
  */
 class QueryFilterFactory extends AbstractFactory
 {

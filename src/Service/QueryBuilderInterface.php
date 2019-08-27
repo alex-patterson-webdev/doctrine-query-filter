@@ -39,7 +39,7 @@ interface QueryBuilderInterface
      *
      * Create a select expression.
      *
-     * @param array  $spec
+     * @param array|string  $spec
      *
      * @return $this
      *
