@@ -14,6 +14,7 @@ use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\IsNull;
 use Arp\DoctrineQueryFilter\IsNotNull;
 use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterFactoryException;
 
 /**
  * QueryFilterFactoryInterface
@@ -29,8 +30,10 @@ interface QueryFilterFactoryInterface
      * @param QueryFilterInterface[] ...$spec
      *
      * @return AndX
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function andX(...$spec);
+    public function andX(...$spec) : AndX;
 
     /**
      * orX
@@ -38,8 +41,10 @@ interface QueryFilterFactoryInterface
      * @param QueryFilterInterface[] ...$spec
      *
      * @return OrX
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function orX(...$spec);
+    public function orX(...$spec) : OrX;
 
     /**
      * eq
@@ -48,8 +53,10 @@ interface QueryFilterFactoryInterface
      * @param mixed  $b
      *
      * @return Equal
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function eq($a, $b);
+    public function eq($a, $b) : Equal;
 
     /**
      * neq
@@ -58,28 +65,32 @@ interface QueryFilterFactoryInterface
      * @param mixed  $b
      *
      * @return NotEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function neq($a, $b);
+    public function neq($a, $b) : NotEqual;
 
     /**
      * isNull
      *
      * @param string $fieldName
-     * @param string $alias
      *
      * @return IsNull
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function isNull($fieldName, $alias = null);
+    public function isNull(string $fieldName) : IsNull;
 
     /**
      * isNotNull
      *
      * @param string $fieldName
-     * @param string $alias
      *
      * @return IsNotNull
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function isNotNull($fieldName, $alias = null);
+    public function isNotNull(string $fieldName) : IsNotNull;
 
     /**
      * lt
@@ -88,8 +99,10 @@ interface QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return LessThan
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function lt($a, $b);
+    public function lt($a, $b) : LessThan;
 
     /**
      * lte
@@ -98,8 +111,10 @@ interface QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return LessThanOrEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function lte($a, $b);
+    public function lte($a, $b) : LessThanOrEqual;
 
     /**
      * gt
@@ -108,8 +123,10 @@ interface QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return GreaterThan
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function gt($a, $b);
+    public function gt($a, $b) : GreaterThan;
 
     /**
      * gte
@@ -118,19 +135,22 @@ interface QueryFilterFactoryInterface
      * @param mixed  $b
      *
      * @return GreaterThanOrEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function gte($a, $b);
+    public function gte($a, $b) : GreaterThanOrEqual;
 
     /**
      * in
      *
-     * @param string      $fieldName
-     * @param array       $collection
-     * @param string|null $alias
+     * @param string $fieldName
+     * @param array  $collection
      *
      * @return In
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function in($fieldName, $collection, $alias = null);
+    public function in(string $fieldName, array $collection) : In;
 
     /**
      * create
@@ -142,7 +162,9 @@ interface QueryFilterFactoryInterface
      * @param array   $options The optional factory options.
      *
      * @return QueryFilterInterface
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function create($name, array $args = [], array $options = []);
+    public function create(string $name, array $args = [], array $options = []) : QueryFilterInterface;
 
 }

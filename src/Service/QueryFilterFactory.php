@@ -14,6 +14,7 @@ use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\NotEqual;
 use Arp\DoctrineQueryFilter\OrX;
 use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterFactoryException;
 
 /**
  * QueryFilterFactory
@@ -46,10 +47,15 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param QueryFilterInterface[] ...$spec
      *
      * @return AndX
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function andX(...$spec)
+    public function andX(...$spec) : AndX
     {
-        return $this->create(AndX::class, $spec);
+        /** @var AndX $queryFilter */
+        $queryFilter = $this->create(AndX::class, $spec);
+
+        return$queryFilter;
     }
 
     /**
@@ -58,10 +64,15 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param QueryFilterInterface[] ...$spec
      *
      * @return OrX
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function orX(...$spec)
+    public function orX(...$spec) : OrX
     {
-        return $this->create(OrX::class, $spec);
+        /** @var OrX $queryFilter */
+        $queryFilter = $this->create(OrX::class, $spec);
+
+        return$queryFilter;
     }
 
     /**
@@ -71,10 +82,15 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return Equal
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function eq($a, $b)
+    public function eq($a, $b) : Equal
     {
-        return $this->create(Equal::class, func_get_args());
+        /** @var Equal $queryFilter */
+        $queryFilter = $this->create(Equal::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
@@ -84,36 +100,49 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return NotEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function neq($a, $b)
+    public function neq($a, $b) : NotEqual
     {
-        return $this->create(NotEqual::class, func_get_args());
+        /** @var NotEqual $queryFilter */
+        $queryFilter = $this->create(NotEqual::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
      * isNull
      *
      * @param string $fieldName
-     * @param string $alias
      *
      * @return IsNull
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function isNull($fieldName, $alias = null)
+    public function isNull(string $fieldName) : IsNull
     {
-        return $this->create(IsNull::class, func_get_args());
+        /** @var IsNull $queryFilter */
+        $queryFilter = $this->create(IsNull::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
      * isNotNull
      *
      * @param string $fieldName
-     * @param string $alias
      *
      * @return IsNotNull
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function isNotNull($fieldName, $alias = null)
+    public function isNotNull(string $fieldName) : IsNotNull
     {
-        return $this->create(IsNotNull::class, func_get_args());
+        /** @var IsNotNull $queryFilter */
+        $queryFilter = $this->create(IsNotNull::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
@@ -123,10 +152,15 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return LessThan
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function lt($a, $b)
+    public function lt($a, $b) : LessThan
     {
-        return $this->create(LessThan::class, func_get_args());
+        /** @var LessThan $queryFilter */
+        $queryFilter = $this->create(LessThan::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
@@ -136,10 +170,15 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return LessThanOrEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function lte($a, $b)
+    public function lte($a, $b) : LessThanOrEqual
     {
-        return $this->create(LessThanOrEqual::class, func_get_args());
+        /** @var LessThanOrEqual $queryFilter */
+        $queryFilter = $this->create(LessThanOrEqual::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
@@ -149,37 +188,51 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param mixed $b
      *
      * @return GreaterThan
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function gt($a, $b)
+    public function gt($a, $b) : GreaterThan
     {
-        return $this->create(GreaterThan::class, func_get_args());
+        /** @var GreaterThan $queryFilter */
+        $queryFilter = $this->create(GreaterThan::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
      * gte
      *
-     * @param mixed  $a
-     * @param mixed  $b
+     * @param mixed $a
+     * @param mixed $b
      *
      * @return GreaterThanOrEqual
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function gte($a, $b)
+    public function gte($a, $b) : GreaterThanOrEqual
     {
-        return $this->create(GreaterThanOrEqual::class, func_get_args());
+        /** @var GreaterThanOrEqual $queryFilter */
+        $queryFilter = $this->create(GreaterThanOrEqual::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
      * in
      *
-     * @param string      $fieldName
-     * @param array       $collection
-     * @param string|null $alias
+     * @param string $fieldName
+     * @param array  $collection
      *
      * @return In
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function in($fieldName, $collection, $alias = null)
+    public function in(string $fieldName, $collection) : In
     {
-        return $this->create(In::class, func_get_args());
+        /** @var In $queryFilter */
+        $queryFilter = $this->create(In::class, func_get_args());
+
+        return $queryFilter;
     }
 
     /**
@@ -191,9 +244,11 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param array   $args    The query filter's arguments.
      * @param array   $options The optional factory options.
      *
-     * @return QueryFilterFactoryInterface
+     * @return QueryFilterInterface
+     *
+     * @throws QueryFilterFactoryException
      */
-    public function create($name, array $args = [], array $options = [])
+    public function create(string $name, array $args = [], array $options = []) : QueryFilterInterface
     {
         $spec = [
             'config' => [
@@ -202,7 +257,21 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
             ],
         ];
 
-        return $this->queryFilterManager->build($name, $spec);
+        try {
+            return $this->queryFilterManager->build($name, $spec);
+        }
+        catch(\Exception $e) {
+
+            throw new QueryFilterFactoryException(
+                sprintf(
+                    'Unable to create new query filter \'%s\' : %s',
+                    $name,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
 }
