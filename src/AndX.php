@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -20,11 +20,11 @@ class AndX extends AbstractComposite
      *
      * Build the query filter expression.
      *
-     * @param QueryBuilderInterface $queryBuilder
+     * @param QueryExpressionFactoryInterface $factory
      *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string
+    public function build(QueryExpressionFactoryInterface $factory): string
     {
         if (empty($this->queryFilters)) {
             return '';
@@ -33,7 +33,7 @@ class AndX extends AbstractComposite
         $andX = (new Expr())->andX();
 
         foreach($this->queryFilters as $queryFilter) {
-            $andX->add($queryFilter->build($queryBuilder));
+            $andX->add($queryFilter->build($factory));
         }
 
         return (string) $andX;

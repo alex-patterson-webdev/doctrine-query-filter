@@ -13,30 +13,30 @@ use Arp\DoctrineQueryFilter\LessThan;
 use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\NotEqual;
 use Arp\DoctrineQueryFilter\OrX;
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
-use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterFactoryException;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryExpressionFactoryException;
 
 /**
- * QueryFilterFactory
+ * QueryExpressionFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Service
  */
-class QueryFilterFactory implements QueryFilterFactoryInterface
+class QueryExpressionFactory implements QueryExpressionFactoryInterface
 {
     /**
      * queryFilterManager
      *
-     * @var QueryFilterManager
+     * @var QueryExpressionManager
      */
     protected $queryFilterManager;
 
     /**
      * __construct
      *
-     * @param QueryFilterManager $queryFilterManager
+     * @param QueryExpressionManager $queryFilterManager
      */
-    public function __construct(QueryFilterManager $queryFilterManager)
+    public function __construct(QueryExpressionManager $queryFilterManager)
     {
         $this->queryFilterManager = $queryFilterManager;
     }
@@ -44,11 +44,11 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
     /**
      * andX
      *
-     * @param QueryFilterInterface[] ...$spec
+     * @param QueryExpressionInterface[] ...$spec
      *
      * @return AndX
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function andX(...$spec) : AndX
     {
@@ -61,11 +61,11 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
     /**
      * orX
      *
-     * @param QueryFilterInterface[] ...$spec
+     * @param QueryExpressionInterface[] ...$spec
      *
      * @return OrX
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function orX(...$spec) : OrX
     {
@@ -83,7 +83,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return Equal
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function eq($a, $b) : Equal
     {
@@ -101,7 +101,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return NotEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function neq($a, $b) : NotEqual
     {
@@ -118,7 +118,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return IsNull
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function isNull(string $fieldName) : IsNull
     {
@@ -135,7 +135,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return IsNotNull
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function isNotNull(string $fieldName) : IsNotNull
     {
@@ -153,7 +153,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return LessThan
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function lt($a, $b) : LessThan
     {
@@ -171,7 +171,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return LessThanOrEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function lte($a, $b) : LessThanOrEqual
     {
@@ -189,7 +189,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return GreaterThan
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function gt($a, $b) : GreaterThan
     {
@@ -207,7 +207,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return GreaterThanOrEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function gte($a, $b) : GreaterThanOrEqual
     {
@@ -225,7 +225,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * @return In
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function in(string $fieldName, $collection) : In
     {
@@ -244,11 +244,11 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      * @param array  $args    The query filter's arguments.
      * @param array  $options The optional factory options.
      *
-     * @return QueryFilterInterface
+     * @return QueryExpressionInterface
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
-    public function create($spec, array $args = [], array $options = []) : QueryFilterInterface
+    public function create($spec, array $args = [], array $options = []) : QueryExpressionInterface
     {
         $queryFilter = null;
 
@@ -259,21 +259,21 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
 
             foreach ($specs as $index => $spec) {
 
-                if ($spec instanceof QueryFilterInterface) {
+                if ($spec instanceof QueryExpressionInterface) {
                     $queryFilters[] = $this->create($spec);
                     continue;
                 }
 
                 if (! isset($spec['name'])) {
 
-                    throw new QueryFilterFactoryException(sprintf(
+                    throw new QueryExpressionFactoryException(sprintf(
                         'Error for array index \'%d\'; query filter specification must define a \'name\'.',
                         $index
                     ));
                 }
                 elseif (! is_string($spec['name'])) {
 
-                    throw new QueryFilterFactoryException(sprintf(
+                    throw new QueryExpressionFactoryException(sprintf(
                         'Error for array index \'%d\'; query filter specification \'name\' must be a string.',
                         $index
                     ));
@@ -291,7 +291,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
 
             if (! $this->queryFilterManager->has($spec)) {
 
-                throw new QueryFilterFactoryException(sprintf(
+                throw new QueryExpressionFactoryException(sprintf(
                     'Failed to find a valid query filter matching \'%s\'.',
                     $spec
                 ));
@@ -310,7 +310,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
             }
             catch(\Exception $e) {
 
-                throw new QueryFilterFactoryException(
+                throw new QueryExpressionFactoryException(
                     sprintf(
                         'Unable to create new query filter \'%s\' : %s',
                         $name,
@@ -321,13 +321,13 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
                 );
             }
         }
-        elseif ($spec instanceof QueryFilterInterface) {
+        elseif ($spec instanceof QueryExpressionInterface) {
             $queryFilter = $spec;
         }
 
-        if (! $queryFilter instanceof QueryFilterInterface) {
+        if (! $queryFilter instanceof QueryExpressionInterface) {
 
-            throw new QueryFilterFactoryException(
+            throw new QueryExpressionFactoryException(
                 'The query filter factory was unable to resolve the provided specification to a valid Query Filter.'
             );
         }

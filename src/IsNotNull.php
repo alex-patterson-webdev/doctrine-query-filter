@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class IsNotNull implements QueryFilterInterface
+class IsNotNull implements QueryExpressionInterface
 {
     /**
      * $fieldName
@@ -21,25 +21,13 @@ class IsNotNull implements QueryFilterInterface
     protected $fieldName;
 
     /**
-     * $alias
-     *
-     * @var string
-     */
-    protected $alias = '';
-
-    /**
      * __construct
      *
      * @param string $fieldName
-     * @param string $alias
      */
-    public function __construct(string $fieldName, string $alias = null)
+    public function __construct(string $fieldName)
     {
         $this->fieldName = $fieldName;
-
-        if ($alias) {
-            $this->alias = $alias;
-        }
     }
 
     /**
@@ -47,20 +35,13 @@ class IsNotNull implements QueryFilterInterface
      *
      * Build the query filter expression.
      *
-     * @param QueryBuilderInterface $queryBuilder
+     * @param QueryExpressionFactoryInterface $factory
      *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string
+    public function build(QueryExpressionFactoryInterface $factory): string
     {
-        $fieldName = $this->fieldName;
-        $alias     = $this->alias;
-
-        if (! empty($alias) && false === strpos($fieldName, '.')) {
-            $fieldName = $alias . '.' . $fieldName;
-        }
-
-        return (string) (new Expr())->isNotNull($fieldName);
+        return (string) (new Expr())->isNotNull($this->fieldName);
     }
 
 }

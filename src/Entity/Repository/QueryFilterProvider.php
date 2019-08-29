@@ -4,9 +4,9 @@ namespace Arp\DoctrineQueryFilter\Entity\Repository;
 
 use Arp\DoctrineQueryFilter\Service\QueryBuilder;
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
-use Arp\DoctrineQueryFilter\Service\QueryFilterFactory;
-use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
-use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactory;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionManager;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -20,26 +20,26 @@ class QueryFilterProvider
     /**
      * $queryFilterManager
      *
-     * @var QueryFilterManager
+     * @var QueryExpressionManager
      */
     protected $queryFilterManager;
 
     /**
      * $queryFilterFactory
      *
-     * @var QueryFilterFactoryInterface
+     * @var QueryExpressionFactoryInterface
      */
     protected $queryFilterFactory;
 
     /**
      * __construct.
      *
-     * @param QueryFilterFactoryInterface|null $queryFilterFactory
-     * @param QueryFilterManager|null          $queryFilterManager
+     * @param QueryExpressionFactoryInterface|null $queryFilterFactory
+     * @param QueryExpressionManager|null          $queryFilterManager
      */
     public function __construct(
-        QueryFilterFactoryInterface $queryFilterFactory = null,
-        QueryFilterManager $queryFilterManager = null
+        QueryExpressionFactoryInterface $queryFilterFactory = null,
+        QueryExpressionManager $queryFilterManager = null
     ){
         $this->queryFilterFactory = $queryFilterFactory;
         $this->queryFilterManager = $queryFilterManager;
@@ -63,12 +63,12 @@ class QueryFilterProvider
     /**
      * getQueryFilterFactory
      *
-     * @return QueryFilterFactoryInterface
+     * @return QueryExpressionFactoryInterface
      */
-    public function getQueryFilterFactory() : QueryFilterFactoryInterface
+    public function getQueryFilterFactory() : QueryExpressionFactoryInterface
     {
         if (! isset($this->queryFilterFactory)) {
-            $this->queryFilterFactory = new QueryFilterFactory($this->getQueryFilterManager());
+            $this->queryFilterFactory = new QueryExpressionFactory($this->getQueryFilterManager());
         }
 
         return $this->queryFilterFactory;
@@ -77,9 +77,9 @@ class QueryFilterProvider
     /**
      * setQueryFilterFactory
      *
-     * @param QueryFilterFactoryInterface $queryFilterFactory
+     * @param QueryExpressionFactoryInterface $queryFilterFactory
      */
-    public function setQueryFilterFactory(QueryFilterFactoryInterface $queryFilterFactory)
+    public function setQueryFilterFactory(QueryExpressionFactoryInterface $queryFilterFactory)
     {
         $this->queryFilterFactory = $queryFilterFactory;
     }
@@ -89,12 +89,12 @@ class QueryFilterProvider
      *
      * Return the query filter manager.
      *
-     * @return QueryFilterManager
+     * @return QueryExpressionManager
      */
-    protected function getQueryFilterManager() : QueryFilterManager
+    protected function getQueryFilterManager() : QueryExpressionManager
     {
         if (! isset($this->queryFilterManager)) {
-            $this->queryFilterManager = new QueryFilterManager();
+            $this->queryFilterManager = new QueryExpressionManager();
         }
         return $this->queryFilterManager;
     }
@@ -102,9 +102,9 @@ class QueryFilterProvider
     /**
      * setQueryFilterManager
      *
-     * @param QueryFilterManager $queryFilterManager
+     * @param QueryExpressionManager $queryFilterManager
      */
-    public function setQueryFilterManager(QueryFilterManager $queryFilterManager)
+    public function setQueryFilterManager(QueryExpressionManager $queryFilterManager)
     {
         $this->queryFilterManager = $queryFilterManager;
     }

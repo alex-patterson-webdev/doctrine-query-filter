@@ -3,7 +3,7 @@
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\AndX;
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -17,7 +17,7 @@ class AndXTest extends AbstractQueryFilterTest
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the class implements QueryFilterInterface.
+     * Ensure that the class implements QueryExpressionInterface.
      *
      * @test
      */
@@ -25,7 +25,7 @@ class AndXTest extends AbstractQueryFilterTest
     {
         $filter = new AndX();
 
-        $this->assertInstanceOf(QueryFilterInterface::class, $filter);
+        $this->assertInstanceOf(QueryExpressionInterface::class, $filter);
     }
 
     /**
@@ -38,13 +38,13 @@ class AndXTest extends AbstractQueryFilterTest
      */
     public function testBuild()
     {
-        /** @var QueryFilterInterface[]|MockObject[] $filters */
+        /** @var QueryExpressionInterface[]|MockObject[] $filters */
         $filters = [
-            $this->getMockForAbstractClass(QueryFilterInterface::class),
-            $this->getMockForAbstractClass(QueryFilterInterface::class),
-            $this->getMockForAbstractClass(QueryFilterInterface::class),
-            $this->getMockForAbstractClass(QueryFilterInterface::class),
-            $this->getMockForAbstractClass(QueryFilterInterface::class),
+            $this->getMockForAbstractClass(QueryExpressionInterface::class),
+            $this->getMockForAbstractClass(QueryExpressionInterface::class),
+            $this->getMockForAbstractClass(QueryExpressionInterface::class),
+            $this->getMockForAbstractClass(QueryExpressionInterface::class),
+            $this->getMockForAbstractClass(QueryExpressionInterface::class),
         ];
 
         $andXFilter = new AndX(...$filters);

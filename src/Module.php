@@ -2,8 +2,8 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
-use Arp\DoctrineQueryFilter\Service\QueryFilterManagerProviderInterface;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionManager;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionManagerInterface;
 use Zend\ModuleManager\Listener\ServiceListenerInterface;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\ModuleManager\ModuleManager;
@@ -31,9 +31,9 @@ class Module
         $serviceListener = $serviceManager->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            QueryFilterManager::class,
+            QueryExpressionManager::class,
             'query_filter_manager',
-            QueryFilterManagerProviderInterface::class,
+            QueryExpressionManagerInterface::class,
             'getQueryFilterConfig'
         );
     }

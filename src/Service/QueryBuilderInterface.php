@@ -2,9 +2,8 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
-use Doctrine\ORM\AbstractQuery;
 
 /**
  * QueryBuilderInterface
@@ -14,6 +13,15 @@ use Doctrine\ORM\AbstractQuery;
  */
 interface QueryBuilderInterface
 {
+    /**
+     * getDQL
+     *
+     * Return the DQL string representation.
+     *
+     * @return string
+     */
+    public function getDQL() : string;
+
     /**
      * configure
      *
@@ -30,9 +38,9 @@ interface QueryBuilderInterface
      *
      * Return the query filter factory.
      *
-     * @return QueryFilterFactoryInterface
+     * @return QueryExpressionFactoryInterface
      */
-    public function factory() : QueryFilterFactoryInterface;
+    public function factory() : QueryExpressionFactoryInterface;
 
     /**
      * select
@@ -74,10 +82,10 @@ interface QueryBuilderInterface
     /**
      * join
      *
-     * @param string                       $spec
-     * @param string                       $alias
-     * @param QueryFilterInterface|string  $conditions
-     * @param array                        $options
+     * @param string                          $spec
+     * @param string                          $alias
+     * @param QueryExpressionInterface|string $conditions
+     * @param array                           $options
      *
      * @return $this
      *
@@ -90,7 +98,7 @@ interface QueryBuilderInterface
      *
      * Set the where query expression.
      *
-     * @param QueryFilterInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $queryFilter
      *
      * @return $this
      *
@@ -103,7 +111,7 @@ interface QueryBuilderInterface
      *
      * Append a new where query expression to the collection.
      *
-     * @param QueryFilterInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $queryFilter
      *
      * @return $this
      *
@@ -147,6 +155,18 @@ interface QueryBuilderInterface
      * @return string
      */
     public function getAlias() : string;
+
+    /**
+     * getAliasFieldName
+     *
+     * Return a field name string with the desired alias prepended.
+     *
+     * @param string      $fieldName
+     * @param string|null $alias
+     *
+     * @return string
+     */
+    public function getAliasFieldName(string $fieldName, string $alias = null) : string;
 
     /**
      * getAliases
@@ -197,6 +217,5 @@ interface QueryBuilderInterface
      * @throws QueryBuilderException
      */
     public function getQuery(array $options = []) : QueryInterface;
-
 
 }

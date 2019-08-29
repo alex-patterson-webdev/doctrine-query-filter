@@ -10,12 +10,12 @@ namespace Arp\DoctrineQueryFilter;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-abstract class AbstractComposite implements QueryFilterInterface
+abstract class AbstractComposite implements QueryExpressionInterface
 {
     /**
      * $queryFilters
      *
-     * @var QueryFilterInterface[]
+     * @var QueryExpressionInterface[]
      */
     protected $queryFilters;
 
@@ -32,9 +32,9 @@ abstract class AbstractComposite implements QueryFilterInterface
     /**
      * add
      *
-     * @param QueryFilterInterface $queryFilter
+     * @param QueryExpressionInterface $queryFilter
      */
-    public function add(QueryFilterInterface $queryFilter)
+    public function add(QueryExpressionInterface $queryFilter)
     {
         $this->queryFilters[] = $queryFilter;
     }

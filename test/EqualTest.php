@@ -3,7 +3,7 @@
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Equal;
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -19,7 +19,7 @@ class EqualTest extends AbstractQueryFilterTest
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the filter implements QueryFilterInterface
+     * Ensure that the filter implements QueryExpressionInterface
      *
      * @test
      */
@@ -27,7 +27,7 @@ class EqualTest extends AbstractQueryFilterTest
     {
         $filter = new Equal(1, 1);
 
-        $this->assertInstanceOf(QueryFilterInterface::class, $filter);
+        $this->assertInstanceOf(QueryExpressionInterface::class, $filter);
     }
 
     /**

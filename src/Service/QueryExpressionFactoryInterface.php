@@ -13,36 +13,36 @@ use Arp\DoctrineQueryFilter\LessThan;
 use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\IsNull;
 use Arp\DoctrineQueryFilter\IsNotNull;
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
-use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterFactoryException;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryExpressionFactoryException;
 
 /**
- * QueryFilterFactoryInterface
+ * QueryExpressionFactoryInterface
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Service
  */
-interface QueryFilterFactoryInterface
+interface QueryExpressionFactoryInterface
 {
     /**
      * andX
      *
-     * @param QueryFilterInterface[] ...$spec
+     * @param QueryExpressionInterface[] ...$spec
      *
      * @return AndX
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function andX(...$spec) : AndX;
 
     /**
      * orX
      *
-     * @param QueryFilterInterface[] ...$spec
+     * @param QueryExpressionInterface[] ...$spec
      *
      * @return OrX
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function orX(...$spec) : OrX;
 
@@ -54,7 +54,7 @@ interface QueryFilterFactoryInterface
      *
      * @return Equal
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function eq($a, $b) : Equal;
 
@@ -66,7 +66,7 @@ interface QueryFilterFactoryInterface
      *
      * @return NotEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function neq($a, $b) : NotEqual;
 
@@ -77,7 +77,7 @@ interface QueryFilterFactoryInterface
      *
      * @return IsNull
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function isNull(string $fieldName) : IsNull;
 
@@ -88,7 +88,7 @@ interface QueryFilterFactoryInterface
      *
      * @return IsNotNull
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function isNotNull(string $fieldName) : IsNotNull;
 
@@ -100,7 +100,7 @@ interface QueryFilterFactoryInterface
      *
      * @return LessThan
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function lt($a, $b) : LessThan;
 
@@ -112,7 +112,7 @@ interface QueryFilterFactoryInterface
      *
      * @return LessThanOrEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function lte($a, $b) : LessThanOrEqual;
 
@@ -124,7 +124,7 @@ interface QueryFilterFactoryInterface
      *
      * @return GreaterThan
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function gt($a, $b) : GreaterThan;
 
@@ -136,7 +136,7 @@ interface QueryFilterFactoryInterface
      *
      * @return GreaterThanOrEqual
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function gte($a, $b) : GreaterThanOrEqual;
 
@@ -148,7 +148,7 @@ interface QueryFilterFactoryInterface
      *
      * @return In
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
     public function in(string $fieldName, array $collection) : In;
 
@@ -161,10 +161,10 @@ interface QueryFilterFactoryInterface
      * @param array   $args    The query filter's arguments.
      * @param array   $options The optional factory options.
      *
-     * @return QueryFilterInterface
+     * @return QueryExpressionInterface
      *
-     * @throws QueryFilterFactoryException
+     * @throws QueryExpressionFactoryException
      */
-    public function create(string $name, array $args = [], array $options = []) : QueryFilterInterface;
+    public function create(string $name, array $args = [], array $options = []) : QueryExpressionInterface;
 
 }

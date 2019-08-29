@@ -2,28 +2,19 @@
 
 namespace Arp\DoctrineQueryFilter\Factory\Service;
 
-use Arp\DoctrineQueryFilter\Service\QueryFilterFactory;
-use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
-use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use Arp\Stdlib\Exception\ServiceNotCreatedException;
-use Arp\Stdlib\Factory\AbstractServiceFactory;
+use Arp\Stdlib\Factory\AbstractFactory;
 use Interop\Container\ContainerInterface;
 
 /**
- * QueryFilterFactoryFactory
+ * QueryExpressionFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Factory\Service
  */
-class QueryFilterFactoryFactory extends AbstractServiceFactory
+class QueryExpressionFactory extends AbstractFactory
 {
-    /**
-     * $defaultClassName
-     *
-     * @var string
-     */
-    protected $defaultClassName = QueryFilterFactory::class;
-
     /**
      * create
      *
@@ -32,15 +23,16 @@ class QueryFilterFactoryFactory extends AbstractServiceFactory
      * @param array              $config        The optional factory configuration options.
      * @param string|null        $className     The name of the class that is being created.
      *
-     * @return QueryFilterFactoryInterface
+     * @return QueryExpressionInterface
      *
      * @throws ServiceNotCreatedException  If the service cannot be created.
      */
     public function create(ContainerInterface $container, $requestedName, array $config = [], $className = null)
     {
-        return new $className(
-            $container->get(QueryFilterManager::class)
-        );
+        $className = isset($className) ?: $requestedName;
+        $arguments = isset($config['arguments']) ? $config['arguments'] : [];
+
+        return new $className(...$arguments);
     }
 
 }

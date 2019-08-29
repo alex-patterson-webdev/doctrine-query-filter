@@ -3,6 +3,7 @@
 namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -11,7 +12,7 @@ use Doctrine\ORM\Query\Expr;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Between implements QueryFilterInterface
+class Between implements QueryExpressionInterface
 {
     /**
      * $fieldName
@@ -53,11 +54,11 @@ class Between implements QueryFilterInterface
      *
      * Build the query filter expression.
      *
-     * @param QueryBuilderInterface $queryBuilder
+     * @param QueryExpressionFactoryInterface $factory
      *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string
+    public function build(QueryExpressionFactoryInterface $factory): string
     {
         return (string) (new Expr())->between($this->fieldName, $this->a, $this->b);
     }

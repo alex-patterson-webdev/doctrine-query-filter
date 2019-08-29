@@ -46,7 +46,7 @@ abstract class AbstractQueryFilterTest extends TestCase
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the filter implements QueryFilterInterface
+     * Ensure that the filter implements QueryExpressionInterface
      *
      * @test
      */

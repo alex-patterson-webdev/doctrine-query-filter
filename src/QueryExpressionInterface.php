@@ -2,30 +2,26 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
-use Doctrine\ORM\Query\Expr;
 
 /**
- * LessThan
+ * QueryExpressionInterface
+ *
+ * A section of SQL.
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class LessThan extends AbstractExpression
+interface QueryExpressionInterface
 {
     /**
      * build
      *
-     * Build the query filter expression.
+     * Construct a DQL 'expression' string.
      *
      * @param QueryExpressionFactoryInterface $factory
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory): string
-    {
-        return (string) (new Expr())->lt($this->a, $this->b);
-    }
-    
+    public function build(QueryExpressionFactoryInterface $factory) : string;
 }

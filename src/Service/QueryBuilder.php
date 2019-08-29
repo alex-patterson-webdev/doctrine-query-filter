@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use Doctrine\ORM\Query\Expr;
@@ -26,20 +26,32 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * $filterFactory
      *
-     * @var QueryFilterFactoryInterface
+     * @var QueryExpressionFactoryInterface
      */
     protected $filterFactory;
 
     /**
      * __construct
      *
-     * @param DoctrineQueryBuilder        $queryBuilder
-     * @param QueryFilterFactoryInterface $filterFactory
+     * @param DoctrineQueryBuilder            $queryBuilder
+     * @param QueryExpressionFactoryInterface $filterFactory
      */
-    public function __construct(DoctrineQueryBuilder $queryBuilder, QueryFilterFactoryInterface $filterFactory)
+    public function __construct(DoctrineQueryBuilder $queryBuilder, QueryExpressionFactoryInterface $filterFactory)
     {
         $this->queryBuilder  = $queryBuilder;
         $this->filterFactory = $filterFactory;
+    }
+
+    /**
+     * getDQL
+     *
+     * Return the DQL string representation.
+     *
+     * @return string
+     */
+    public function getDQL() : string
+    {
+        return $this->queryBuilder->getDQL();
     }
 
     /**
@@ -103,9 +115,9 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * Return the query filter factory.
      *
-     * @return QueryFilterFactoryInterface
+     * @return QueryExpressionFactoryInterface
      */
-    public function factory() : QueryFilterFactoryInterface
+    public function factory() : QueryExpressionFactoryInterface
     {
         return $this->filterFactory;
     }
@@ -208,10 +220,10 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * join
      *
-     * @param string                       $spec
-     * @param string                       $alias
-     * @param QueryFilterInterface|string  $conditions
-     * @param array                        $options
+     * @param string                          $spec
+     * @param string                          $alias
+     * @param QueryExpressionInterface|string $conditions
+     * @param array                           $options
      *
      * @return $this
      *
@@ -251,7 +263,7 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * Set the where query expression.
      *
-     * @param QueryFilterInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $queryFilter
      *
      * @return $this
      *
@@ -259,7 +271,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function where($queryFilter) : QueryBuilderInterface
     {
-        if ($queryFilter instanceof QueryFilterInterface) {
+        if ($queryFilter instanceof QueryExpressionInterface) {
             $queryFilter = $queryFilter->build($this);
         }
 
@@ -290,7 +302,7 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * Append a new where query expression to the collection.
      *
-     * @param QueryFilterInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $queryFilter
      *
      * @return $this
      *
@@ -298,7 +310,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function andWhere($queryFilter) : QueryBuilderInterface
     {
-        if ($queryFilter instanceof QueryFilterInterface) {
+        if ($queryFilter instanceof QueryExpressionInterface) {
             $queryFilter = $queryFilter->build($this);
         }
 
@@ -402,6 +414,23 @@ class QueryBuilder implements QueryBuilderInterface
 
 
         return $this;
+    }
+
+    /**
+     * getAliasFieldName
+     *
+     * Return a field name string with the desired alias prepended.
+     *
+     * @param string      $fieldName
+     * @param string|null $alias
+     *
+     * @return string
+     */
+    public function getAliasFieldName(string $fieldName, string $alias = null) : string
+    {
+        $alias = isset($alias) ? $alias : $this->getAlias();
+
+        return empty($alias) ? $fieldName : $alias . '.' . $fieldName;
     }
 
     /**

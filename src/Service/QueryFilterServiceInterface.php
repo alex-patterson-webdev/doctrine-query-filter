@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
-use Arp\DoctrineQueryFilter\QueryFilterInterface;
+use Arp\DoctrineQueryFilter\QueryExpressionInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterException;
 
 /**
@@ -18,8 +18,8 @@ interface QueryFilterServiceInterface
      *
      * Perform a filtered search for a collection of entities.
      *
-     * @param QueryFilterInterface $filter
-     * @param array                $options
+     * @param QueryExpressionInterface $filter
+     * @param array                    $options
      *
      * @return object
      *
@@ -32,8 +32,8 @@ interface QueryFilterServiceInterface
      *
      * Perform a filtered search for a collection of entities.
      *
-     * @param QueryFilterInterface|QueryFilterInterface[] $filter
-     * @param array                                       $options
+     * @param QueryExpressionInterface|QueryExpressionInterface[] $filter
+     * @param array                                               $options
      *
      * @return object[]
      *

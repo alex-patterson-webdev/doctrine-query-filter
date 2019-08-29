@@ -2,9 +2,10 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryFilterFactory;
 use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
-use Arp\DoctrineQueryFilter\Factory\Service\QueryFilterFactoryFactory;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionFactory;
+use Arp\DoctrineQueryFilter\Service\QueryExpressionManager;
+use Arp\DoctrineQueryFilter\Factory\Service\QueryExpressionFactoryFactory;
 use Arp\DoctrineQueryFilter\Factory\Service\QueryFilterManagerFactory;
 
 return [
@@ -13,8 +14,9 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            QueryFilterManager::class => QueryFilterManagerFactory::class,
-            QueryFilterFactory::class => QueryFilterFactoryFactory::class,
+            QueryFilterManager::class     => QueryFilterManagerFactory::class,
+            QueryExpressionManager::class => QueryFilterManagerFactory::class,
+            QueryExpressionFactory::class => QueryExpressionFactoryFactory::class,
         ]
     ],
 ];
