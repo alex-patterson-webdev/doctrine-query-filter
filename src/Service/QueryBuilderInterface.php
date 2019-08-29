@@ -192,11 +192,11 @@ interface QueryBuilderInterface
      *
      * @param array $options  Optional creation options.
      *
-     * @return AbstractQuery
+     * @return QueryInterface
      *
      * @throws QueryBuilderException
      */
-    public function getQuery(array $options = []) : AbstractQuery;
+    public function getQuery(array $options = []) : QueryInterface;
 
 
 }

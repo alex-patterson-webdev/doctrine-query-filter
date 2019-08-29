@@ -18,8 +18,6 @@ interface QueryFilterInterface
      * Build the query filter expression.
      *
      * @param QueryBuilderInterface $queryBuilder
-     *
-     * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string;
+    public function build(QueryBuilderInterface $queryBuilder);
 }

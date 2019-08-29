@@ -55,7 +55,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
         /** @var AndX $queryFilter */
         $queryFilter = $this->create(AndX::class, $spec);
 
-        return$queryFilter;
+        return $queryFilter;
     }
 
     /**
@@ -72,7 +72,7 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
         /** @var OrX $queryFilter */
         $queryFilter = $this->create(OrX::class, $spec);
 
-        return$queryFilter;
+        return $queryFilter;
     }
 
     /**
@@ -240,38 +240,99 @@ class QueryFilterFactory implements QueryFilterFactoryInterface
      *
      * Create a new filter and seed it with the provided arguments.
      *
-     * @param string  $name    The name of the query filter to create.
-     * @param array   $args    The query filter's arguments.
-     * @param array   $options The optional factory options.
+     * @param mixed  $spec    The name of the query filter to create.
+     * @param array  $args    The query filter's arguments.
+     * @param array  $options The optional factory options.
      *
      * @return QueryFilterInterface
      *
      * @throws QueryFilterFactoryException
      */
-    public function create(string $name, array $args = [], array $options = []) : QueryFilterInterface
+    public function create($spec, array $args = [], array $options = []) : QueryFilterInterface
     {
-        $spec = [
-            'config' => [
-                'arguments' => $args,
-                'options'   => $options
-            ],
-        ];
+        $queryFilter = null;
 
-        try {
-            return $this->queryFilterManager->build($name, $spec);
+        if (is_array($spec)) {
+            $specs = (array_values($spec) === $spec) ? $spec : [$spec];
+
+            $queryFilters = [];
+
+            foreach ($specs as $index => $spec) {
+
+                if ($spec instanceof QueryFilterInterface) {
+                    $queryFilters[] = $this->create($spec);
+                    continue;
+                }
+
+                if (! isset($spec['name'])) {
+
+                    throw new QueryFilterFactoryException(sprintf(
+                        'Error for array index \'%d\'; query filter specification must define a \'name\'.',
+                        $index
+                    ));
+                }
+                elseif (! is_string($spec['name'])) {
+
+                    throw new QueryFilterFactoryException(sprintf(
+                        'Error for array index \'%d\'; query filter specification \'name\' must be a string.',
+                        $index
+                    ));
+                }
+
+                $args    = isset($spec['arguments']) ? $spec['arguments'] : [];
+                $options = isset($spec['options'])   ? $spec['options']   : [];
+
+                $queryFilters[] = $this->create($spec['name'], $args, $options);
+            }
+
+            $queryFilter = $this->andX($queryFilters);
         }
-        catch(\Exception $e) {
+        elseif (is_string($spec)) {
+
+            if (! $this->queryFilterManager->has($spec)) {
+
+                throw new QueryFilterFactoryException(sprintf(
+                    'Failed to find a valid query filter matching \'%s\'.',
+                    $spec
+                ));
+            }
+
+            $name = $spec;
+            $spec = [
+                'config' => [
+                    'arguments' => $args,
+                    'options'   => $options
+                ],
+            ];
+
+            try {
+                $queryFilter = $this->queryFilterManager->build($name, $spec);
+            }
+            catch(\Exception $e) {
+
+                throw new QueryFilterFactoryException(
+                    sprintf(
+                        'Unable to create new query filter \'%s\' : %s',
+                        $name,
+                        $e->getMessage()
+                    ),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+        elseif ($spec instanceof QueryFilterInterface) {
+            $queryFilter = $spec;
+        }
+
+        if (! $queryFilter instanceof QueryFilterInterface) {
 
             throw new QueryFilterFactoryException(
-                sprintf(
-                    'Unable to create new query filter \'%s\' : %s',
-                    $name,
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
+                'The query filter factory was unable to resolve the provided specification to a valid Query Filter.'
             );
         }
+
+        return $queryFilter;
     }
 
 }

@@ -5,7 +5,6 @@ namespace Arp\DoctrineQueryFilter\Service;
 use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 use Exception;
 
@@ -495,18 +494,18 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @param array $options  Optional creation options.
      *
-     * @return AbstractQuery
+     * @return QueryInterface
      *
      * @throws QueryBuilderException
      */
-    public function getQuery(array $options = []) : AbstractQuery
+    public function getQuery(array $options = []) : QueryInterface
     {
         if (! empty($options)) {
             $this->configure($options);
         }
 
         try {
-            return $this->queryBuilder->getQuery();
+            return new Query($this->queryBuilder->getQuery());
         }
         catch(Exception $e) {
 

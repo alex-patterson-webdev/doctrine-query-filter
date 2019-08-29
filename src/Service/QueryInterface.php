@@ -44,7 +44,7 @@ interface QueryInterface
      *
      * @throws QueryException  If the instance cannot be returned.
      */
-    public function getDoctrineQuery(array $options = []);
+    public function getDoctrineQuery(array $options = []) : DoctrineAbstractQuery;
 
     /**
      * configure
