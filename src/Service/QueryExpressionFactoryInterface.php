@@ -157,14 +157,14 @@ interface QueryExpressionFactoryInterface
      *
      * Create a new filter and seed it with the provided arguments.
      *
-     * @param string  $name    The name of the query filter to create.
-     * @param array   $args    The query filter's arguments.
-     * @param array   $options The optional factory options.
+     * @param mixed  $spec    The name of the query filter to create.
+     * @param array  $args    The query filter's arguments.
+     * @param array  $options The optional factory options.
      *
      * @return QueryExpressionInterface
      *
      * @throws QueryExpressionFactoryException
      */
-    public function create(string $name, array $args = [], array $options = []) : QueryExpressionInterface;
+    public function create($spec, array $args = [], array $options = []) : QueryExpressionInterface;
 
 }

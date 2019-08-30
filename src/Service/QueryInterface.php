@@ -16,13 +16,14 @@ interface QueryInterface
     /**
      * execute
      *
+     * @param array $parameters
      * @param array $options
      *
      * @return mixed
      *
      * @throws QueryException
      */
-    public function execute(array $options = []);
+    public function execute(array $parameters = [], array $options = []);
 
     /**
      * getSQL

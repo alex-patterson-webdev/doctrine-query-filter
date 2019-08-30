@@ -4,6 +4,7 @@ namespace Arp\DoctrineQueryFilter\Service;
 
 use Arp\DoctrineQueryFilter\AndX;
 use Arp\DoctrineQueryFilter\Equal;
+use Arp\DoctrineQueryFilter\FieldName;
 use Arp\DoctrineQueryFilter\GreaterThan;
 use Arp\DoctrineQueryFilter\GreaterThanOrEqual;
 use Arp\DoctrineQueryFilter\In;
@@ -29,16 +30,16 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      *
      * @var QueryExpressionManager
      */
-    protected $queryFilterManager;
+    protected $expressionManager;
 
     /**
      * __construct
      *
-     * @param QueryExpressionManager $queryFilterManager
+     * @param QueryExpressionManager $expressionManager
      */
-    public function __construct(QueryExpressionManager $queryFilterManager)
+    public function __construct(QueryExpressionManager $expressionManager)
     {
-        $this->queryFilterManager = $queryFilterManager;
+        $this->expressionManager = $expressionManager;
     }
 
     /**
@@ -52,10 +53,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function andX(...$spec) : AndX
     {
-        /** @var AndX $queryFilter */
-        $queryFilter = $this->create(AndX::class, $spec);
+        /** @var AndX $expression */
+        $expression = $this->create(AndX::class, $spec);
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -69,10 +70,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function orX(...$spec) : OrX
     {
-        /** @var OrX $queryFilter */
-        $queryFilter = $this->create(OrX::class, $spec);
+        /** @var OrX $expression */
+        $expression = $this->create(OrX::class, $spec);
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -87,10 +88,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function eq($a, $b) : Equal
     {
-        /** @var Equal $queryFilter */
-        $queryFilter = $this->create(Equal::class, func_get_args());
+        /** @var Equal $expression */
+        $expression = $this->create(Equal::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -105,10 +106,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function neq($a, $b) : NotEqual
     {
-        /** @var NotEqual $queryFilter */
-        $queryFilter = $this->create(NotEqual::class, func_get_args());
+        /** @var NotEqual $expression */
+        $expression = $this->create(NotEqual::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -122,10 +123,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function isNull(string $fieldName) : IsNull
     {
-        /** @var IsNull $queryFilter */
-        $queryFilter = $this->create(IsNull::class, func_get_args());
+        /** @var IsNull $expression */
+        $expression = $this->create(IsNull::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -139,10 +140,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function isNotNull(string $fieldName) : IsNotNull
     {
-        /** @var IsNotNull $queryFilter */
-        $queryFilter = $this->create(IsNotNull::class, func_get_args());
+        /** @var IsNotNull $expression */
+        $expression = $this->create(IsNotNull::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -157,10 +158,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function lt($a, $b) : LessThan
     {
-        /** @var LessThan $queryFilter */
-        $queryFilter = $this->create(LessThan::class, func_get_args());
+        /** @var LessThan $expression */
+        $expression = $this->create(LessThan::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -175,10 +176,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function lte($a, $b) : LessThanOrEqual
     {
-        /** @var LessThanOrEqual $queryFilter */
-        $queryFilter = $this->create(LessThanOrEqual::class, func_get_args());
+        /** @var LessThanOrEqual $expression */
+        $expression = $this->create(LessThanOrEqual::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -193,10 +194,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function gt($a, $b) : GreaterThan
     {
-        /** @var GreaterThan $queryFilter */
-        $queryFilter = $this->create(GreaterThan::class, func_get_args());
+        /** @var GreaterThan $expression */
+        $expression = $this->create(GreaterThan::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -211,10 +212,10 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function gte($a, $b) : GreaterThanOrEqual
     {
-        /** @var GreaterThanOrEqual $queryFilter */
-        $queryFilter = $this->create(GreaterThanOrEqual::class, func_get_args());
+        /** @var GreaterThanOrEqual $expression */
+        $expression = $this->create(GreaterThanOrEqual::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
     }
 
     /**
@@ -229,10 +230,30 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function in(string $fieldName, $collection) : In
     {
-        /** @var In $queryFilter */
-        $queryFilter = $this->create(In::class, func_get_args());
+        /** @var In $expression */
+        $expression = $this->create(In::class, func_get_args());
 
-        return $queryFilter;
+        return $expression;
+    }
+
+    /**
+     * getFieldName
+     *
+     * Return a field name string with the desired alias prepended.
+     *
+     * @param string      $fieldName
+     * @param string|null $alias
+     *
+     * @return FieldName
+     *
+     * @throws QueryExpressionFactoryException
+     */
+    public function fieldName(string $fieldName, string $alias = null) : FieldName
+    {
+        /** @var FieldName $expression */
+        $expression = $this->create(FieldName::class, func_get_args());
+
+        return $expression;
     }
 
     /**
@@ -250,17 +271,17 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      */
     public function create($spec, array $args = [], array $options = []) : QueryExpressionInterface
     {
-        $queryFilter = null;
+        $expression = null;
 
         if (is_array($spec)) {
             $specs = (array_values($spec) === $spec) ? $spec : [$spec];
 
-            $queryFilters = [];
+            $expressions = [];
 
             foreach ($specs as $index => $spec) {
 
                 if ($spec instanceof QueryExpressionInterface) {
-                    $queryFilters[] = $this->create($spec);
+                    $expressions[] = $this->create($spec);
                     continue;
                 }
 
@@ -282,14 +303,14 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
                 $args    = isset($spec['arguments']) ? $spec['arguments'] : [];
                 $options = isset($spec['options'])   ? $spec['options']   : [];
 
-                $queryFilters[] = $this->create($spec['name'], $args, $options);
+                $expressions[] = $this->create($spec['name'], $args, $options);
             }
 
-            $queryFilter = $this->andX($queryFilters);
+            $expression = $this->andX($expressions);
         }
         elseif (is_string($spec)) {
 
-            if (! $this->queryFilterManager->has($spec)) {
+            if (! $this->expressionManager->has($spec)) {
 
                 throw new QueryExpressionFactoryException(sprintf(
                     'Failed to find a valid query filter matching \'%s\'.',
@@ -306,7 +327,7 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
             ];
 
             try {
-                $queryFilter = $this->queryFilterManager->build($name, $spec);
+                $expression = $this->expressionManager->build($name, $spec);
             }
             catch(\Exception $e) {
 
@@ -322,17 +343,17 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
             }
         }
         elseif ($spec instanceof QueryExpressionInterface) {
-            $queryFilter = $spec;
+            $expression = $spec;
         }
 
-        if (! $queryFilter instanceof QueryExpressionInterface) {
+        if (! $expression instanceof QueryExpressionInterface) {
 
             throw new QueryExpressionFactoryException(
-                'The query filter factory was unable to resolve the provided specification to a valid Query Filter.'
+                'The query expression factory was unable to resolve the provided specification.'
             );
         }
 
-        return $queryFilter;
+        return $expression;
     }
 
 }

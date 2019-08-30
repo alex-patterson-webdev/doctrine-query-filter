@@ -34,13 +34,13 @@ interface QueryBuilderInterface
     public function configure(array $options = []) : QueryBuilderInterface;
 
     /**
-     * filter
+     * expr
      *
-     * Return the query filter factory.
+     * Return the query expression factory.
      *
      * @return QueryExpressionFactoryInterface
      */
-    public function factory() : QueryExpressionFactoryInterface;
+    public function expr() : QueryExpressionFactoryInterface;
 
     /**
      * select
@@ -69,15 +69,15 @@ interface QueryBuilderInterface
     /**
      * from
      *
-     * @param mixed       $spec
-     * @param string|null $alias
-     * @param array       $options
+     * @param mixed  $spec
+     * @param string $alias
+     * @param array  $options
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function from($spec, string $alias = null, array $options = []) : QueryBuilderInterface;
+    public function from($spec, string $alias, array $options = []) : QueryBuilderInterface;
 
     /**
      * join

@@ -28,18 +28,18 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @var QueryExpressionFactoryInterface
      */
-    protected $filterFactory;
+    protected $expressionFactory;
 
     /**
      * __construct
      *
      * @param DoctrineQueryBuilder            $queryBuilder
-     * @param QueryExpressionFactoryInterface $filterFactory
+     * @param QueryExpressionFactoryInterface $expressionFactory
      */
-    public function __construct(DoctrineQueryBuilder $queryBuilder, QueryExpressionFactoryInterface $filterFactory)
+    public function __construct(DoctrineQueryBuilder $queryBuilder, QueryExpressionFactoryInterface $expressionFactory)
     {
         $this->queryBuilder  = $queryBuilder;
-        $this->filterFactory = $filterFactory;
+        $this->expressionFactory = $expressionFactory;
     }
 
     /**
@@ -111,15 +111,15 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * filter
+     * expr
      *
-     * Return the query filter factory.
+     * Return the query expression factory.
      *
      * @return QueryExpressionFactoryInterface
      */
-    public function factory() : QueryExpressionFactoryInterface
+    public function expr() : QueryExpressionFactoryInterface
     {
-        return $this->filterFactory;
+        return $this->expressionFactory;
     }
 
     /**
@@ -187,15 +187,15 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * from
      *
-     * @param mixed       $spec
-     * @param string|null $alias
-     * @param array       $options
+     * @param mixed  $spec
+     * @param string $alias
+     * @param array  $options
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function from($spec, string $alias = null, array $options = []) : QueryBuilderInterface
+    public function from($spec, string $alias, array $options = []) : QueryBuilderInterface
     {
         $indexBy = isset($options['index_by']) ? $options['index_by'] : null;
 
@@ -220,26 +220,38 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * join
      *
-     * @param string                          $spec
-     * @param string                          $alias
-     * @param QueryExpressionInterface|string $conditions
-     * @param array                           $options
+     * @param string  $spec
+     * @param string  $alias
+     * @param mixed   $conditions
+     * @param array   $options
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function join(string $spec, string $alias, $conditions, array $options = []) : QueryBuilderInterface
+    public function join(string $spec, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
     {
         $indexBy = isset($options['index_by']) ? $options['index_by'] : null;
         $type    = isset($options['type'])     ? $options['type']     : Expr\Join::WITH;
 
         try {
+            if (isset($conditions) && ! is_string($conditions)) {
+                $conditions = $this->expressionFactory->create($conditions);
+            }
+
+            if ($conditions instanceof QueryExpressionInterface) {
+                $conditions = $conditions->build($this->expressionFactory);
+            }
+
+            if (! is_string($conditions) || empty($conditions)) {
+                $conditions = null;
+            }
+
             $this->queryBuilder->join(
                 $spec,
                 $alias,
                 $type,
-                $conditions->build($this),
+                $conditions,
                 $indexBy
             );
         }
@@ -263,35 +275,37 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * Set the where query expression.
      *
-     * @param QueryExpressionInterface|string $queryFilter
+     * @param mixed $spec
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function where($queryFilter) : QueryBuilderInterface
+    public function where($spec) : QueryBuilderInterface
     {
-        if ($queryFilter instanceof QueryExpressionInterface) {
-            $queryFilter = $queryFilter->build($this);
+        try {
+            if (! is_string($spec)) {
+                $spec = $this->expressionFactory->create($spec);
+            }
+
+            if ($spec instanceof QueryExpressionInterface) {
+                $spec = $spec->build($this->expressionFactory);
+            }
+
+            if (! empty($spec)) {
+                $this->queryBuilder->where($spec);
+            }
         }
+        catch(Exception $e) {
 
-        if (is_string($queryFilter) && ! empty($queryFilter)) {
-
-            try {
-                $this->queryBuilder->where($queryFilter);
-            }
-            catch(Exception $e) {
-
-                throw new QueryBuilderException(
-                    sprintf(
-                        'Failed to add specification : %s',
-                        $e->getMessage()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
-            }
-
+            throw new QueryBuilderException(
+                sprintf(
+                    'Failed to add specification : %s',
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
         }
 
         return $this;
@@ -302,36 +316,39 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * Append a new where query expression to the collection.
      *
-     * @param QueryExpressionInterface|string $queryFilter
+     * @param mixed $spec
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function andWhere($queryFilter) : QueryBuilderInterface
+    public function andWhere($spec) : QueryBuilderInterface
     {
-        if ($queryFilter instanceof QueryExpressionInterface) {
-            $queryFilter = $queryFilter->build($this);
-        }
-
-        if (is_string($queryFilter) && ! empty($queryFilter)) {
-
-            try {
-                $this->queryBuilder->andWhere($queryFilter);
-            }
-            catch(Exception $e) {
-
-                throw new QueryBuilderException(
-                    sprintf(
-                        'Failed to add specification : %s',
-                        $e->getMessage()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+        try {
+            if (! is_string($spec)) {
+                $spec = $this->expressionFactory->create($spec);
             }
 
+            if ($spec instanceof QueryExpressionInterface) {
+                $spec = $spec->build($this->expressionFactory);
+            }
+
+            if (! empty($spec)) {
+                $this->queryBuilder->where($spec);
+            }
         }
+        catch(Exception $e) {
+
+            throw new QueryBuilderException(
+                sprintf(
+                    'Failed to add specification : %s',
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
+
         return $this;
     }
 
@@ -414,23 +431,6 @@ class QueryBuilder implements QueryBuilderInterface
 
 
         return $this;
-    }
-
-    /**
-     * getAliasFieldName
-     *
-     * Return a field name string with the desired alias prepended.
-     *
-     * @param string      $fieldName
-     * @param string|null $alias
-     *
-     * @return string
-     */
-    public function getAliasFieldName(string $fieldName, string $alias = null) : string
-    {
-        $alias = isset($alias) ? $alias : $this->getAlias();
-
-        return empty($alias) ? $fieldName : $alias . '.' . $fieldName;
     }
 
     /**

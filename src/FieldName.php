@@ -3,15 +3,14 @@
 namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
-use Doctrine\ORM\Query\Expr;
 
 /**
- * Between
+ * FieldName
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Between implements QueryExpressionInterface
+class FieldName implements QueryExpressionInterface
 {
     /**
      * $fieldName
@@ -21,45 +20,40 @@ class Between implements QueryExpressionInterface
     protected $fieldName;
 
     /**
-     * $a
+     * $alias
      *
-     * @var mixed
+     * @var string
      */
-    protected $a;
+    protected $alias;
 
     /**
-     * $b
-     *
-     * @var mixed
-     */
-    protected $b;
-
-    /**
-     * __construct
+     * __construct.
      *
      * @param string $fieldName
-     * @param mixed  $a
-     * @param mixed  $b
+     * @param string $alias
      */
-    public function __construct(string $fieldName, $a, $b)
+    public function __construct(string $fieldName, string $alias = '')
     {
         $this->fieldName = $fieldName;
-        $this->a         = $a;
-        $this->b         = $b;
+        $this->alias     = $alias;
     }
 
     /**
      * build
      *
-     * Build the query filter expression.
+     * Construct a DQL 'expression' string.
      *
      * @param QueryExpressionFactoryInterface $factory
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory): string
+    public function build(QueryExpressionFactoryInterface $factory) : string
     {
-        return (string) (new Expr())->between($this->fieldName, $this->a, $this->b);
+        if (empty($this->alias) || false !== strpos($this->fieldName, '.')) {
+            return $this->fieldName;
+        }
+
+        return $this->alias . '.' . $this->fieldName;
     }
 
 }

@@ -67,16 +67,17 @@ class Query implements QueryInterface
     /**
      * execute
      *
+     * @param array $parameters
      * @param array $options
      *
      * @return mixed
      *
      * @throws QueryException
      */
-    public function execute(array $options = [])
+    public function execute(array $parameters = [], array $options = [])
     {
         try {
-            return $this->getDoctrineQuery($options)->execute();
+            return $this->getDoctrineQuery($options)->execute($parameters);
         }
         catch (\Exception $e) {
 
@@ -102,7 +103,7 @@ class Query implements QueryInterface
      *
      * @throws QueryException  If the instance cannot be returned.
      */
-    public function getDoctrineQuery(array $options = [])
+    public function getDoctrineQuery(array $options = []) : DoctrineAbstractQuery
     {
         if (! empty($options)) {
             $this->configure($options);

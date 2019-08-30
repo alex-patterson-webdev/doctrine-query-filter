@@ -24,7 +24,6 @@ class IsNull implements QueryExpressionInterface
      * __construct
      *
      * @param string $fieldName
-     * @param string $alias
      */
     public function __construct(string $fieldName)
     {
