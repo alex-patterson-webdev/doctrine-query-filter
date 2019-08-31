@@ -43,11 +43,11 @@ class FieldName implements QueryExpressionInterface
      *
      * Construct a DQL 'expression' string.
      *
-     * @param QueryExpressionFactoryInterface $factory
+     * @param QueryBuilderInterface $queryBuilder
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory) : string
+    public function build(QueryBuilderInterface $queryBuilder): string
     {
         if (empty($this->alias) || false !== strpos($this->fieldName, '.')) {
             return $this->fieldName;

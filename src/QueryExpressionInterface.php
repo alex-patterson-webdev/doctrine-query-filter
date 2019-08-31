@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
 
 /**
  * QueryExpressionInterface
@@ -19,9 +19,9 @@ interface QueryExpressionInterface
      *
      * Construct a DQL 'expression' string.
      *
-     * @param QueryExpressionFactoryInterface $factory
+     * @param QueryBuilderInterface $queryBuilder
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory) : string;
+    public function build(QueryBuilderInterface $queryBuilder) : string;
 }

@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -20,16 +20,16 @@ class OrX extends AbstractComposite
      *
      * Build the query filter expression.
      *
-     * @param QueryExpressionFactoryInterface $factory
+     * @param QueryBuilderInterface $queryBuilder
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory): string
+    public function build(QueryBuilderInterface $queryBuilder): string
     {
         $orX = (new Expr())->orX();
 
         foreach($this->queryFilters as $queryFilter) {
-            $orX->add($queryFilter->build($factory));
+            $orX->add($queryFilter->build($queryBuilder));
         }
 
         return (string) $orX;

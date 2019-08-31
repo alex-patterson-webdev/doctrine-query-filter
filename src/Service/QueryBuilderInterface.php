@@ -82,70 +82,108 @@ interface QueryBuilderInterface
     /**
      * join
      *
-     * @param string                          $spec
-     * @param string                          $alias
-     * @param QueryExpressionInterface|string $conditions
-     * @param array                           $options
+     * @param string  $type
+     * @param string  $join
+     * @param string  $alias
+     * @param mixed   $conditions
+     * @param array   $options
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function join(string $spec, string $alias, $conditions, array $options = []) : self;
+    public function join(string $type, string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface;
+
+    /**
+     * leftJoin
+     *
+     * @param string  $join
+     * @param string  $alias
+     * @param mixed   $conditions
+     * @param array   $options
+     *
+     * @return $this
+     *
+     * @throws QueryBuilderException
+     */
+    public function leftJoin(string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface;
+
+    /**
+     * innerJoin
+     *
+     * @param string  $join
+     * @param string  $alias
+     * @param mixed   $conditions
+     * @param array   $options
+     *
+     * @return $this
+     *
+     * @throws QueryBuilderException
+     */
+    public function innerJoin(string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface;
 
     /**
      * where
      *
      * Set the where query expression.
      *
-     * @param QueryExpressionInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $expression
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function where($queryFilter) : QueryBuilderInterface;
+    public function where($expression) : QueryBuilderInterface;
 
     /**
      * andWhere
      *
      * Append a new where query expression to the collection.
      *
-     * @param QueryExpressionInterface|string $queryFilter
+     * @param QueryExpressionInterface|string $expression
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
-    public function andWhere($queryFilter) : QueryBuilderInterface;
+    public function andWhere($expression) : QueryBuilderInterface;
 
     /**
-     * limit
+     * having
      *
-     * Add a limit query expression.
+     * @param $expression
      *
-     * @param int      $limit
-     * @param null|int $offset
-     *
-     * @return $this
-     *
-     * @throws QueryBuilderException
+     * @return QueryBuilderInterface
      */
-    public function limit(int $limit, int $offset = null) : QueryBuilderInterface;
+    public function having($expression) : QueryBuilderInterface;
 
     /**
-     * offset
+     * orderBy
      *
-     * Add an offset query express.
+     * @param string $field
+     * @param string $direction
      *
-     * @param integer      $offset
-     * @param null|integer $limit
+     * @return QueryBuilderInterface
+     */
+    public function orderBy(string $field, string $direction = null) : QueryBuilderInterface;
+
+    /**
+     * setFirstResult
+     *
+     * @param int|null $firstResult
      *
      * @return $this
-     *
-     * @throws QueryBuilderException
      */
-    public function offset(int $offset, int $limit = null) : QueryBuilderInterface;
+    public function setFirstResult(int $firstResult = null) : QueryBuilderInterface;
+
+    /**
+     * setMaxResults
+     *
+     * @param int|null $maxResults
+     *
+     * @return $this
+     */
+    public function setMaxResults(int $maxResults = null) : QueryBuilderInterface;
 
     /**
      * getAlias
@@ -155,18 +193,6 @@ interface QueryBuilderInterface
      * @return string
      */
     public function getAlias() : string;
-
-    /**
-     * getAliasFieldName
-     *
-     * Return a field name string with the desired alias prepended.
-     *
-     * @param string      $fieldName
-     * @param string|null $alias
-     *
-     * @return string
-     */
-    public function getAliasFieldName(string $fieldName, string $alias = null) : string;
 
     /**
      * getAliases
@@ -186,11 +212,9 @@ interface QueryBuilderInterface
      * @param mixed        $value  The value of the parameter.
      * @param string|null  $type   Optional parameter type string.
      *
-     * @return string
-     *
-     * @throws QueryBuilderException
+     * @return $this
      */
-    public function setParameter($name, $value, $type = null) : string;
+    public function setParameter(string $name, $value, $type = null) : QueryBuilderInterface;
 
     /**
      * setParameters
@@ -199,11 +223,9 @@ interface QueryBuilderInterface
      *
      * @param array $params  The new parameters collection to set.
      *
-     * @return array
-     *
-     * @throws QueryBuilderException
+     * @return $this
      */
-    public function setParameters(array $params) : array;
+    public function setParameters(array $params) : QueryBuilderInterface;
 
     /**
      * getQuery

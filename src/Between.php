@@ -53,11 +53,11 @@ class Between implements QueryExpressionInterface
      *
      * Build the query filter expression.
      *
-     * @param QueryExpressionFactoryInterface $factory
+     * @param QueryBuilderInterface $queryBuilder
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory): string
+    public function build(QueryBuilderInterface $queryBuilder): string
     {
         return (string) (new Expr())->between($this->fieldName, $this->a, $this->b);
     }

@@ -2,10 +2,14 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
+use Arp\DoctrineQueryFilter\From;
+use Arp\DoctrineQueryFilter\Having;
+use Arp\DoctrineQueryFilter\Join;
 use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\Select;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
-use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
-use Doctrine\ORM\Query\Expr;
+use Arp\DoctrineQueryFilter\Where;
+use Doctrine\ORM\EntityManager;
 use Exception;
 
 /**
@@ -17,11 +21,42 @@ use Exception;
 class QueryBuilder implements QueryBuilderInterface
 {
     /**
-     * $queryBuilder
+     * $entityManager
      *
-     * @var DoctrineQueryBuilder
+     * @var EntityManager
      */
-    protected $queryBuilder;
+    protected $entityManager;
+
+    /**
+     * $dqlParts
+     *
+     * @var QueryExpressionInterface[]
+     */
+    protected $dqlParts = [
+        'distinct' => false,
+        'delete'   => [],
+        'update'   => [],
+        'select'   => [],
+        'from'     => [],
+        'join'     => [],
+        'where'    => [],
+        'having'   => [],
+        'order_by' => [],
+    ];
+
+    /**
+     * $queryType
+     *
+     * @var string
+     */
+    protected $queryType;
+
+    /**
+     * $parameters
+     *
+     * @var array
+     */
+    protected $parameters = [];
 
     /**
      * $filterFactory
@@ -31,14 +66,28 @@ class QueryBuilder implements QueryBuilderInterface
     protected $expressionFactory;
 
     /**
+     * $maxResults
+     *
+     * @var integer|null
+     */
+    protected $maxResults;
+
+    /**
+     * $firstResult
+     *
+     * @var integer|null
+     */
+    protected $firstResult;
+
+    /**
      * __construct
      *
-     * @param DoctrineQueryBuilder            $queryBuilder
+     * @param EntityManager                   $entityManager
      * @param QueryExpressionFactoryInterface $expressionFactory
      */
-    public function __construct(DoctrineQueryBuilder $queryBuilder, QueryExpressionFactoryInterface $expressionFactory)
+    public function __construct(EntityManager $entityManager, QueryExpressionFactoryInterface $expressionFactory)
     {
-        $this->queryBuilder  = $queryBuilder;
+        $this->entityManager     = $entityManager;
         $this->expressionFactory = $expressionFactory;
     }
 
@@ -51,63 +100,78 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function getDQL() : string
     {
-        return $this->queryBuilder->getDQL();
+        $dql = '';
+
+        switch ($this->queryType) {
+            case 'SELECT' :
+                $dql = $this->createSelectDQL();
+            break;
+        }
+
+        return $dql;
     }
 
     /**
-     * configure
+     * createSelectDQL
      *
-     * Configure the query builder instance.
-     *
-     * @param array $options  The configuration options to set.
-     *
-     * @return $this
-     *
-     * @throws QueryBuilderException
+     * @return string
      */
-    public function configure(array $options = []) : QueryBuilderInterface
+    protected function createSelectDQL()
     {
-        if (! empty($options)) {
+        $dql = 'SELECT';
 
-            try {
-                foreach ($options as $name => $value) {
-                    switch ($name) {
+        if (isset($this->dqlParts['distinct']) && true === $this->dqlParts['distinct']) {
+            $dql .= 'DISTINCT';
+        }
 
-                        case 'limit' :
-                            $this->limit($value);
-                        break;
+        /** @var Select $expression */
+        $selectParts = [];
+        foreach ($this->dqlParts['select'] as $expression) {
+            $selectParts[] = $expression->build($this);
+        }
+        $dql .= implode(', ', $selectParts);
+        $dql .= ' FROM ';
 
-                        case 'offset' :
-                            $this->offset($value);
-                        break;
+        /** @var From $expression */
+        foreach($this->dqlParts['from'] as $expression) {
+            $dql .= $expression->build($this);
+        }
 
-                        case 'order_by' :
-                            if (is_array($value)) {
-                                foreach ($value as $fieldName => $direction) {
-                                    $this->queryBuilder->orderBy($fieldName, $direction);
-                                }
-                            }
-                        break;
-                    }
-                }
-            }
-            catch (QueryBuilderException $e) {
-                throw $e;
-            }
-            catch(\Exception $e) {
-
-                throw new QueryBuilderException(
-                    sprintf(
-                        'Unable to configure query builder : %s',
-                        $e->getMessage()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+        if (! empty($this->dqlParts['join'])) {
+            /** @var Join $expression */
+            foreach($this->dqlParts['join'] as $expression) {
+                $dql .= $expression->build($this);
             }
         }
 
-        return $this;
+        if (! empty($this->dqlParts['where'])) {
+            $dql .= ' WHERE ';
+
+            /** @var QueryExpressionInterface $expression */
+            foreach($this->dqlParts['where'] as $expression) {
+                $dql .= $expression->build($this);
+            }
+        }
+
+        if (! empty($this->dqlParts['having'])) {
+            $dql .= ' HAVING ';
+
+            /** @var QueryExpressionInterface $expression */
+            foreach($this->dqlParts['having'] as $expression) {
+                $dql .= $expression->build($this);
+            }
+        }
+
+        if (! empty($this->dqlParts['order_by'])) {
+            $dql .= ' ORDER BY ';
+
+            /** @var QueryExpressionInterface $expression */
+            foreach($this->dqlParts['order_by'] as $expression) {
+                $dql .= $expression->build($this);
+            }
+        }
+
+        return $dql;
     }
 
     /**
@@ -135,22 +199,11 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function select($spec) : QueryBuilderInterface
     {
-        try {
-            $this->queryBuilder->select($spec);
-        }
-        catch(\Exception $e) {
+        $this->queryType = 'SELECT';
 
-            throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
-        }
+        $this->dqlParts['select'] = [];
 
-        return $this;
+        return $this->addSelect($spec);
     }
 
     /**
@@ -166,8 +219,12 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function addSelect($spec) : QueryBuilderInterface
     {
+        if (empty($this->queryType)) {
+            $this->queryType = 'SELECT';
+        }
+
         try {
-            $this->queryBuilder->addSelect($spec);
+            $this->dqlParts['select'][] = $this->expr()->create(Select::class, func_get_args());
         }
         catch(Exception $e) {
 
@@ -197,10 +254,29 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function from($spec, string $alias, array $options = []) : QueryBuilderInterface
     {
+        $this->dqlParts['from'] = [];
+
+        return $this->addFrom($spec, $alias, $options);
+    }
+
+    /**
+     * addFrom
+     *
+     * Add a condition
+     *
+     * @param string $spec
+     * @param string $alias
+     * @param array  $options
+     *
+     * @return QueryBuilderInterface
+     * @throws QueryBuilderException
+     */
+    public function addFrom(string $spec, string $alias, array $options) : QueryBuilderInterface
+    {
         $indexBy = isset($options['index_by']) ? $options['index_by'] : null;
 
         try {
-            $this->queryBuilder->from($spec, $alias, $indexBy);
+            $this->dqlParts['from'][] = $this->expr()->create(From::class, [$spec, $alias, $indexBy]);
         }
         catch(Exception $e) {
 
@@ -218,9 +294,26 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * join
+     * innerJoin
      *
-     * @param string  $spec
+     * @param string $join
+     * @param string $alias
+     * @param null   $conditions
+     * @param array  $options
+     *
+     * @return $this
+     *
+     * @throws QueryBuilderException
+     */
+    public function innerJoin(string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
+    {
+        return $this->join(Join::JOIN_INNER, $join, $alias, $conditions, $options);
+    }
+
+    /**
+     * leftJoin
+     *
+     * @param string  $join
      * @param string  $alias
      * @param mixed   $conditions
      * @param array   $options
@@ -229,31 +322,28 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @throws QueryBuilderException
      */
-    public function join(string $spec, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
+    public function leftJoin(string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
     {
-        $indexBy = isset($options['index_by']) ? $options['index_by'] : null;
-        $type    = isset($options['type'])     ? $options['type']     : Expr\Join::WITH;
+        return $this->join(Join::JOIN_LEFT, $join, $alias, $conditions, $options);
+    }
 
+    /**
+     * join
+     *
+     * @param string  $type
+     * @param string  $join
+     * @param string  $alias
+     * @param mixed   $conditions
+     * @param array   $options
+     *
+     * @return $this
+     *
+     * @throws QueryBuilderException
+     */
+    public function join(string $type, string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
+    {
         try {
-            if (isset($conditions) && ! is_string($conditions)) {
-                $conditions = $this->expressionFactory->create($conditions);
-            }
-
-            if ($conditions instanceof QueryExpressionInterface) {
-                $conditions = $conditions->build($this->expressionFactory);
-            }
-
-            if (! is_string($conditions) || empty($conditions)) {
-                $conditions = null;
-            }
-
-            $this->queryBuilder->join(
-                $spec,
-                $alias,
-                $type,
-                $conditions,
-                $indexBy
-            );
+            $this->dqlParts['join'][$alias] = $this->expr()->create(Join::class, [$type, $join, $alias, $conditions]);
         }
         catch(Exception $e) {
 
@@ -283,32 +373,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function where($spec) : QueryBuilderInterface
     {
-        try {
-            if (! is_string($spec)) {
-                $spec = $this->expressionFactory->create($spec);
-            }
+        $this->dqlParts['where'] = [];
 
-            if ($spec instanceof QueryExpressionInterface) {
-                $spec = $spec->build($this->expressionFactory);
-            }
-
-            if (! empty($spec)) {
-                $this->queryBuilder->where($spec);
-            }
-        }
-        catch(Exception $e) {
-
-            throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
-        }
-
-        return $this;
+        return $this->andWhere($spec);
     }
 
     /**
@@ -325,17 +392,7 @@ class QueryBuilder implements QueryBuilderInterface
     public function andWhere($spec) : QueryBuilderInterface
     {
         try {
-            if (! is_string($spec)) {
-                $spec = $this->expressionFactory->create($spec);
-            }
-
-            if ($spec instanceof QueryExpressionInterface) {
-                $spec = $spec->build($this->expressionFactory);
-            }
-
-            if (! empty($spec)) {
-                $this->queryBuilder->where($spec);
-            }
+            $this->dqlParts['where'][] = $this->expr()->create(Where::class, func_get_args());
         }
         catch(Exception $e) {
 
@@ -353,29 +410,18 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * limit
+     * having
      *
-     * Add a limit query expression.
+     * @param mixed $expression
      *
-     * @param int      $limit
-     * @param null|int $offset
-     *
-     * @return $this
+     * @return QueryBuilderInterface
      *
      * @throws QueryBuilderException
      */
-    public function limit(int $limit, int $offset = null) : QueryBuilderInterface
+    public function having($expression) : QueryBuilderInterface
     {
         try {
-            $this->queryBuilder->setMaxResults($limit);
-
-            if ($offset) {
-                $this->offset($offset);
-            }
-
-        }
-        catch (QueryBuilderException $e) {
-            throw $e;
+            $this->dqlParts['having'][] = $this->expr()->create(Having::class, func_get_args());
         }
         catch(Exception $e) {
 
@@ -393,42 +439,42 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * offset
+     * orderBy
      *
-     * Add an offset query express.
+     * @param string $field
+     * @param string $direction
      *
-     * @param integer      $offset
-     * @param null|integer $limit
+     * @return QueryBuilderInterface
+     */
+    public function orderBy(string $field, string $direction = null) : QueryBuilderInterface
+    {
+
+    }
+
+    /**
+     * setFirstResult
+     *
+     * @param int|null $firstResult
      *
      * @return $this
-     *
-     * @throws QueryBuilderException
      */
-    public function offset(int $offset, int $limit = null) : QueryBuilderInterface
+    public function setFirstResult(int $firstResult = null) : QueryBuilderInterface
     {
-        try {
-            $this->queryBuilder->setFirstResult($offset);
+        $this->firstResult = $firstResult;
 
-            if ($limit) {
-                $this->limit($limit);
-            }
+        return $this;
+    }
 
-        }
-        catch (QueryBuilderException $e) {
-            throw $e;
-        }
-        catch(Exception $e) {
-
-            throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
-        }
-
+    /**
+     * setMaxResults
+     *
+     * @param int|null $maxResults
+     *
+     * @return $this
+     */
+    public function setMaxResults(int $maxResults = null) : QueryBuilderInterface
+    {
+        $this->maxResults = $maxResults;
 
         return $this;
     }
@@ -456,7 +502,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function getAliases() : array
     {
-        return $this->queryBuilder->getRootAliases();
+        return [];
     }
 
     /**
@@ -468,30 +514,13 @@ class QueryBuilder implements QueryBuilderInterface
      * @param mixed        $value  The value of the parameter.
      * @param string|null  $type   Optional parameter type string.
      *
-     * @return string
-     *
-     * @throws QueryBuilderException
+     * @return $this
      */
-    public function setParameter($name, $value, $type = null) : string
+    public function setParameter(string $name, $value, $type = null) : QueryBuilderInterface
     {
-        $key = $this->createParameterKey($name);
+       $this->parameters[$name] = compact('name', 'value', 'type');
 
-        try {
-            $this->queryBuilder->setParameter($key, $value, $type);
-        }
-        catch(Exception $e) {
-
-            throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
-        }
-
-        return ':' . $key;
+       return $this;
     }
 
     /**
@@ -501,19 +530,17 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @param array $params  The new parameters collection to set.
      *
-     * @return array
-     *
-     * @throws QueryBuilderException
+     * @return $this
      */
-    public function setParameters(array $params) : array
+    public function setParameters(array $params) : QueryBuilderInterface
     {
-        $keys = [];
+        $this->parameters = [];
 
-        foreach($params as $name => $param) {
-            $keys[$name] = $this->setParameter($name, $param);
+        foreach($params as $name => $value) {
+            $this->setParameter($name, $value);
         }
 
-        return $keys;
+        return $this;
     }
 
     /**
@@ -529,12 +556,29 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function getQuery(array $options = []) : QueryInterface
     {
-        if (! empty($options)) {
-            $this->configure($options);
-        }
-
         try {
-            return new Query($this->queryBuilder->getQuery());
+            $query = $this->entityManager->createQuery($this->getDQL());
+
+            foreach ($this->parameters as $parameter) {
+
+                if (isset($parameter['name'], $parameter['value'])) {
+                    $query->setParameter(
+                        $parameter['name'],
+                        $parameter['value'],
+                        (isset($parameter['type']) ? $parameter['type'] : null)
+                    );
+                }
+            }
+
+            if (isset($this->firstResult)) {
+                $query->setFirstResult($this->firstResult);
+            }
+
+            if (isset($this->maxResults)) {
+                $query->setMaxResults($this->maxResults);
+            }
+
+            return new Query($query, $options);
         }
         catch(Exception $e) {
 
@@ -550,21 +594,44 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * createParameterKey
+     * configure
      *
-     * Create a new key to use as a placeholder for a parameter value.
+     * Configure the query builder instance.
      *
-     * @param string $name  The key name or index.
+     * @param array $options  The configuration options to set.
      *
-     * @return string|int
+     * @return $this
+     *
+     * @throws QueryBuilderException
      */
-    protected function createParameterKey($name)
+    public function configure(array $options = []) : QueryBuilderInterface
     {
-        if (is_int($name)) {
-            return $name;
+        try {
+            foreach ($options as $name => $value) {
+                switch ($name) {
+                    case 'first_result' :
+                        $this->setFirstResult($value);
+                    break;
+
+                    case 'max_results' :
+                        $this->setMaxResults($value);
+                    break;
+                }
+            }
+        }
+        catch(\Exception $e) {
+
+            throw new QueryBuilderException(
+                sprintf(
+                    'Unable to configure query builder : %s',
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
         }
 
-        return uniqid($name);
+        return $this;
     }
 
 }

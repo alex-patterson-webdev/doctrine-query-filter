@@ -18,11 +18,11 @@ class GreaterThanOrEqual extends AbstractExpression
      *
      * Build the query filter expression.
      *
-     * @param QueryExpressionFactoryInterface $factory
+     * @param QueryBuilderInterface $queryBuilder
      *
      * @return string
      */
-    public function build(QueryExpressionFactoryInterface $factory) : string
+    public function build(QueryBuilderInterface $queryBuilder): string
     {
         return (new Expr())->gte($this->a, $this->b);
     }
