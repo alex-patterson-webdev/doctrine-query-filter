@@ -3,7 +3,7 @@
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\AndX;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -17,7 +17,7 @@ class AndXTest extends AbstractQueryFilterTest
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the class implements QueryExpressionInterface.
+     * Ensure that the class implements QueryFilterInterface.
      *
      * @test
      */
@@ -25,7 +25,7 @@ class AndXTest extends AbstractQueryFilterTest
     {
         $filter = new AndX();
 
-        $this->assertInstanceOf(QueryExpressionInterface::class, $filter);
+        $this->assertInstanceOf(QueryFilterInterface::class, $filter);
     }
 
     /**
@@ -38,13 +38,13 @@ class AndXTest extends AbstractQueryFilterTest
      */
     public function testBuild()
     {
-        /** @var QueryExpressionInterface[]|MockObject[] $filters */
+        /** @var QueryFilterInterface[]|MockObject[] $filters */
         $filters = [
-            $this->getMockForAbstractClass(QueryExpressionInterface::class),
-            $this->getMockForAbstractClass(QueryExpressionInterface::class),
-            $this->getMockForAbstractClass(QueryExpressionInterface::class),
-            $this->getMockForAbstractClass(QueryExpressionInterface::class),
-            $this->getMockForAbstractClass(QueryExpressionInterface::class),
+            $this->getMockForAbstractClass(QueryFilterInterface::class),
+            $this->getMockForAbstractClass(QueryFilterInterface::class),
+            $this->getMockForAbstractClass(QueryFilterInterface::class),
+            $this->getMockForAbstractClass(QueryFilterInterface::class),
+            $this->getMockForAbstractClass(QueryFilterInterface::class),
         ];
 
         $andXFilter = new AndX(...$filters);
@@ -69,7 +69,7 @@ class AndXTest extends AbstractQueryFilterTest
 
         $expressionsString = implode(' AND ', $expressions);
 
-        $result = $andXFilter->build($this->queryBuilder);
+        $result = $andXFilter->filter($this->queryBuilder,);
 
         $this->assertTrue(is_string($result));
         $this->assertEquals($expressionsString, $result);
@@ -86,7 +86,7 @@ class AndXTest extends AbstractQueryFilterTest
     {
         $queryFilter = new AndX;
 
-        $this->assertSame('', $queryFilter->build($this->queryBuilder));
+        $this->assertSame('', $queryFilter->filter($this->queryBuilder,));
     }
 
 }

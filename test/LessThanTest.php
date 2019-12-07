@@ -3,7 +3,7 @@
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\LessThan;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -19,7 +19,7 @@ class LessThanTest extends AbstractQueryFilterTest
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the filter implements QueryExpressionInterface
+     * Ensure that the filter implements QueryFilterInterface
      *
      * @test
      */
@@ -27,7 +27,7 @@ class LessThanTest extends AbstractQueryFilterTest
     {
         $filter = new LessThan(1, 2);
 
-        $this->assertInstanceOf(QueryExpressionInterface::class, $filter);
+        $this->assertInstanceOf(QueryFilterInterface::class, $filter);
     }
 
     /**
@@ -44,7 +44,7 @@ class LessThanTest extends AbstractQueryFilterTest
     {
         $filter = new LessThan($a, $b);
 
-        $result = $filter->build($this->queryBuilder);
+        $result = $filter->filter($this->queryBuilder,);
 
         $this->assertTrue(is_string($result));
         $this->assertEquals($expected, $result);

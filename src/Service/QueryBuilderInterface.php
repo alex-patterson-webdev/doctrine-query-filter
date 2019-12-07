@@ -2,8 +2,9 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
+use Doctrine\ORM\Query\Expr;
 
 /**
  * QueryBuilderInterface
@@ -14,33 +15,29 @@ use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
 interface QueryBuilderInterface
 {
     /**
-     * getDQL
+     * getDoctrineQueryBuilder
      *
-     * Return the DQL string representation.
-     *
-     * @return string
+     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getDQL() : string;
+    public function getDoctrineQueryBuilder() : \Doctrine\ORM\QueryBuilder;
 
     /**
-     * configure
-     *
-     * Configure the query builder instance.
-     *
-     * @param array $options  The configuration options to set.
-     *
-     * @return $this
-     */
-    public function configure(array $options = []) : QueryBuilderInterface;
-
-    /**
-     * expr
+     * getFilterFactory
      *
      * Return the query expression factory.
      *
-     * @return QueryExpressionFactoryInterface
+     * @return QueryFilterFactoryInterface
      */
-    public function expr() : QueryExpressionFactoryInterface;
+    public function getFilterFactory() : QueryFilterFactoryInterface;
+
+    /**
+     * $expr
+     *
+     * Return the expression builder for Doctrine ORM.
+     *
+     * @return Expr
+     */
+    public function expr() : Expr;
 
     /**
      * select
@@ -127,7 +124,7 @@ interface QueryBuilderInterface
      *
      * Set the where query expression.
      *
-     * @param QueryExpressionInterface|string $expression
+     * @param QueryFilterInterface|string $expression
      *
      * @return $this
      *
@@ -140,13 +137,26 @@ interface QueryBuilderInterface
      *
      * Append a new where query expression to the collection.
      *
-     * @param QueryExpressionInterface|string $expression
+     * @param QueryFilterInterface|string $expression
      *
      * @return $this
      *
      * @throws QueryBuilderException
      */
     public function andWhere($expression) : QueryBuilderInterface;
+
+    /**
+     * orWhere
+     *
+     * Append a new where query expression to the collection.
+     *
+     * @param QueryFilterInterface|string $expression
+     *
+     * @return $this
+     *
+     * @throws QueryBuilderException
+     */
+    public function orWhere($expression) : QueryBuilderInterface;
 
     /**
      * having
@@ -239,5 +249,16 @@ interface QueryBuilderInterface
      * @throws QueryBuilderException
      */
     public function getQuery(array $options = []) : QueryInterface;
+
+    /**
+     * configure
+     *
+     * Configure the query builder instance.
+     *
+     * @param array $options  The configuration options to set.
+     *
+     * @return $this
+     */
+    public function configure(array $options = []) : QueryBuilderInterface;
 
 }

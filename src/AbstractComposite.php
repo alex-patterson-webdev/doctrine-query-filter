@@ -10,31 +10,35 @@ namespace Arp\DoctrineQueryFilter;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-abstract class AbstractComposite implements QueryExpressionInterface
+abstract class AbstractComposite extends AbstractQueryFilter
 {
     /**
      * $queryFilters
      *
-     * @var QueryExpressionInterface[]
+     * @var QueryFilterInterface[]
      */
     protected $queryFilters;
 
     /**
-     * __construct
+     * addMultiple
      *
-     * @param array ...$queryFilters
+     * Add multiple query filters to the collection.
+     *
+     * @param array $queryFilters
      */
-    public function __construct(...$queryFilters)
+    public function addMultiple(array $queryFilters)
     {
-        $this->queryFilters = $queryFilters;
+        foreach($queryFilters as $queryFilter) {
+            $this->add($queryFilter);
+        }
     }
 
     /**
      * add
      *
-     * @param QueryExpressionInterface $queryFilter
+     * @param QueryFilterInterface $queryFilter
      */
-    public function add(QueryExpressionInterface $queryFilter)
+    public function add(QueryFilterInterface $queryFilter)
     {
         $this->queryFilters[] = $queryFilter;
     }

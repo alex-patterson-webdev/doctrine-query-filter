@@ -11,7 +11,7 @@ use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Where implements QueryExpressionInterface
+class Where implements QueryFilterInterface
 {
     /**
      * $spec
@@ -37,17 +37,19 @@ class Where implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      *
      * @throws QueryExpressionFactoryException
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         if (count($this->spec) !== 1 || ! $this->spec instanceof AbstractComposite) {
             $this->spec = $queryBuilder->expr()->andX(...$this->spec);
         }
 
-        return $this->spec->build($queryBuilder);
+        return $this->spec->filter($queryBuilder, $criteria);
     }
 
 }

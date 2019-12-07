@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
 
 /**
  * FieldName
@@ -10,7 +10,7 @@ use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class FieldName implements QueryExpressionInterface
+class FieldName implements QueryFilterInterface
 {
     /**
      * $fieldName
@@ -45,9 +45,11 @@ class FieldName implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         if (empty($this->alias) || false !== strpos($this->fieldName, '.')) {
             return $this->fieldName;

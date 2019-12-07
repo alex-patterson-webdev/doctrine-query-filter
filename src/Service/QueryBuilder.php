@@ -2,14 +2,13 @@
 
 namespace Arp\DoctrineQueryFilter\Service;
 
+use Arp\DoctrineQueryFilter\Join;
 use Arp\DoctrineQueryFilter\From;
 use Arp\DoctrineQueryFilter\Having;
-use Arp\DoctrineQueryFilter\Join;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
-use Arp\DoctrineQueryFilter\Select;
-use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Where;
-use Doctrine\ORM\EntityManager;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
+use Doctrine\ORM\Query\Expr;
 use Exception;
 
 /**
@@ -21,169 +20,63 @@ use Exception;
 class QueryBuilder implements QueryBuilderInterface
 {
     /**
-     * $entityManager
+     * $queryBuilder
      *
-     * @var EntityManager
+     * @var \Doctrine\ORM\QueryBuilder
      */
-    protected $entityManager;
+    protected $queryBuilder;
 
     /**
-     * $dqlParts
+     * $queryFilterFactory
      *
-     * @var QueryExpressionInterface[]
+     * @var QueryFilterFactoryInterface
      */
-    protected $dqlParts = [
-        'distinct' => false,
-        'delete'   => [],
-        'update'   => [],
-        'select'   => [],
-        'from'     => [],
-        'join'     => [],
-        'where'    => [],
-        'having'   => [],
-        'order_by' => [],
-    ];
+    protected $queryFilterFactory;
 
     /**
-     * $queryType
+     * __construct.
      *
-     * @var string
+     * @param \Doctrine\ORM\QueryBuilder  $queryBuilder
+     * @param QueryFilterFactoryInterface $queryFilterFactory
      */
-    protected $queryType;
-
-    /**
-     * $parameters
-     *
-     * @var array
-     */
-    protected $parameters = [];
-
-    /**
-     * $filterFactory
-     *
-     * @var QueryExpressionFactoryInterface
-     */
-    protected $expressionFactory;
-
-    /**
-     * $maxResults
-     *
-     * @var integer|null
-     */
-    protected $maxResults;
-
-    /**
-     * $firstResult
-     *
-     * @var integer|null
-     */
-    protected $firstResult;
-
-    /**
-     * __construct
-     *
-     * @param EntityManager                   $entityManager
-     * @param QueryExpressionFactoryInterface $expressionFactory
-     */
-    public function __construct(EntityManager $entityManager, QueryExpressionFactoryInterface $expressionFactory)
+    public function __construct(\Doctrine\ORM\QueryBuilder $queryBuilder, QueryFilterFactoryInterface $queryFilterFactory)
     {
-        $this->entityManager     = $entityManager;
-        $this->expressionFactory = $expressionFactory;
+        $this->queryBuilder = $queryBuilder;
+        $this->queryFilterFactory = $queryFilterFactory;
     }
 
     /**
-     * getDQL
+     * getDoctrineQueryBuilder
      *
-     * Return the DQL string representation.
-     *
-     * @return string
+     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getDQL() : string
+    public function getDoctrineQueryBuilder() : \Doctrine\ORM\QueryBuilder
     {
-        $dql = '';
-
-        switch ($this->queryType) {
-            case 'SELECT' :
-                $dql = $this->createSelectDQL();
-            break;
-        }
-
-        return $dql;
+        return $this->queryBuilder;
     }
 
     /**
-     * createSelectDQL
+     * $expr
      *
-     * @return string
+     * Return the expression builder for Doctrine ORM.
+     *
+     * @return Expr
      */
-    protected function createSelectDQL()
+    public function expr() : Expr
     {
-        $dql = 'SELECT';
-
-        if (isset($this->dqlParts['distinct']) && true === $this->dqlParts['distinct']) {
-            $dql .= 'DISTINCT';
-        }
-
-        /** @var Select $expression */
-        $selectParts = [];
-        foreach ($this->dqlParts['select'] as $expression) {
-            $selectParts[] = $expression->build($this);
-        }
-        $dql .= implode(', ', $selectParts);
-        $dql .= ' FROM ';
-
-        /** @var From $expression */
-        foreach($this->dqlParts['from'] as $expression) {
-            $dql .= $expression->build($this);
-        }
-
-        if (! empty($this->dqlParts['join'])) {
-            /** @var Join $expression */
-            foreach($this->dqlParts['join'] as $expression) {
-                $dql .= $expression->build($this);
-            }
-        }
-
-        if (! empty($this->dqlParts['where'])) {
-            $dql .= ' WHERE ';
-
-            /** @var QueryExpressionInterface $expression */
-            foreach($this->dqlParts['where'] as $expression) {
-                $dql .= $expression->build($this);
-            }
-        }
-
-        if (! empty($this->dqlParts['having'])) {
-            $dql .= ' HAVING ';
-
-            /** @var QueryExpressionInterface $expression */
-            foreach($this->dqlParts['having'] as $expression) {
-                $dql .= $expression->build($this);
-            }
-        }
-
-        if (! empty($this->dqlParts['order_by'])) {
-            $dql .= ' ORDER BY ';
-
-            /** @var QueryExpressionInterface $expression */
-            foreach($this->dqlParts['order_by'] as $expression) {
-                $dql .= $expression->build($this);
-            }
-        }
-
-        return $dql;
+        return $this->queryBuilder->expr();
     }
 
     /**
-     * expr
+     * getFilterFactory
      *
      * Return the query expression factory.
      *
-     * @return QueryExpressionFactoryInterface
+     * @return QueryFilterFactoryInterface
      */
-    public function expr() : QueryExpressionFactoryInterface
+    public function getFilterFactory() : QueryFilterFactoryInterface
     {
-        return $this->expressionFactory;
+        return $this->queryFilterFactory;
     }
 
     /**
@@ -199,11 +92,19 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function select($spec) : QueryBuilderInterface
     {
-        $this->queryType = 'SELECT';
+        try {
+            $this->queryBuilder->select($spec);
+        }
+        catch (\Exception $e) {
 
-        $this->dqlParts['select'] = [];
+            throw new QueryBuilderException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
 
-        return $this->addSelect($spec);
+        return $this;
     }
 
     /**
@@ -219,20 +120,13 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function addSelect($spec) : QueryBuilderInterface
     {
-        if (empty($this->queryType)) {
-            $this->queryType = 'SELECT';
-        }
-
         try {
-            $this->dqlParts['select'][] = $this->expr()->create(Select::class, func_get_args());
+            $this->queryBuilder->addSelect($spec);
         }
-        catch(Exception $e) {
+        catch (\Exception $e) {
 
             throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
+                $e->getMessage(),
                 $e->getCode(),
                 $e
             );
@@ -254,37 +148,13 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function from($spec, string $alias, array $options = []) : QueryBuilderInterface
     {
-        $this->dqlParts['from'] = [];
-
-        return $this->addFrom($spec, $alias, $options);
-    }
-
-    /**
-     * addFrom
-     *
-     * Add a condition
-     *
-     * @param string $spec
-     * @param string $alias
-     * @param array  $options
-     *
-     * @return QueryBuilderInterface
-     * @throws QueryBuilderException
-     */
-    public function addFrom(string $spec, string $alias, array $options) : QueryBuilderInterface
-    {
-        $indexBy = isset($options['index_by']) ? $options['index_by'] : null;
-
         try {
-            $this->dqlParts['from'][] = $this->expr()->create(From::class, [$spec, $alias, $indexBy]);
+            $this->queryBuilder->from($spec, $alias, $options);
         }
-        catch(Exception $e) {
+        catch (\Exception $e) {
 
             throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
+                $e->getMessage(),
                 $e->getCode(),
                 $e
             );
@@ -342,16 +212,28 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function join(string $type, string $join, string $alias, $conditions = null, array $options = []) : QueryBuilderInterface
     {
-        try {
-            $this->dqlParts['join'][$alias] = $this->expr()->create(Join::class, [$type, $join, $alias, $conditions]);
+        $indexBy       = isset($options['index_by'])       ? $options['index_by']       : null;
+        $conditionType = isset($options['condition_type']) ? $options['condition_type'] : null;
+
+        if (isset($conditions)
+            && ! is_string($conditions)
+            && (! $conditions instanceof QueryFilterInterface)
+        ) {
+            $conditions = $this->factory()->create($conditions);
         }
-        catch(Exception $e) {
+
+        if ($conditions instanceof QueryFilterInterface) {
+            $conditions->filter($this,);
+        }
+
+        try {
+            $this->queryBuilder->join($join, $alias, $conditionType, $conditions, $indexBy);
+        }
+
+        catch (\Exception $e) {
 
             throw new QueryBuilderException(
-                sprintf(
-                    'Failed to add specification : %s',
-                    $e->getMessage()
-                ),
+                $e->getMessage(),
                 $e->getCode(),
                 $e
             );
@@ -373,9 +255,23 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function where($spec) : QueryBuilderInterface
     {
-        $this->dqlParts['where'] = [];
+        try {
+            if (isset($spec) && ! is_string($spec) && ! $spec instanceof QueryFilterInterface) {
+                $spec = $this->factory()->create($spec);
+            }
 
-        return $this->andWhere($spec);
+            if ($spec instanceof QueryFilterInterface) {
+                $spec->filter($this,);
+            }
+        }
+        catch (Exception $e) {
+
+            throw new QueryBuilderException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     /**

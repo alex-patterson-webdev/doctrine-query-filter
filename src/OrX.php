@@ -22,14 +22,16 @@ class OrX extends AbstractComposite
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         $orX = (new Expr())->orX();
 
         foreach($this->queryFilters as $queryFilter) {
-            $orX->add($queryFilter->build($queryBuilder));
+            $orX->add($queryFilter->filter($queryBuilder, $criteria));
         }
 
         return (string) $orX;

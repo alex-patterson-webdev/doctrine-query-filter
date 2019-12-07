@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr\Select as DoctrineSelect;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Select implements QueryExpressionInterface
+class Select implements QueryFilterInterface
 {
     /**
      * $spec
@@ -37,9 +37,11 @@ class Select implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder) : string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         return (string) (new DoctrineSelect($this->spec));
     }

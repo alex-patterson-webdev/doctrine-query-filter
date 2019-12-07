@@ -13,21 +13,21 @@ use Arp\DoctrineQueryFilter\LessThan;
 use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\IsNull;
 use Arp\DoctrineQueryFilter\IsNotNull;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryExpressionFactoryException;
 
 /**
- * QueryExpressionFactoryInterface
+ * QueryFilterFactoryInterface
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Service
  */
-interface QueryExpressionFactoryInterface
+interface QueryFilterFactoryInterface
 {
     /**
      * andX
      *
-     * @param QueryExpressionInterface[] ...$spec
+     * @param QueryFilterInterface[] ...$spec
      *
      * @return AndX
      *
@@ -38,7 +38,7 @@ interface QueryExpressionFactoryInterface
     /**
      * orX
      *
-     * @param QueryExpressionInterface[] ...$spec
+     * @param QueryFilterInterface[] ...$spec
      *
      * @return OrX
      *
@@ -161,10 +161,10 @@ interface QueryExpressionFactoryInterface
      * @param array  $args    The query filter's arguments.
      * @param array  $options The optional factory options.
      *
-     * @return QueryExpressionInterface
+     * @return QueryFilterInterface
      *
      * @throws QueryExpressionFactoryException
      */
-    public function create($spec, array $args = [], array $options = []) : QueryExpressionInterface;
+    public function create($spec, array $args = [], array $options = []) : QueryFilterInterface;
 
 }

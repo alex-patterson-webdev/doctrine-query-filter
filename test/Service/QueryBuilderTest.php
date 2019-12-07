@@ -2,10 +2,10 @@
 
 namespace ArpTest\Doctrine\QueryFilter;
 
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Service\QueryBuilder;
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,7 +29,7 @@ class QueryBuilderTest extends TestCase
     /**
      * $filterFactory
      *
-     * @var QueryExpressionFactoryInterface|MockObject
+     * @var QueryFilterFactoryInterface|MockObject
      */
     protected $filterFactory;
 
@@ -46,7 +46,7 @@ class QueryBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->filterFactory = $this->getMockForAbstractClass(QueryExpressionFactoryInterface::class);
+        $this->filterFactory = $this->getMockForAbstractClass(QueryFilterFactoryInterface::class);
     }
 
     /**
@@ -74,7 +74,7 @@ class QueryBuilderTest extends TestCase
 
         $result = $service->factory();
 
-        $this->assertInstanceOf(QueryExpressionFactoryInterface::class, $result);
+        $this->assertInstanceOf(QueryFilterFactoryInterface::class, $result);
         $this->assertSame($this->filterFactory, $result);
     }
 
@@ -168,8 +168,8 @@ class QueryBuilderTest extends TestCase
     {
         $service = new QueryBuilder($this->queryBuilder, $this->filterFactory);
 
-        /** @var QueryExpressionInterface|MockObject $queryFilter */
-        $queryFilter = $this->getMockForAbstractClass(QueryExpressionInterface::class);
+        /** @var QueryFilterInterface|MockObject $queryFilter */
+        $queryFilter = $this->getMockForAbstractClass(QueryFilterInterface::class);
 
         $dql = 'x != y AND z = 123';
 
@@ -214,8 +214,8 @@ class QueryBuilderTest extends TestCase
     {
         $service = new QueryBuilder($this->queryBuilder, $this->filterFactory);
 
-        /** @var QueryExpressionInterface|MockObject $queryFilter */
-        $queryFilter = $this->getMockForAbstractClass(QueryExpressionInterface::class);
+        /** @var QueryFilterInterface|MockObject $queryFilter */
+        $queryFilter = $this->getMockForAbstractClass(QueryFilterInterface::class);
 
         $dql = 'x != y AND z = 123';
 

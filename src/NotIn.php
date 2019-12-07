@@ -3,7 +3,7 @@
 namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -21,9 +21,11 @@ class NotIn extends AbstractFunction
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         return (string) (new Expr())->notIn($this->fieldName, $this->collection);
     }

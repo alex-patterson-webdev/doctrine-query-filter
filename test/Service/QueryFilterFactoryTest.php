@@ -2,9 +2,9 @@
 
 namespace ArpTest\Doctrine\QueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactory;
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
-use Arp\DoctrineQueryFilter\Service\QueryExpressionManager;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactory;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterManager;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,7 +18,7 @@ class QueryFilterFactoryTest extends TestCase
     /**
      * $filterManager
      *
-     * @var QueryExpressionManager|MockObject
+     * @var QueryFilterManager|MockObject
      */
     protected $filterManager;
 
@@ -29,7 +29,7 @@ class QueryFilterFactoryTest extends TestCase
      */
     public function setUp() : void
     {
-        $this->filterManager = $this->getMockBuilder(QueryExpressionManager::class)
+        $this->filterManager = $this->getMockBuilder(QueryFilterManager::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -41,9 +41,9 @@ class QueryFilterFactoryTest extends TestCase
      */
     public function testImplementsQueryFilterFactoryInterface()
     {
-        $factory = new QueryExpressionFactory($this->filterManager);
+        $factory = new QueryFilterFactory($this->filterManager);
 
-        $this->assertInstanceOf(QueryExpressionFactoryInterface::class, $factory);
+        $this->assertInstanceOf(QueryFilterFactoryInterface::class, $factory);
     }
 
 }

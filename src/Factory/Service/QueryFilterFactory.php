@@ -2,18 +2,18 @@
 
 namespace Arp\DoctrineQueryFilter\Factory\Service;
 
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\Stdlib\Exception\ServiceNotCreatedException;
 use Arp\Stdlib\Factory\AbstractFactory;
 use Interop\Container\ContainerInterface;
 
 /**
- * QueryExpressionFactory
+ * QueryFilterFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Factory\Service
  */
-class QueryExpressionFactory extends AbstractFactory
+class QueryFilterFactory extends AbstractFactory
 {
     /**
      * create
@@ -23,7 +23,7 @@ class QueryExpressionFactory extends AbstractFactory
      * @param array              $config        The optional factory configuration options.
      * @param string|null        $className     The name of the class that is being created.
      *
-     * @return QueryExpressionInterface
+     * @return QueryFilterInterface
      *
      * @throws ServiceNotCreatedException  If the service cannot be created.
      */

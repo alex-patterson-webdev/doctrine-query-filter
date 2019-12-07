@@ -3,7 +3,7 @@
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\IsNotNull;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 
 /**
  * IsNotNullTest
@@ -16,7 +16,7 @@ class IsNotNullTest extends AbstractQueryFilterTest
     /**
      * testImplementsQueryFilterInterface
      *
-     * Ensure that the filter implements QueryExpressionInterface
+     * Ensure that the filter implements QueryFilterInterface
      *
      * @test
      */
@@ -24,7 +24,7 @@ class IsNotNullTest extends AbstractQueryFilterTest
     {
         $filter = new IsNotNull('foo', 'f');
 
-        $this->assertInstanceOf(QueryExpressionInterface::class, $filter);
+        $this->assertInstanceOf(QueryFilterInterface::class, $filter);
     }
 
     /**
@@ -41,7 +41,7 @@ class IsNotNullTest extends AbstractQueryFilterTest
     {
         $filter = new IsNotNull($fieldName, $alias);
 
-        $result = $filter->build($this->queryBuilder);
+        $result = $filter->filter($this->queryBuilder,);
 
         $this->assertTrue(is_string($result));
         $this->assertEquals($expected, $result);

@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -20,9 +20,11 @@ class In extends AbstractFunction
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         $fieldName = empty($this->alias) ? $this->fieldName : $this->alias . '.' . $this->fieldName;
 

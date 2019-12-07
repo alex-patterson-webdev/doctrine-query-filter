@@ -2,9 +2,10 @@
 
 namespace Arp\DoctrineQueryFilter;
 
+use Arp\DoctrineQueryFilter\Service\Exception\InvalidOptionException;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryBuilderException;
+use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterException;
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
-use Doctrine\ORM\Query\Expr;
 
 /**
  * Equal
@@ -12,7 +13,7 @@ use Doctrine\ORM\Query\Expr;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Equal extends AbstractExpression
+class Equal extends AbstractQueryFilter
 {
     /**
      * build
@@ -21,11 +22,52 @@ class Equal extends AbstractExpression
      *
      * @param QueryBuilderInterface $queryBuilder
      *
-     * @return string
+     * @throws QueryFilterException
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder)
     {
-        return (string) (new Expr())->eq($this->a, $this->b);
+        $fieldName = $this->getOption('field_name');
+
+        if (empty($fieldName)) {
+            throw InvalidOptionException::missingOptionException('field_name', static::class);
+        }
+
+        $value = $this->getOption('value');
+
+        if (! isset($value)) {
+            throw InvalidOptionException::missingOptionException('value', static::class);
+        }
+
+        $where  = ($this->getOption('where', 'and') === 'and' ? 'and' : 'or');
+        $alias  = $this->getOption('alias', $queryBuilder->getAlias());
+        $format = $this->getOption('format');
+
+        $parameter = uniqid($alias);
+        $spec      = $queryBuilder->expr()->eq($alias . '.' . $fieldName, ':' . $parameter);
+
+        $queryBuilder->setParameter($parameter, $value, $format);
+
+        try {
+            if ('or' === $where) {
+                $queryBuilder->orWhere($spec);
+            }
+            else {
+                $queryBuilder->andWhere($spec);
+            }
+        }
+        catch (QueryBuilderException $e) {
+
+            throw new QueryFilterException(
+                sprintf(
+                    'Failed to apply \'%s\' condition in query filter \'%s\' : %s',
+                    $where,
+                    static::class,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
 }

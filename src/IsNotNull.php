@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class IsNotNull implements QueryExpressionInterface
+class IsNotNull implements QueryFilterInterface
 {
     /**
      * $fieldName
@@ -37,9 +37,11 @@ class IsNotNull implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         return (string) (new Expr())->isNotNull($this->fieldName);
     }

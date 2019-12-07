@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr\From as DoctrineFrom;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class From implements QueryExpressionInterface
+class From implements QueryFilterInterface
 {
     /**
      * $spec
@@ -55,9 +55,11 @@ class From implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         return (string) (new DoctrineFrom($this->spec, $this->alias, $this->indexBy));
     }

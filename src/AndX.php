@@ -2,6 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
+use Arp\DoctrineQueryFilter\Service\Exception\QueryFilterException;
 use Arp\DoctrineQueryFilter\Service\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr;
 
@@ -18,22 +19,48 @@ class AndX extends AbstractComposite
     /**
      * build
      *
-     * Build the query filter expression.
+     * Apply filtering to the provided query builder.
      *
-     * @param QueryBuilderInterface $queryBuilder
+     * @param QueryBuilderInterface $queryBuilder  The query filter
+     * @param array                 $criteria      The filtering criteria.
      *
-     * @return string
+     * @return void
+     *
+     * @throws QueryFilterException  If the query filtering cannot be applied
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
+        $conditions = empty($criteria['conditions']) ? $criteria['conditions'] : [];
+
+        if (! is_array($conditions)) {
+
+            throw new QueryFilterException(sprintf(
+                'The \'$conditions\' argument must be of type \'array\'; \'%s\' provided in \'%s\'.',
+                gettype($conditions),
+                __METHOD__
+            ));
+        }
+
+        $factory = $queryBuilder->getFilterFactory();
+
+        $andX = (new Expr())->andX();
+
+        foreach ($conditions as $filter) {
+            $queryFilter = $queryBuilder->getFilterFactory()->create($filter);
+
+            if ($queryFilter) {
+                $queryFilter->filter($queryBuilder);
+            }
+        }
+
+
         if (empty($this->queryFilters)) {
             return '';
         }
 
-        $andX = (new Expr())->andX();
 
         foreach($this->queryFilters as $queryFilter) {
-            $andX->add($queryFilter->build($queryBuilder));
+            $andX->add($queryFilter->filter($queryBuilder, $criteria));
         }
 
         return (string) $andX;

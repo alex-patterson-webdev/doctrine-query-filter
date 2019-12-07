@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr\Join as DoctrineJoin;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class Join implements QueryExpressionInterface
+class Join implements QueryFilterInterface
 {
     /**
      * @const
@@ -71,20 +71,17 @@ class Join implements QueryExpressionInterface
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         try {
+
             $conditions = empty($this->conditions) ? null : $this->conditions;
 
-            if (!empty($this->conditions) && !is_string($this->conditions)) {
-                $conditions = $queryBuilder->expr()->create($this->conditions);
-            }
 
-            if ($this->conditions instanceof QueryExpressionInterface) {
-                $conditions = $this->conditions->build($queryBuilder);
-            }
 
             $join = new DoctrineJoin(
                 $this->type,

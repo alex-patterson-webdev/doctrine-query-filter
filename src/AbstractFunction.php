@@ -10,7 +10,7 @@ namespace Arp\DoctrineQueryFilter;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-abstract class AbstractFunction implements QueryExpressionInterface
+abstract class AbstractFunction implements QueryFilterInterface
 {
     /**
      * $fieldName

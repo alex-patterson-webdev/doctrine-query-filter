@@ -2,7 +2,7 @@
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Service\QueryExpressionFactoryInterface;
+use Arp\DoctrineQueryFilter\Service\QueryFilterFactoryInterface;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Expr;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter
  */
-class NotEqual extends AbstractExpression
+class NotEqual extends AbstractFilter
 {
     /**
      * build
@@ -20,9 +20,11 @@ class NotEqual extends AbstractExpression
      *
      * @param QueryBuilderInterface $queryBuilder
      *
+     * @param array                 $criteria
+     *
      * @return string
      */
-    public function build(QueryBuilderInterface $queryBuilder): string
+    public function filter(QueryBuilderInterface $queryBuilder, array $criteria)
     {
         return (string) (new Expr())->neq($this->a, $this->b);
     }

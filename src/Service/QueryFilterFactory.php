@@ -14,30 +14,30 @@ use Arp\DoctrineQueryFilter\LessThan;
 use Arp\DoctrineQueryFilter\LessThanOrEqual;
 use Arp\DoctrineQueryFilter\NotEqual;
 use Arp\DoctrineQueryFilter\OrX;
-use Arp\DoctrineQueryFilter\QueryExpressionInterface;
+use Arp\DoctrineQueryFilter\QueryFilterInterface;
 use Arp\DoctrineQueryFilter\Service\Exception\QueryExpressionFactoryException;
 
 /**
- * QueryExpressionFactory
+ * QueryFilterFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Service
  */
-class QueryExpressionFactory implements QueryExpressionFactoryInterface
+class QueryFilterFactory implements QueryFilterFactoryInterface
 {
     /**
      * queryFilterManager
      *
-     * @var QueryExpressionManager
+     * @var QueryFilterManager
      */
     protected $expressionManager;
 
     /**
      * __construct
      *
-     * @param QueryExpressionManager $expressionManager
+     * @param QueryFilterManager $expressionManager
      */
-    public function __construct(QueryExpressionManager $expressionManager)
+    public function __construct(QueryFilterManager $expressionManager)
     {
         $this->expressionManager = $expressionManager;
     }
@@ -45,7 +45,7 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
     /**
      * andX
      *
-     * @param QueryExpressionInterface[] ...$spec
+     * @param QueryFilterInterface[] ...$spec
      *
      * @return AndX
      *
@@ -62,7 +62,7 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
     /**
      * orX
      *
-     * @param QueryExpressionInterface[] ...$spec
+     * @param QueryFilterInterface[] ...$spec
      *
      * @return OrX
      *
@@ -265,11 +265,11 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
      * @param array  $args    The query filter's arguments.
      * @param array  $options The optional factory options.
      *
-     * @return QueryExpressionInterface
+     * @return QueryFilterInterface
      *
      * @throws QueryExpressionFactoryException
      */
-    public function create($spec, array $args = [], array $options = []) : QueryExpressionInterface
+    public function create($spec, array $args = [], array $options = []) : QueryFilterInterface
     {
         $expression = null;
 
@@ -280,33 +280,36 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
 
             foreach ($specs as $index => $spec) {
 
-                if ($spec instanceof QueryExpressionInterface) {
-                    $expressions[] = $this->create($spec);
+                if ($spec instanceof QueryFilterInterface) {
+                    $expressions[] = $spec;
+                    continue;
+                }
+                elseif (! is_array($spec)) {
                     continue;
                 }
 
-                if (! isset($spec['name'])) {
+                if (! isset($spec['filter'])) {
 
                     throw new QueryExpressionFactoryException(sprintf(
-                        'Error for array index \'%d\'; query filter specification must define a \'name\'.',
+                        'Error for array index \'%d\'; query filter specification must define a \'filter\'.',
                         $index
                     ));
                 }
-                elseif (! is_string($spec['name'])) {
+                elseif (! is_string($spec['filter'])) {
 
                     throw new QueryExpressionFactoryException(sprintf(
-                        'Error for array index \'%d\'; query filter specification \'name\' must be a string.',
+                        'Error for array index \'%d\'; query filter specification \'filter\' must be a string.',
                         $index
                     ));
                 }
 
-                $args    = isset($spec['arguments']) ? $spec['arguments'] : [];
-                $options = isset($spec['options'])   ? $spec['options']   : [];
+                $filter = $spec['filter'];
+                unset($spec['filter']);
 
-                $expressions[] = $this->create($spec['name'], $args, $options);
+                $expressions[] = $this->create($filter, $spec, $options);
             }
 
-            $expression = $this->andX($expressions);
+            $expression = $this->andX(...$expressions);
         }
         elseif (is_string($spec)) {
 
@@ -318,8 +321,7 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
                 ));
             }
 
-            $name = $spec;
-            $spec = [
+            $config = [
                 'config' => [
                     'arguments' => $args,
                     'options'   => $options
@@ -327,14 +329,14 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
             ];
 
             try {
-                $expression = $this->expressionManager->build($name, $spec);
+                $expression = $this->expressionManager->build($spec, $config);
             }
             catch(\Exception $e) {
 
                 throw new QueryExpressionFactoryException(
                     sprintf(
                         'Unable to create new query filter \'%s\' : %s',
-                        $name,
+                        $spec,
                         $e->getMessage()
                     ),
                     $e->getCode(),
@@ -342,11 +344,11 @@ class QueryExpressionFactory implements QueryExpressionFactoryInterface
                 );
             }
         }
-        elseif ($spec instanceof QueryExpressionInterface) {
+        elseif ($spec instanceof QueryFilterInterface) {
             $expression = $spec;
         }
 
-        if (! $expression instanceof QueryExpressionInterface) {
+        if (! $expression instanceof QueryFilterInterface) {
 
             throw new QueryExpressionFactoryException(
                 'The query expression factory was unable to resolve the provided specification.'
