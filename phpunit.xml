@@ -1,16 +1,25 @@
-<phpunit bootstrap="./vendor/autoload.php" colors="true">
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="./vendor/autoload.php"
+        verbose="true"
+        beStrictAboutOutputDuringTests="true"
+        beStrictAboutTestsThatDoNotTestAnything="true"
+        beStrictAboutTodoAnnotatedTests="true"
+        colors="true"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+>
     <testsuites>
-
-        <testsuite name="DoctrineQueryFilter">
-            <directory>./test</directory>
+        <testsuite name="unit">
+            <directory>./test/unit</directory>
         </testsuite>
-
     </testsuites>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="false">
+    <coverage processUncoveredFiles="false">
+        <include>
             <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
-
+        </include>
+    </coverage>
+    <logging>
+        <testdoxXml outputFile="clover.xml"/>
+    </logging>
 </phpunit>

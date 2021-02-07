@@ -1,0 +1,23 @@
+language: php
+
+env:
+  global:
+    - COMPOSER_ARGS="-vvv --no-interaction --no-suggest"
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7.4
+
+    - php: 8.0
+      env:
+        - COMPOSER_ARGS="-vvv --no-interaction --no-suggest --ignore-platform-reqs"
+
+install:
+  - travis_retry composer install $COMPOSER_ARGS
+
+script:
+  - composer test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
