@@ -13,7 +13,7 @@ use Arp\DoctrineQueryFilter\QueryBuilderInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-final class Between extends AbstractFilter
+final class IsBetween extends AbstractFilter
 {
     /**
      * @param QueryBuilderInterface $queryBuilder

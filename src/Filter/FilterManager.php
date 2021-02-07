@@ -16,6 +16,33 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 class FilterManager implements FilterManagerInterface
 {
     /**
+     * @var array|string[]
+     */
+    private array $classMap = [
+        'eq' => IsEqual::class,
+        'neq' => IsNotEqual::class,
+        'gt' => IsGreaterThan::class,
+        'gte' => IsGreaterThanOrEqual::class,
+        'lt' => IsLessThan::class,
+        'lte' => IsLessThanOrEqual::class,
+        'isnull' => IsNull::class,
+        'memberof' => IsMemberOf::class,
+        'between' => IsBetween::class,
+        'andx' => AndX::class,
+        'orx' => OrX::class,
+        'leftjoin' => LeftJoin::class,
+        'innerjoin' => InnerJoin::class,
+    ];
+
+    /**
+     * @param array $classMap
+     */
+    public function __construct(array $classMap = [])
+    {
+        $this->classMap = empty($classMap) ? $this->classMap : $classMap;
+    }
+
+    /**
      * Create the $name query filter with the provided $options.
      *
      * @param QueryFilterManagerInterface $manager
@@ -28,17 +55,19 @@ class FilterManager implements FilterManagerInterface
      */
     public function create(QueryFilterManagerInterface $manager, string $name, array $options = []): FilterInterface
     {
-        if (!is_a($name, FilterInterface::class, true)) {
+        $className = $this->classMap[$name] ?? $name;
+
+        if (!is_a($className, FilterInterface::class, true)) {
             throw new QueryFilterException(
                 sprintf('The query filter \'%s\' must be an object which implements \'%s\'',
-                    $name,
+                    $className,
                     FilterInterface::class,
                 )
             );
         }
 
         try {
-            return new $name($manager);
+            return new $className($manager);
         } catch (\Throwable $e) {
             throw new QueryFilterException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
