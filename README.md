@@ -6,7 +6,7 @@
 
 ## About
 
-Provides query builder filtering functionality for Doctrine ORM.
+Query filtering components for Doctrine ORM.
 
 This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project.
 
