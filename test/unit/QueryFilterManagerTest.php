@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
+use Arp\DoctrineQueryFilter\Filter\FilterInterface;
+use Arp\DoctrineQueryFilter\Filter\IsEqual;
+use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
+use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -24,14 +32,14 @@ final class QueryFilterManagerTest extends TestCase
     /**
      * @var FilterFactoryInterface|MockObject
      */
-    private $filterManager;
+    private $filterFactory;
 
     /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
     {
-        $this->filterManager = $this->createMock(FilterFactoryInterface::class);
+        $this->filterFactory = $this->createMock(FilterFactoryInterface::class);
     }
 
     /**
@@ -39,7 +47,7 @@ final class QueryFilterManagerTest extends TestCase
      */
     public function testImplementsQueryFilterManagerInterface(): void
     {
-        $manager = new QueryFilterManager($this->filterManager);
+        $manager = new QueryFilterManager($this->filterFactory);
 
         $this->assertInstanceOf(QueryFilterManagerInterface::class, $manager);
     }
@@ -51,14 +59,170 @@ final class QueryFilterManagerTest extends TestCase
      */
     public function testFilterWillNotPerformFilteringWithoutFilterKey(): void
     {
-        $queryFilterManager = new QueryFilterManager($this->filterManager);
+        $manager = new QueryFilterManager($this->filterFactory);
 
         /** @var QueryBuilderInterface|MockObject $queryBuilder */
         $queryBuilder = $this->createMock(QueryBuilderInterface::class);
 
         $queryBuilder->expects($this->never())->method('getEntityManager');
 
-        $this->assertSame($queryBuilder, $queryFilterManager->filter($queryBuilder, 'Foo', []));
+        $this->assertSame($queryBuilder, $manager->filter($queryBuilder, 'Foo', []));
+    }
+
+    /**
+     * Assert that a QueryFilterManagerException is thrown if providing an invalid QueryBuilder instance to filter()
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testQueryFilterManagerExceptionIsThrownWhenProvidingAnInvalidQueryBuilderToFilter(): void
+    {
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        $invalidQueryBuilder = new \stdClass();
+        $entityName = 'EntityTestName';
+        $criteria = [];
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'The \'queryBuilder\' argument must be an object of type \'%s\' or \'%s\'; '
+                . '\'%s\' provided in \'%s\'',
+                QueryBuilderInterface::class,
+                DoctrineQueryBuilder::class,
+                is_object($invalidQueryBuilder) ? get_class($invalidQueryBuilder) : gettype($invalidQueryBuilder),
+                QueryFilterManager::class
+            )
+        );
+
+        /** @noinspection PhpParamsInspection */
+        $manager->filter($invalidQueryBuilder, $entityName, $criteria);
+    }
+
+    /**
+     * Assert that a QueryFilterManagerException is thrown when unable to apply the filters in applyFilter().
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testFailureToApplyFilterWillResultInQueryFilterManagerException(): void
+    {
+        /** @var FilterInterface[]|MockObject[] $filters */
+        $filters = [
+            $this->createMock(FilterInterface::class),
+            $this->createMock(FilterInterface::class),
+        ];
+
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        /** @var QueryBuilderInterface|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $entityName = 'TestClass';
+        $criteria = [
+            'filters' => $filters,
+        ];
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        /** @var ClassMetadata|MockObject $metadata */
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($metadata);
+
+        $exceptionMessage = 'This is a test filter exception message';
+        $exceptionCode = 999;
+        $filterException = new FilterException($exceptionMessage, $exceptionCode);
+
+        $filters[0]->expects($this->once())
+            ->method('filter')
+            ->with($queryBuilder, $this->isInstanceOf(MetadataInterface::class), [])
+            ->willThrowException($filterException);
+
+        $metadata->expects($this->once())
+            ->method('getName')
+            ->willReturn($entityName);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionCode($exceptionCode);
+        $this->expectExceptionMessage(
+            sprintf('Failed to apply query filter for entity \'%s\': %s', $entityName, $exceptionMessage)
+        );
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
+    }
+
+    /**
+     * Assert that the expected $criteria filters will be applyed when calling filter()
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testFilterApplyArrayFilterCriteria(): void
+    {
+        $filterData = [
+            [
+                'name' => IsEqual::class,
+                'field' => 'test',
+                'value' => 123,
+            ],
+            [
+                'name' => IsNotEqual::class,
+                'field' => 'test2',
+                'value' => 'Hello World!',
+            ],
+        ];
+
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        /** @var QueryBuilderInterface|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $entityName = 'TestClass';
+        $criteria = [
+            'filters' => $filterData,
+        ];
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        /** @var ClassMetadata|MockObject $metadata */
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($metadata);
+
+        $factoryArgs = $createdFilters = [];
+        foreach ($filterData as $data) {
+            /** @var FilterInterface|MockObject $createdFilter */
+            $createdFilter = $this->createMock(FilterInterface::class);
+
+            $factoryArgs[] = [$manager, $data['name'], $data['options'] ?? []];
+
+            $createdFilter->expects($this->once())
+                ->method('filter')
+                ->with($queryBuilder, $this->isInstanceOf(MetadataInterface::class), $data);
+
+            $createdFilters[] = $createdFilter;
+        }
+
+        $this->filterFactory->expects($this->exactly(count($filterData)))
+            ->method('create')
+            ->withConsecutive(...$factoryArgs)
+            ->willReturnOnConsecutiveCalls(...$createdFilters);
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
     }
 
     /**
@@ -68,7 +232,7 @@ final class QueryFilterManagerTest extends TestCase
      */
     public function testCreateFilterThrowsQueryFilterManagerExceptionIfUnableToCreateFilter(): void
     {
-        $manager = new QueryFilterManager($this->filterManager);
+        $manager = new QueryFilterManager($this->filterFactory);
 
         $name = 'FooFilterName';
         $options = [
@@ -80,7 +244,7 @@ final class QueryFilterManagerTest extends TestCase
         $exceptionCode = 123;
         $exception = new FilterFactoryException($exceptionMessage, $exceptionCode);
 
-        $this->filterManager->expects($this->once())
+        $this->filterFactory->expects($this->once())
             ->method('create')
             ->with($manager, $name, $options)
             ->willThrowException($exception);
