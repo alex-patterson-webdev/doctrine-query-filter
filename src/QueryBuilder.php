@@ -34,8 +34,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function createQueryBuilder(): QueryBuilderInterface
     {
-        $em = $this->queryBuilder->getEntityManager();
-        return new static($em->createQueryBuilder());
+        return new static($this->getEntityManager()->createQueryBuilder());
     }
 
     /**
