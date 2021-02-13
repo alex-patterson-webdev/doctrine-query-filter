@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
-use Arp\DoctrineQueryFilter\Filter\FilterInterface;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
+use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Metadata\Metadata;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Doctrine\ORM\EntityManager;
@@ -126,7 +126,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
 
             if (empty($filterName)) {
                 throw new QueryFilterManagerException(
-                    sprintf('The required \'name\' query filter configuration option is missing in \'%s\'', __METHOD__)
+                    sprintf('The required \'name\' configuration option is missing in \'%s\'', static::class)
                 );
             }
 

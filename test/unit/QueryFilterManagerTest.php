@@ -22,7 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\QueryFilterManager
+ * @covers  \Arp\DoctrineQueryFilter\QueryFilterManager
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\LaminasDoctrine
@@ -70,6 +70,53 @@ final class QueryFilterManagerTest extends TestCase
     }
 
     /**
+     * Assert that failure to create a entity metadata instance will result in a
+     * QueryFilterManagerException being thrown
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testFilterWillThrowQueryFilterManagerExceptionIfProvidedWithAnInvalidEntityName(): void
+    {
+        $entityName = 'Test';
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        $criteria = [
+            'filters' => [
+                [
+                    'name' => 'foo',
+                ],
+            ],
+        ];
+
+        /** @var DoctrineQueryBuilder|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(DoctrineQueryBuilder::class);
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        $exceptionMessage = 'This is an exception message';
+        $exceptionCode = 123;
+        $exception = new \Exception($exceptionMessage, $exceptionCode);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willThrowException($exception);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionCode($exceptionCode);
+        $this->expectExceptionMessage(
+            sprintf('Failed to fetch entity metadata for class \'%s\': %s', $entityName, $exceptionMessage),
+        );
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
+    }
+
+    /**
      * Assert that a QueryFilterManagerException is thrown if providing an invalid QueryBuilder instance to filter()
      *
      * @throws QueryFilterManagerException
@@ -96,6 +143,97 @@ final class QueryFilterManagerTest extends TestCase
 
         /** @noinspection PhpParamsInspection */
         $manager->filter($invalidQueryBuilder, $entityName, $criteria);
+    }
+
+    /**
+     * Assert that a QueryFilterManagerException if thrown when providing an array query filter specification that
+     * does not contain a 'name' property
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testMissingFilterNameWillThrowQueryFilterManagerException(): void
+    {
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        /** @var QueryBuilderInterface|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $entityName = 'TestClass';
+        $criteria = [
+            'filters' => [
+                [],
+            ],
+        ];
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        /** @var ClassMetadata|MockObject $metadata */
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($metadata);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionMessage(
+            sprintf('The required \'name\' configuration option is missing in \'%s\'', QueryFilterManager::class)
+        );
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
+    }
+
+    /**
+     * Assert that a QueryFilterManagerException if thrown when providing invalid criteria filters to filter()
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testInvalidFilterWillThrowQueryFilterManagerException(): void
+    {
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        /** @var QueryBuilderInterface|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $filter = new \stdClass();
+        $entityName = 'TestClass';
+        $criteria = [
+            'filters' => [
+                $filter,
+            ],
+        ];
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        /** @var ClassMetadata|MockObject $metadata */
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($metadata);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
+                FilterInterface::class,
+                is_object($filter) ? get_class($filter) : gettype($filter),
+                QueryFilterManager::class
+            )
+        );
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
     }
 
     /**
@@ -167,12 +305,12 @@ final class QueryFilterManagerTest extends TestCase
     {
         $filterData = [
             [
-                'name' => IsEqual::class,
+                'name'  => IsEqual::class,
                 'field' => 'test',
                 'value' => 123,
             ],
             [
-                'name' => IsNotEqual::class,
+                'name'  => IsNotEqual::class,
                 'field' => 'test2',
                 'value' => 'Hello World!',
             ],
