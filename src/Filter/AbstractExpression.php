@@ -45,7 +45,7 @@ abstract class AbstractExpression extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
         $queryAlias = $criteria['alias'] ?? 'entity';
-        $paramName = uniqid($queryAlias, false);
+        $paramName = $this->createParamName($queryAlias);
 
         $expression = $this->createExpression($queryBuilder->expr(), $fieldName, $paramName, $queryAlias);
         if (!isset($criteria['where']) || WhereType::AND === $criteria['where']) {

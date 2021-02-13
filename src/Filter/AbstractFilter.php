@@ -28,6 +28,18 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * Create a new unique parameter name
+     *
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function createParamName(string $prefix = ''): string
+    {
+        return uniqid($prefix, true);
+    }
+
+    /**
      * @param MetadataInterface $metadata
      * @param array             $criteria
      * @param string            $key

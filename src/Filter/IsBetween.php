@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 
@@ -28,8 +28,8 @@ final class IsBetween extends AbstractFilter
 
         $queryAlias = $criteria['alias'] ?? 'entity';
 
-        $fromParamName = uniqid($queryAlias, false);
-        $toParamName = uniqid($queryAlias, false);
+        $fromParamName = $this->createParamName($queryAlias);
+        $toParamName = $this->createParamName($queryAlias);
 
         $expression = $queryBuilder->expr()->between(
             $queryAlias . '.' . $fieldName,
