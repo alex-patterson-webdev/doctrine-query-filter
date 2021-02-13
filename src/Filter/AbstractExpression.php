@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr;

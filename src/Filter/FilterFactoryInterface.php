@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-interface FilterManagerInterface
+interface FilterFactoryInterface
 {
     /**
      * Create the $name query filter with the provided $options.
@@ -22,7 +22,7 @@ interface FilterManagerInterface
      *
      * @return FilterInterface
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     public function create(QueryFilterManagerInterface $manager, string $name, array $options = []): FilterInterface;
 }

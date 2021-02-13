@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Filter\IsEqual;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;

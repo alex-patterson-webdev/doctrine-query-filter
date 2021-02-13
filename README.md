@@ -16,4 +16,3 @@ Installation via [composer](https://getcomposer.org).
 
     require alex-patterson-webdev/doctrine-query-filter ^0.1
 
-    

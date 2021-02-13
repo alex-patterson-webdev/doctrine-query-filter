@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
-use Arp\DoctrineQueryFilter\Filter\FilterManagerInterface;
+use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
 use Arp\DoctrineQueryFilter\Metadata\Metadata;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Doctrine\ORM\EntityManager;
@@ -20,16 +20,16 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 class QueryFilterManager implements QueryFilterManagerInterface
 {
     /**
-     * @var FilterManagerInterface
+     * @var FilterFactoryInterface
      */
-    private FilterManagerInterface $filterManager;
+    private FilterFactoryInterface $filterFactory;
 
     /**
-     * @param FilterManagerInterface $filterManager
+     * @param FilterFactoryInterface $filterFactory
      */
-    public function __construct(FilterManagerInterface $filterManager)
+    public function __construct(FilterFactoryInterface $filterFactory)
     {
-        $this->filterManager = $filterManager;
+        $this->filterFactory = $filterFactory;
     }
 
     /**
@@ -70,10 +70,10 @@ class QueryFilterManager implements QueryFilterManagerInterface
     public function createFilter(string $name, array $options = []): FilterInterface
     {
         try {
-            return $this->filterManager->create($this, $name, $options);
+            return $this->filterFactory->create($this, $name, $options);
         } catch (\Throwable $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to build query filter \'%s\': %s', $name, $e->getMessage()),
+                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),
                 $e
             );
@@ -112,25 +112,39 @@ class QueryFilterManager implements QueryFilterManagerInterface
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $data
+     * @param array|FilterInterface $data
      *
      * @throws QueryFilterManagerException
      */
-    private function applyFilter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $data): void
+    private function applyFilter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
     {
-        $filterName = $data['name'] ?? null;
+        if ($data instanceof FilterInterface) {
+            $filter = $data;
+            $data = [];
+        } elseif (is_array($data)) {
+            $filterName = $data['name'] ?? null;
 
-        if (empty($filterName)) {
+            if (empty($filterName)) {
+                throw new QueryFilterManagerException(
+                    sprintf('The required \'name\' query filter configuration option is missing in \'%s\'', __METHOD__)
+                );
+            }
+
+            $filter = $this->createFilter($filterName, $data['options'] ?? []);
+        } else {
             throw new QueryFilterManagerException(
-                sprintf('The required \'name\' query filter configuration option is missing in \'%s\'', __METHOD__)
+                sprintf(
+                    'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
+                    FilterInterface::class,
+                    is_object($data) ? get_class($data) : gettype($data),
+                    static::class
+                )
             );
         }
 
-        $filter = $this->createFilter($filterName, $data['options'] ?? []);
-
         try {
             $filter->filter($queryBuilder, $metadata, $data);
-        } catch (QueryFilterException $e) {
+        } catch (FilterException $e) {
             throw new QueryFilterManagerException(
                 sprintf('Failed to apply query filter for entity \'%s\': %s', $metadata->getName(), $e->getMessage()),
                 $e->getCode(),

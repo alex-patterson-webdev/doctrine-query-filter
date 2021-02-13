@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
@@ -31,7 +31,7 @@ abstract class AbstractComposite extends AbstractFilter
      * @param MetadataInterface     $metadata
      * @param array                 $criteria
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
@@ -66,14 +66,14 @@ abstract class AbstractComposite extends AbstractFilter
      * @param MetadataInterface     $metadata
      * @param                       $conditions
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     private function applyConditions(QueryBuilderInterface $qb, MetadataInterface $metadata, $conditions): void
     {
         try {
             $this->queryFilterManager->filter($qb, $metadata->getName(), ['filters' => $conditions]);
         } catch (QueryFilterManagerException $e) {
-            throw new QueryFilterException(
+            throw new FilterException(
                 sprintf('Failed to construct query filter \'%s\' conditions: %s', static::class, $e->getMessage()),
                 $e->getCode(),
                 $e

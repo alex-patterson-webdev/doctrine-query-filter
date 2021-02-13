@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 
@@ -19,7 +19,7 @@ interface FilterInterface
      * @param MetadataInterface     $metadata
      * @param array                 $criteria
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void;
 }
