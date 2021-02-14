@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
@@ -13,24 +13,24 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-class FilterManager implements FilterManagerInterface
+class FilterFactory implements FilterFactoryInterface
 {
     /**
      * @var array|string[]
      */
     private array $classMap = [
-        'eq' => IsEqual::class,
-        'neq' => IsNotEqual::class,
-        'gt' => IsGreaterThan::class,
-        'gte' => IsGreaterThanOrEqual::class,
-        'lt' => IsLessThan::class,
-        'lte' => IsLessThanOrEqual::class,
-        'isnull' => IsNull::class,
-        'memberof' => IsMemberOf::class,
-        'between' => IsBetween::class,
-        'andx' => AndX::class,
-        'orx' => OrX::class,
-        'leftjoin' => LeftJoin::class,
+        'eq'        => IsEqual::class,
+        'neq'       => IsNotEqual::class,
+        'gt'        => IsGreaterThan::class,
+        'gte'       => IsGreaterThanOrEqual::class,
+        'lt'        => IsLessThan::class,
+        'lte'       => IsLessThanOrEqual::class,
+        'isnull'    => IsNull::class,
+        'memberof'  => IsMemberOf::class,
+        'between'   => IsBetween::class,
+        'andx'      => AndX::class,
+        'orx'       => OrX::class,
+        'leftjoin'  => LeftJoin::class,
         'innerjoin' => InnerJoin::class,
     ];
 
@@ -51,14 +51,14 @@ class FilterManager implements FilterManagerInterface
      *
      * @return FilterInterface
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     public function create(QueryFilterManagerInterface $manager, string $name, array $options = []): FilterInterface
     {
         $className = $this->classMap[$name] ?? $name;
 
         if (!is_a($className, FilterInterface::class, true)) {
-            throw new QueryFilterException(
+            throw new FilterException(
                 sprintf('The query filter \'%s\' must be an object which implements \'%s\'',
                     $className,
                     FilterInterface::class,
@@ -69,7 +69,7 @@ class FilterManager implements FilterManagerInterface
         try {
             return new $className($manager);
         } catch (\Throwable $e) {
-            throw new QueryFilterException(
+            throw new FilterException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),
                 $e

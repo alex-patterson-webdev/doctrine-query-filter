@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
-use Arp\DoctrineQueryFilter\Exception\QueryFilterException;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Mapping\MappingException;
@@ -45,7 +45,7 @@ abstract class AbstractJoin extends AbstractFilter
      * @param array                 $criteria
      *
      * @throws InvalidArgumentException
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
@@ -118,14 +118,14 @@ abstract class AbstractJoin extends AbstractFilter
      * @param string                $targetEntity
      * @param array                 $criteria
      *
-     * @throws QueryFilterException
+     * @throws FilterException
      */
     private function filterJoinCriteria(QueryBuilderInterface $qb, string $targetEntity, array $criteria): void
     {
         try {
             $this->queryFilterManager->filter($qb, $targetEntity, $criteria);
         } catch (QueryFilterManagerException $e) {
-            throw new QueryFilterException(
+            throw new FilterException(
                 sprintf(
                     'Failed to apply query filter \'%s\' conditions for target entity \'%s\': %s',
                     static::class,

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Constant\WhereType;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Filter\IsEqual;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
+use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -74,6 +76,66 @@ final class IsEqualTest extends TestCase
                 IsEqual::class
             )
         );
+
+        $filter->filter($this->queryBuilder, $this->metadata, $criteria);
+    }
+
+    /**
+     * Assert that the IsEqual query filter can be applied with the provided $criteria
+     *
+     * @throws InvalidArgumentException
+     */
+    public function testFilterWillApplyIsEqualFiltering(): void
+    {
+        $filter = new IsEqual($this->queryFilterManager);
+
+        $fieldName = 'FieldNameTest';
+        $criteria = [
+            'field'  => $fieldName,
+            'alias'  => 'test',
+            'where'  => WhereType::AND,
+            'value'  => 123,
+            'format' => null,
+        ];
+
+        $this->metadata->expects($this->once())
+            ->method('hasField')
+            ->with($fieldName)
+            ->willReturn(true);
+
+        /** @var Expr|MockObject $expr */
+        $expr = $this->createMock(Expr::class);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        /** @var Expr\Comparison|MockObject $eq */
+        $eq = $this->createMock(Expr\Comparison::class);
+
+        $isEqualString = $criteria['alias'] . '.' . $fieldName . '=' . ':param_name';
+        $expr->expects($this->once())
+            ->method('eq')
+            ->with($criteria['alias'] . '.' . $fieldName, $this->stringStartsWith(':'))
+            ->willReturn($eq);
+
+        $eq->expects($this->once())
+            ->method('__toString')
+            ->willReturn($isEqualString);
+
+        $methodName = (!isset($criteria['where']) || WhereType::AND === $criteria['where'])
+            ? 'andWhere'
+            : 'orWhere';
+
+        $this->queryBuilder->expects($this->once())->method($methodName);
+
+        if (array_key_exists('value', $criteria)) {
+            $this->queryBuilder->expects($this->once())
+                ->method('setParameter')
+                ->with($this->callback(static function ($argument) {
+                    return is_string($argument);
+                }), $criteria['value']);
+        }
 
         $filter->filter($this->queryBuilder, $this->metadata, $criteria);
     }

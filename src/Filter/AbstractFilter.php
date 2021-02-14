@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
 
@@ -25,6 +25,18 @@ abstract class AbstractFilter implements FilterInterface
     public function __construct(QueryFilterManager $queryFilterManager)
     {
         $this->queryFilterManager = $queryFilterManager;
+    }
+
+    /**
+     * Create a new unique parameter name
+     *
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function createParamName(string $prefix = ''): string
+    {
+        return uniqid($prefix, true);
     }
 
     /**
@@ -51,58 +63,16 @@ abstract class AbstractFilter implements FilterInterface
         if (!$metadata->hasField($criteria[$key]) && !$metadata->hasAssociation($criteria[$key])) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'The field name \'%s\' is invalid for entity \'%s\'',
-                    $criteria[$key],
-                    $metadata->getName()
+                    'Unable to apply query filter \'%s\': '
+                    . 'The entity class \'%s\' has no field or association named \'%s\'',
+                    static::class,
+                    $metadata->getName(),
+                    $criteria[$key]
                 )
             );
         }
 
         return $criteria[$key];
-    }
-
-    /**
-     * @param MetadataInterface $metadata
-     * @param string            $fieldName
-     * @param string            $entityName
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function validateFieldName(MetadataInterface $metadata, string $fieldName, string $entityName): void
-    {
-        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Unable to apply query filter \'%s\': '
-                    . 'The entity class \'%s\' has no field or association named \'%s\'',
-                    static::class,
-                    $entityName,
-                    $fieldName
-                )
-            );
-        }
-    }
-
-    /**
-     * @param string $fieldName
-     * @param array  $criteria
-     *
-     * @return mixed
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function resolveValue(string $fieldName, array $criteria)
-    {
-        if (!array_key_exists('value', $criteria)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The required \'value\' criteria value is missing for filter \'%s::%s\'',
-                    static::class,
-                    $fieldName
-                )
-            );
-        }
-        return $criteria['value'];
     }
 
     /**

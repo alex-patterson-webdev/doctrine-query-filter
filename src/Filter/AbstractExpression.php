@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
-use Arp\DoctrineQueryFilter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr;
@@ -45,7 +45,7 @@ abstract class AbstractExpression extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
         $queryAlias = $criteria['alias'] ?? 'entity';
-        $paramName = uniqid($queryAlias, false);
+        $paramName = $this->createParamName($queryAlias);
 
         $expression = $this->createExpression($queryBuilder->expr(), $fieldName, $paramName, $queryAlias);
         if (!isset($criteria['where']) || WhereType::AND === $criteria['where']) {
