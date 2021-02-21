@@ -19,9 +19,9 @@ match a given `forename`, `surname` and `age` range.
 
 Such a request could look like this
 
-    GET /api/v1/customers?forename=Fred&surname=Smith&age_min=18&age_max=65`
+    GET /api/v1/customers?forename=Fred&surname=Smith&age_min=18&age_max=65
 
-When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters and 
+When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters 
 manually to construct a query.
 
     $queryBuilder->where(
