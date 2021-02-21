@@ -6,9 +6,78 @@
 
 ## About
 
-Provides Query filtering components for the Doctrine ORM QueryBuilder using `array` parameters.
+The package provides Query filtering components for the Doctrine ORM QueryBuilder.
 
-This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project.
+This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project
+and provides similar functionality without the Laminas Framework dependency.
+
+## Use case
+
+When developing API's developers often need to fetch resources from endpoints that allow for filtering of arbitrary criteria. 
+A simple example, a `Customer` endpoint could allow query parameters to find `customer` resources that match a `forename` and `surname`.
+
+    GET /api/v1/customers?forename=Fred&surname=Smith`
+
+When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters and manually to construct a query.
+
+    $queryBuilder = //...
+    $queryBuilder->where('c.forename = :forname AND c.surname = :surname');
+    $queryBuilder->setParameter('forname', $_GET['forename']);
+    $queryBuilder->setParameter('surname', $_GET['surname']);
+
+For simple queries this might be straight forward, with more filtering requirements it can become complex and repetitive. 
+For example ranges such as `Between` must include an 'upper' and 'lower' bounds. 
+
+Consider adding a new `age` filtering requirement to our request parameters.
+
+    GET /api/v1/customers?forename=Fred&surname=Smith&age_min=18&age_max=65`
+
+By adding the `age_min` and `age_max` parameters to the query, we have introduced a custom filtering key to our API endpoint.
+Now we have to handle ranges for the `age` field and ensure that the filters are correctly documented for our clients 
+as `age_min` and `age_max` are not natual properties of the `customer` resource. You can repeat this process for each resource property 
+that you require filtering on.
+
+## Theory
+
+This package provides a generic structure to define query filter criteria when passing parameters via the URL. Essentially we group the
+filter requirements into query filter criteria, much like the below
+
+    GET /api/v1/customers
+        ?filters[0][name]=eq&filters[0][field]=forename&filters[0][value]=Fred
+        &filters[1][name]=eq&filters[1][field]=surname&filters[1][value]=Smith
+        &filters[2][name]=between&filters[2][field]=age&filters[2][min]=18&filters[2][max]=65
+
+The request parameters would resolve as a `array` like below. Each filter requires at a minimum a `name`
+which will determine the type of filtering to create and then apply.
+
+    $criteria = [
+        'filters' => [
+            [
+                'name' => 'eq',
+                'field' => 'forename',
+                'value' => 'Fred',
+            ],
+            [
+                'name' => 'eq',
+                'field' => 'surname',
+                'value' => 'Smith',
+            ],
+            [
+                'name' => 'between',
+                'field' => 'age',
+                'min' => 18,
+                'max' => 65,
+            ],
+        ],
+    ],
+
+This approach provides a number of benefits:
+
+- Provides an intuitive and consistent API for query filtering that can be used for all of your endpoints.
+- No need to create custom queries as they can now be created directly from the url parameters.  
+- We can implement query filtering logic in a single place for all entities/resources.
+- Complex query filters can be created by _nesting_ query filter components.
+- Dynamically validate the query filters fields using Doctrine metadata, throwing exceptions if we attempt to filter on invalid fields.
 
 ## Installation
 
@@ -20,51 +89,45 @@ Installation via [composer](https://getcomposer.org).
 
 ### Query Filter Manager
 
-The only requirement to apply query filters it to create a new `Arp\DoctrineQueryFilter\QueryFilterManager` instance. The 
-`QueryFilterManager` has a single dependency `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface`. You can use the default
-`Arp\DoctrineQueryFilter\Filter\FilterFactory` implementation to get started or create your own implementation of `FilterFactoryInterface`
-to allow the `QueryFilterManager` to internally create the filters we want to apply.
+We require a new `Arp\DoctrineQueryFilter\QueryFilterManager` instance in order to apply query filters to a Doctrine QueryBuilder instance. 
+The `QueryFilterManager` has a single dependency of a `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface`. The 
+FilterFactory allows the QueryFilterManager to internally resolve and create filters we want to apply in an abstract way.
+
+You can use the default `Arp\DoctrineQueryFilter\Filter\FilterFactory` to get started; or if required this can be  
+swapped for a custom implementation of `FilterFactoryInterface`.
 
     use Arp\DoctrineQueryFilter\Filter\FilterFactory;
     use Arp\DoctrineQueryFilter\QueryFilterManager;
     
     $queryFilterManager = new QueryFilterManager(new FilterFactory());
 
-The `QueryFilterManager` exposes a single public method, `QueryFilterManagerInterface::filter`.
+The `QueryFilterManager` exposes a single public method, `QueryFilterManagerInterface::filter`. 
 
     use Arp\DoctrineQueryFilter\QueryBuilderInterface;
     use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
-    /**
-     * Apply the query filters to the provided query builder instance
-     *
-     * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
-     * @param string                                     $entityName
-     * @param array                                      $criteria
-     *
-     * @return QueryBuilderInterface
-     *
-     * @throws QueryFilterManagerException
-     */
     interface QueryFilterManagerInterface
     {
-        public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface;
+        public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder;
     }
 
-### Query Filters
+The `filter()` method will accept a query builder instance and query filter criteria. The query filters closely match
+existing criteria offered by `Doctrine\ORM\QueryBuilder`, however we are able to provide the criteria as array configuration. 
+Internally the query filter manager will work out what filters should be applied to the provided `$queryBuilder`.
 
-We construct an array of `Arp\DoctrineQueryFilter\Filter\FilterInterface` instances and apply filtering on a `Doctrine\ORM\QueryBuilder` 
-instance passed to `QueryFilterManager::filter()`. 
+For example, we can create a query to fetch customers named "Fred Smith" using the following criteria. The `eq` query filter
+will map to Doctrine's `Doctrine\ORM\Query\Expr\Comparison::EQ`.
 
-We can pass a simple array of filter criteria to allow the `QueryFilterManager` to construct the required query filters for use.
+> ** ⚠ Note: **  
+> When adding more than one query filter, the conditions will be explicitly `AND` together. If you wish to construct a 
+> logical `OR` please use the `Orx` query filter documented below.
 
     $queryFilterManager = new QueryFilterManager(new FilterFactory());
-
     $criteria = [
         'filters' => [
             [
                 'name' => 'eq',
-                'field' => 'first_name',
+                'field' => 'forename',
                 'value' => 'Fred',
             ],
             [
@@ -72,39 +135,89 @@ We can pass a simple array of filter criteria to allow the `QueryFilterManager` 
                 'field' => 'surname',
                 'value' => 'Smith',
             ],
-            
+            [
+                'name' => 'between',
+                'field' => 'age',
+                'min' => 18,
+                'max' => 65,
+            ],
         ],
     ],
 
-    $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
+    // @var \Doctrine\ORM\QueryBuilder $queryBuilder
+    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
+    $customers = $queryBuilder->getQuery()->execute();
 
-Additionally, we can also achieve the same result using the `QueryFilterManager::createFilter()` method directly creating 
-the query filters for greater control.
+If you require greater control on the construction of the query filters, it is possible to provide `QueryFilter` instances directly
+to the `$criteria['filters']` array.
 
-    $queryFilterManager = new QueryFilterManager(new FilterFactory());
+The example below is equivalent
+
+    $filterFactory = new FilterFactory();
+    $queryFilterManager = new QueryFilterManager($filterFactory);
+    $criteria = [
+        'filters' => [
+            $filterFactory->create('eq', ['field' => 'forename', 'value' => 'Fred']),
+            [
+                'name' => 'eq',
+                'field' => 'surname',
+                'value' => 'Smith',
+            ],
+            $filterFactory->create('between', ['field' => 'age', 'min' => 18, 'max' => 65]),
+        ],
+    ],
+
+### Query Filters 
+
+There are many query filters that can be used, each can be referenced by an alias, or alternatively fully qualified class name.
+The alias or name must be provided for all filters with key `name`.
+
+
+| Alias         | Class Name     | Description  | Required Options
+| --------------|:-------------:| :-----:| :-----:
+| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is A = B | `field`, `value` |
+| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is A != B | `field`, `value` |
+| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is A > B | `field`, `value` |
+| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is A >= B | `field`, `value` |
+| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is A < B | `field`, `value` |
+| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is A <= B | `field`, `value` |
+| andx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical AND | `conditions` |
+| orx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical OR | `conditions` |
+| between    | Arp\DoctrineQueryFilter\Filter\IsBetween | Test if A => min and A <= max | `field`, `min`, `max` |
+| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Check if x exists within collection y | `field`, `value` |
+| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Check if A is NULL | `field` |
+| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Check if B is NOT NULL | `field` |
+
+### Composite Query Filters
+
+The composite query filters are designed to allow for other query filters
+to be nested together. Filters will explicitly use the `AndX` composite when passed to `filter()`.
+To join filters using an OR condition we must nest it within a `OrX` filter.
 
     $criteria = [
         'filters' => [
-            $queryFilterManager->createFilter('eq', ['field' => 'first_name', 'value' => 'Fred']),
-            $queryFilterManager->createFilter('eq', ['field' => 'surname', 'value' => 'Smith']),
+            [
+                'name' => 'or',
+                'conditions' => [
+                    [
+                        'name' => 'eq',
+                        'field' => 'surname',
+                        'value' => 'Smith',
+                    ],
+                    [
+                        'name' => 'eq',
+                        'field' => 'surname',
+                        'value' => 'Doe',
+                    ],
+                ]
+            ]
         ],
-    ],
+    ];
 
-    $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
+This is equivalent to a `(surname = 'Smith' OR surname = 'Doe')` DQL condition.
 
-There are many query filters that can be used, each can be referenced by their alias or fully qualified class name.
+## Unit test
 
-| Alias         | Class Name     | Description  |
-| --------------|:-------------:| -----:|
-| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is A = B |
-| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is A != B |
-| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is A > B |
-| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is A >= B |
-| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is A < B |
-| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is A <= B |
-| andx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical AND |
-| orx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical OR |
-| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Check if x exists within collection y |
-| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Check if A is NULL |
-| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Check if B is NOT NULL |
+Unit tests can be executed using PHPUnit from the application root directory.
 
+    php vendor/bin/phpunit
