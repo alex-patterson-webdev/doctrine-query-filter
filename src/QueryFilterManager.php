@@ -39,11 +39,11 @@ class QueryFilterManager implements QueryFilterManagerInterface
      * @param string                                     $entityName
      * @param array                                      $criteria
      *
-     * @return QueryBuilderInterface
+     * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface
+    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($queryBuilder);
 
@@ -54,7 +54,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
             }
         }
 
-        return $queryBuilder;
+        return $queryBuilder->getWrappedQueryBuilder();
     }
 
     /**

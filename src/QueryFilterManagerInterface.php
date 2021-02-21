@@ -20,9 +20,9 @@ interface QueryFilterManagerInterface
      * @param string                                     $entityName
      * @param array                                      $criteria
      *
-     * @return QueryBuilderInterface
+     * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface;
+    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder;
 }
