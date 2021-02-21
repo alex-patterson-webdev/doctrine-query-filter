@@ -20,22 +20,35 @@ Installation via [composer](https://getcomposer.org).
 
 ### Query Filter Manager
 
-In order to filter Doctrine entities, we must first create a `QueryFilterManager` instance. The `QueryFilterManager` 
-has a single dependency `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface`. You can use the default
-`Arp\DoctrineQueryFilter\Filter\FilterFactory` implementation to get started.
+The only requirement to apply query filters it to create a new `Arp\DoctrineQueryFilter\QueryFilterManager` instance. The 
+`QueryFilterManager` has a single dependency `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface`. You can use the default
+`Arp\DoctrineQueryFilter\Filter\FilterFactory` implementation to get started or create your own implementation of `FilterFactoryInterface`
+to allow the `QueryFilterManager` to internally create the filters we want to apply.
 
     use Arp\DoctrineQueryFilter\Filter\FilterFactory;
     use Arp\DoctrineQueryFilter\QueryFilterManager;
     
     $queryFilterManager = new QueryFilterManager(new FilterFactory());
 
-The `QueryFilterManager` exposes two public methods.
+The `QueryFilterManager` exposes a single public method, `QueryFilterManagerInterface::filter`.
 
+    use Arp\DoctrineQueryFilter\QueryBuilderInterface;
+    use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
+
+    /**
+     * Apply the query filters to the provided query builder instance
+     *
+     * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
+     * @param string                                     $entityName
+     * @param array                                      $criteria
+     *
+     * @return QueryBuilderInterface
+     *
+     * @throws QueryFilterManagerException
+     */
     interface QueryFilterManagerInterface
     {
         public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface;
-
-        public function createFilter(string $name, array $options = []): FilterInterface;
     }
 
 ### Query Filters

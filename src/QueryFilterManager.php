@@ -67,7 +67,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
      *
      * @throws QueryFilterManagerException
      */
-    public function createFilter(string $name, array $options = []): FilterInterface
+    private function createFilter(string $name, array $options = []): FilterInterface
     {
         try {
             return $this->filterFactory->create($this, $name, $options);
