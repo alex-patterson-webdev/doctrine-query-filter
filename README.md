@@ -11,10 +11,12 @@ The package provides Query filtering components for the Doctrine ORM QueryBuilde
 This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project
 and provides similar functionality without the Laminas Framework dependency.
 
-## Use case
+## Theory and Use case
 
-When developing API's developers often need to fetch resources from endpoints that allow for filtering of arbitrary criteria. 
-A simple example, a `Customer` endpoint could allow query parameters to find `customer` resources that match a `forename` and `surname`.
+When creating API's, developers often need to fetch resources from endpoints that allow for filtering of arbitrary criteria. 
+A simple example could be where a `Customer` endpoint allows query parameters to find `customer` resources that match a given `forename` and/or `surname`.
+
+Such a request could look like this
 
     GET /api/v1/customers?forename=Fred&surname=Smith`
 
@@ -36,8 +38,6 @@ By adding the `age_min` and `age_max` parameters to the query, we have introduce
 Now we have to handle ranges for the `age` field and ensure that the filters are correctly documented for our clients 
 as `age_min` and `age_max` are not natual properties of the `customer` resource. You can repeat this process for each resource property 
 that you require filtering on.
-
-## Theory
 
 This package provides a generic structure to define query filter criteria when passing parameters via the URL. Essentially we group the
 filter requirements into query filter criteria, much like the below
@@ -118,7 +118,6 @@ Internally the query filter manager will work out what filters should be applied
 For example, we can create a query to fetch customers named "Fred Smith" using the following criteria. The `eq` query filter
 will map to Doctrine's `Doctrine\ORM\Query\Expr\Comparison::EQ`.
 
-> ** ⚠ Note: **  
 > When adding more than one query filter, the conditions will be explicitly `AND` together. If you wish to construct a 
 > logical `OR` please use the `Orx` query filter documented below.
 
@@ -216,7 +215,7 @@ To join filters using an OR condition we must nest it within a `OrX` filter.
 
 This is equivalent to a `(surname = 'Smith' OR surname = 'Doe')` DQL condition.
 
-## Unit test
+## Unit tests
 
 Unit tests can be executed using PHPUnit from the application root directory.
 
