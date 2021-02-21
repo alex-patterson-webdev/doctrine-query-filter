@@ -18,4 +18,6 @@ install:
 
 script:
   - composer test
-  - bash <(curl -s https://codecov.io/bash) -v || echo "Failed to push code coverage report"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

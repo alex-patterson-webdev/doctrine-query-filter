@@ -27,7 +27,7 @@
     }
   },
   "scripts": {
-    "test": "php vendor/bin/phpunit --coverage-clover=coverage.xml"
+    "test": "php vendor/bin/phpunit"
   },
   "config": {
     "optimize-autoloader": true,
