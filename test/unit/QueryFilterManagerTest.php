@@ -61,8 +61,8 @@ final class QueryFilterManagerTest extends TestCase
     {
         $manager = new QueryFilterManager($this->filterFactory);
 
-        /** @var QueryBuilderInterface|MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+        /** @var DoctrineQueryBuilder|MockObject $doctrineQueryBuilder */
+        $queryBuilder = $this->createMock(DoctrineQueryBuilder::class);
 
         $queryBuilder->expects($this->never())->method('getEntityManager');
 
@@ -361,38 +361,5 @@ final class QueryFilterManagerTest extends TestCase
             ->willReturnOnConsecutiveCalls(...$createdFilters);
 
         $manager->filter($queryBuilder, $entityName, $criteria);
-    }
-
-    /**
-     * Assert that a QueryFilterManagerException is thrown when createFilter is unable to create $name
-     *
-     * @throws QueryFilterManagerException
-     */
-    public function testCreateFilterThrowsQueryFilterManagerExceptionIfUnableToCreateFilter(): void
-    {
-        $manager = new QueryFilterManager($this->filterFactory);
-
-        $name = 'FooFilterName';
-        $options = [
-            'foo' => 123,
-            'bar' => true,
-        ];
-
-        $exceptionMessage = 'This is a test exception message';
-        $exceptionCode = 123;
-        $exception = new FilterFactoryException($exceptionMessage, $exceptionCode);
-
-        $this->filterFactory->expects($this->once())
-            ->method('create')
-            ->with($manager, $name, $options)
-            ->willThrowException($exception);
-
-        $this->expectException(QueryFilterManagerException::class);
-        $this->expectExceptionCode($exceptionCode);
-        $this->expectExceptionMessage(
-            sprintf('Failed to create filter \'%s\': %s', $name, $exceptionMessage)
-        );
-
-        $manager->createFilter($name, $options);
     }
 }
