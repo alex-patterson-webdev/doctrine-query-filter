@@ -14,30 +14,23 @@ and provides similar functionality without the Laminas Framework dependency.
 ## Theory and Use case
 
 When creating API's, developers often need to fetch resources from endpoints that allow for filtering of arbitrary criteria. 
-A simple example could be where a `Customer` endpoint allows query parameters to find `customer` resources that match a given `forename` and/or `surname`.
+A simple example could be where a `Customer` endpoint allows query parameters to find `customer` resources that 
+match a given `forename`, `surname` and `age` range.
 
 Such a request could look like this
 
-    GET /api/v1/customers?forename=Fred&surname=Smith`
-
-When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters and manually to construct a query.
-
-    $queryBuilder = //...
-    $queryBuilder->where('c.forename = :forname AND c.surname = :surname');
-    $queryBuilder->setParameter('forname', $_GET['forename']);
-    $queryBuilder->setParameter('surname', $_GET['surname']);
-
-For simple queries this might be straight forward, with more filtering requirements it can become complex and repetitive. 
-For example ranges such as `Between` must include an 'upper' and 'lower' bounds. 
-
-Consider adding a new `age` filtering requirement to our request parameters.
-
     GET /api/v1/customers?forename=Fred&surname=Smith&age_min=18&age_max=65`
 
-By adding the `age_min` and `age_max` parameters to the query, we have introduced a custom filtering key to our API endpoint.
-Now we have to handle ranges for the `age` field and ensure that the filters are correctly documented for our clients 
-as `age_min` and `age_max` are not natual properties of the `customer` resource. You can repeat this process for each resource property 
-that you require filtering on.
+When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters and 
+manually to construct a query.
+
+    $queryBuilder->where(
+        'c.forename = :forename AND c.surname = :surname AND age >= :age_min AND age <= :age_max'
+    )
+    ->setParameter('forename', $_GET['forename'])
+    ->setParameter('surname', $_GET['surname'])
+    ->setParameter('age_min', $_GET['age_min'])
+    ->setParameter('age_max', $_GET['age_max']);
 
 This package provides a generic structure to define query filter criteria when passing parameters via the URL. Essentially we group the
 filter requirements into query filter criteria, much like the below
@@ -74,16 +67,16 @@ which will determine the type of filtering to create and then apply.
 This approach provides a number of benefits:
 
 - Provides an intuitive and consistent API for query filtering that can be used for all of your endpoints.
-- No need to create custom queries as they can now be created directly from the url parameters.  
+- No need to create any doctrine queries as they can now be created directly from the filter criteria.  
 - We can implement query filtering logic in a single place for all entities/resources.
 - Complex query filters can be created by _nesting_ query filter components.
-- Dynamically validate the query filters fields using Doctrine metadata, throwing exceptions if we attempt to filter on invalid fields.
+- Dynamically validate the query filters fields using Doctrine metadata to prevent filtering on invalid fields.
 
 ## Installation
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.1
+    require alex-patterson-webdev/doctrine-query-filter ^0.2
 
 ## Documentation
 
