@@ -170,7 +170,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->setParameters(
             new ArrayCollection(
-                array_merge(
+                array_replace_recursive(
                     $this->getParameters()->toArray(),
                     $queryBuilder->getParameters()->toArray()
                 )
