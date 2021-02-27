@@ -237,6 +237,70 @@ final class QueryFilterManagerTest extends TestCase
     }
 
     /**
+     * Assert that a QueryFilterManagerException is thrown when unable to create the filters in createFilter().
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function testFailureToCreateFilterWillResultInQueryFilterManagerException(): void
+    {
+        $filterName = 'eq';
+        $filterOptions = [
+            'testing' => 123,
+            'hello' => 'world!',
+        ];
+
+        /** @var FilterInterface[]|MockObject[] $filters */
+        $filters = [
+            [
+                'name' => $filterName,
+                'options' => $filterOptions, // Creation options
+            ],
+        ];
+
+        $manager = new QueryFilterManager($this->filterFactory);
+
+        /** @var QueryBuilderInterface|MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $entityName = 'TestClass';
+        $criteria = [
+            'filters' => $filters,
+        ];
+
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        /** @var ClassMetadata|MockObject $metadata */
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($metadata);
+
+        $exceptionMessage = 'This is a test filter factory exception message';
+        $exceptionCode = 456;
+        $filterException = new FilterFactoryException($exceptionMessage, $exceptionCode);
+
+        $this->filterFactory->expects($this->once())
+            ->method('create')
+            ->with($manager, $filterName, $filterOptions)
+            ->willThrowException($filterException);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionCode($exceptionCode);
+        $this->expectExceptionMessage(
+            sprintf('Failed to create filter \'%s\': %s', $filterName, $exceptionMessage),
+        );
+
+        $manager->filter($queryBuilder, $entityName, $criteria);
+    }
+
+    /**
      * Assert that a QueryFilterManagerException is thrown when unable to apply the filters in applyFilter().
      *
      * @throws QueryFilterManagerException
@@ -297,7 +361,7 @@ final class QueryFilterManagerTest extends TestCase
     }
 
     /**
-     * Assert that the expected $criteria filters will be applyed when calling filter()
+     * Assert that the expected $criteria filters will be applied when calling filter()
      *
      * @throws QueryFilterManagerException
      */

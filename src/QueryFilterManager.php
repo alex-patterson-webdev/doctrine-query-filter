@@ -6,6 +6,7 @@ namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Metadata\Metadata;
@@ -71,7 +72,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
     {
         try {
             return $this->filterFactory->create($this, $name, $options);
-        } catch (\Throwable $e) {
+        } catch (FilterFactoryException $e) {
             throw new QueryFilterManagerException(
                 sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),

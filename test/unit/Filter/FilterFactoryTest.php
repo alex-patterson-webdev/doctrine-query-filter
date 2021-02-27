@@ -6,7 +6,6 @@ namespace ArpTest\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\AbstractFilter;
 use Arp\DoctrineQueryFilter\Filter\AndX;
-use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
@@ -213,7 +212,13 @@ final class FilterFactoryTest extends TestCase
     }
 }
 
-class ThrowExceptionInConstructorFilterMock extends AbstractFilter
+/**
+ * @internal
+ *
+ * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
+ * @package ArpTest\DoctrineQueryFilter\Filter
+ */
+final class ThrowExceptionInConstructorFilterMock extends AbstractFilter
 {
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
@@ -221,6 +226,7 @@ class ThrowExceptionInConstructorFilterMock extends AbstractFilter
      *
      * @throws \RuntimeException
      * @noinspection PhpMissingParentConstructorInspection
+     * @noinspection PhpUnusedParameterInspection
      */
     public function __construct(QueryFilterManagerInterface $queryFilterManager, array $options = [])
     {
