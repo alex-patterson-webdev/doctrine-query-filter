@@ -20,11 +20,26 @@ abstract class AbstractFilter implements FilterInterface
     protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
-     * @param QueryFilterManagerInterface $queryFilterManager
+     * @var array
      */
-    public function __construct(QueryFilterManagerInterface $queryFilterManager)
+    protected array $options = [];
+
+    /**
+     * @param QueryFilterManagerInterface $queryFilterManager
+     * @param array                       $options
+     */
+    public function __construct(QueryFilterManagerInterface $queryFilterManager, array $options = [])
     {
         $this->queryFilterManager = $queryFilterManager;
+        $this->options = $options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**

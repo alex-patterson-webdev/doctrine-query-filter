@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
@@ -25,7 +26,8 @@ final class FilterFactory implements FilterFactoryInterface
         'gte'       => IsGreaterThanOrEqual::class,
         'lt'        => IsLessThan::class,
         'lte'       => IsLessThanOrEqual::class,
-        'isnull'    => IsNull::class,
+        'null'      => IsNull::class,
+        'notnull'   => IsNotNull::class,
         'memberof'  => IsMemberOf::class,
         'between'   => IsBetween::class,
         'andx'      => AndX::class,
@@ -51,17 +53,20 @@ final class FilterFactory implements FilterFactoryInterface
      *
      * @return FilterInterface
      *
-     * @throws FilterException
+     * @throws FilterFactoryException
      */
     public function create(QueryFilterManagerInterface $manager, string $name, array $options = []): FilterInterface
     {
         $className = $this->classMap[$name] ?? $name;
 
-        if (!is_a($className, FilterInterface::class, true)) {
-            throw new FilterException(
-                sprintf('The query filter \'%s\' must be an object which implements \'%s\'',
-                    $className,
+        if (!class_exists($className, true) || !is_a($className, FilterInterface::class, true)) {
+            throw new FilterFactoryException(
+                sprintf(
+                    'The query filter \'%s\' must be an object of type \'%s\'; '
+                    . 'The resolved class \'%s\' is invalid or cannot be found',
+                    $name,
                     FilterInterface::class,
+                    $className
                 )
             );
         }
@@ -69,7 +74,7 @@ final class FilterFactory implements FilterFactoryInterface
         try {
             return new $className($manager);
         } catch (\Throwable $e) {
-            throw new FilterException(
+            throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),
                 $e
