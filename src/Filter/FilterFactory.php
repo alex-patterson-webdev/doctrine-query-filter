@@ -36,11 +36,18 @@ final class FilterFactory implements FilterFactoryInterface
     ];
 
     /**
-     * @param array $classMap
+     * @var array
      */
-    public function __construct(array $classMap = [])
+    private array $options = [];
+
+    /**
+     * @param array $classMap
+     * @param array $options
+     */
+    public function __construct(array $classMap = [], array $options = [])
     {
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
+        $this->options = $options;
     }
 
     /**
@@ -70,8 +77,13 @@ final class FilterFactory implements FilterFactoryInterface
             );
         }
 
+        $options = array_replace_recursive(
+            $this->options['default_filter_options'] ?? [],
+            $options
+        );
+
         try {
-            return new $className($manager);
+            return new $className($manager, $options);
         } catch (\Throwable $e) {
             throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
