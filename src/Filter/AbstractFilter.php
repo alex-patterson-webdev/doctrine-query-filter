@@ -36,7 +36,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createParamName(string $prefix = ''): string
     {
-        return uniqid($prefix);
+        return uniqid($prefix, false);
     }
 
     /**
