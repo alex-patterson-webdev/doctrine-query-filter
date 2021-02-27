@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Filter\AbstractFilter;
 use Arp\DoctrineQueryFilter\Filter\AndX;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
@@ -21,6 +23,8 @@ use Arp\DoctrineQueryFilter\Filter\IsNotNull;
 use Arp\DoctrineQueryFilter\Filter\IsNull;
 use Arp\DoctrineQueryFilter\Filter\LeftJoin;
 use Arp\DoctrineQueryFilter\Filter\OrX;
+use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -80,6 +84,27 @@ final class FilterFactoryTest extends TestCase
                 FilterInterface::class,
                 $className ?? $name
             )
+        );
+
+        $factory->create($this->queryFilterManager, $name);
+    }
+
+    /**
+     * Assert that create() will throw a FilterFactoryException if a valid filter class cannot be created
+     *
+     * @throws FilterFactoryException
+     */
+    public function testCreateWillThrowAFilterFactoryExceptionIfTheFilterCannotBeCreated(): void
+    {
+        $factory = new FilterFactory();
+
+        // Defined at the bottom of this class
+        $name = ThrowExceptionInConstructorFilterMock::class;
+        $errorMessage = 'This is is a test exception';
+
+        $this->expectException(FilterFactoryException::class);
+        $this->expectExceptionMessage(
+            sprintf('Failed to create query filter \'%s\': %s', $name, $errorMessage)
         );
 
         $factory->create($this->queryFilterManager, $name);
@@ -185,5 +210,30 @@ final class FilterFactoryTest extends TestCase
             [LeftJoin::class, 'leftjoin'],
             [LeftJoin::class, LeftJoin::class],
         ];
+    }
+}
+
+class ThrowExceptionInConstructorFilterMock extends AbstractFilter
+{
+    /**
+     * @param QueryFilterManagerInterface $queryFilterManager
+     * @param array                       $options
+     *
+     * @throws \RuntimeException
+     * @noinspection PhpMissingParentConstructorInspection
+     */
+    public function __construct(QueryFilterManagerInterface $queryFilterManager, array $options = [])
+    {
+        throw new \RuntimeException('This is is a test exception');
+    }
+
+    /**
+     * @param QueryBuilderInterface $queryBuilder
+     * @param MetadataInterface     $metadata
+     * @param array                 $criteria
+     */
+    public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
+    {
+
     }
 }
