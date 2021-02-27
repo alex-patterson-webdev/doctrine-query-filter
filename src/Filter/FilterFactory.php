@@ -13,7 +13,7 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-class FilterFactory implements FilterFactoryInterface
+final class FilterFactory implements FilterFactoryInterface
 {
     /**
      * @var array|string[]

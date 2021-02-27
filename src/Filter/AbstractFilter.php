@@ -6,7 +6,7 @@ namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
-use Arp\DoctrineQueryFilter\QueryFilterManager;
+use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
@@ -15,14 +15,14 @@ use Arp\DoctrineQueryFilter\QueryFilterManager;
 abstract class AbstractFilter implements FilterInterface
 {
     /**
-     * @var QueryFilterManager
+     * @var QueryFilterManagerInterface
      */
-    protected QueryFilterManager $queryFilterManager;
+    protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
-     * @param QueryFilterManager $queryFilterManager
+     * @param QueryFilterManagerInterface $queryFilterManager
      */
-    public function __construct(QueryFilterManager $queryFilterManager)
+    public function __construct(QueryFilterManagerInterface $queryFilterManager)
     {
         $this->queryFilterManager = $queryFilterManager;
     }
