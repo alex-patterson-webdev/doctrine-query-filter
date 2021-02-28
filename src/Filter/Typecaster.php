@@ -8,6 +8,7 @@ use Arp\DateTime\DateTimeFactoryInterface;
 use Arp\DateTime\Exception\DateTimeFactoryException;
 use Arp\DoctrineQueryFilter\Constant\TypecastType;
 use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
+use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 
 /**
@@ -22,18 +23,11 @@ final class Typecaster implements TypecasterInterface
     private DateTimeFactoryInterface $dateTimeFactory;
 
     /**
-     * @var array
-     */
-    private array $options;
-
-    /**
      * @param DateTimeFactoryInterface $dateTimeFactory
-     * @param array                    $options
      */
-    public function __construct(DateTimeFactoryInterface $dateTimeFactory, array $options = [])
+    public function __construct(DateTimeFactoryInterface $dateTimeFactory)
     {
         $this->dateTimeFactory = $dateTimeFactory;
-        $this->options = $options;
     }
 
     /**
@@ -54,15 +48,9 @@ final class Typecaster implements TypecasterInterface
         ?string $type = null,
         array $options = []
     ) {
-        if (null === $type || !in_array($type, TypecastType::getValues(), true)) {
-            if (!$metadata->hasField($fieldName)) {
-                throw new TypecastException(
-                    sprintf('Failed to cast date time to format \'%s\': %s', $format, $e->getMessage()),
-                    $e->getCode(),
-                    $e
-                );
-            }
-            $type = $metadata->getFieldType($fieldName);
+        $type = $this->getType($metadata, $fieldName, $type);
+        if (null === $type) {
+            return $value;
         }
 
         $castDates = isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true;
@@ -91,9 +79,9 @@ final class Typecaster implements TypecasterInterface
                 $value = $castDates
                     ? $this->castDateTime($value, $options['format'] ?? 'Y-m-d')
                     : $value;
-                
+
                 if ($value instanceof \DateTime) {
-                    $value->setTime(0, 0, 0);
+                    $value->setTime(0, 0);
                 }
             break;
 
@@ -115,7 +103,7 @@ final class Typecaster implements TypecasterInterface
     }
 
     /**
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $format
      *
      * @return \DateTimeInterface
@@ -132,6 +120,34 @@ final class Typecaster implements TypecasterInterface
                 $e->getCode(),
                 $e
             );
+        }
+    }
+
+    /**
+     * @param MetadataInterface $metadata
+     * @param string            $fieldName
+     * @param string|null       $type
+     *
+     * @return string|null
+     *
+     * @throws TypecastException
+     */
+    private function getType(MetadataInterface $metadata, string $fieldName, ?string $type): ?string
+    {
+        if (null === $type || !in_array($type, TypecastType::getValues(), true)) {
+            return $type;
+        }
+
+        if (!$metadata->hasField($fieldName)) {
+            throw new TypecastException(
+                sprintf('The field \'%s\' does not exist for entity \'%s\'', $fieldName, $metadata->getName())
+            );
+        }
+
+        try {
+            return $metadata->getFieldType($fieldName);
+        } catch (MetadataException $e) {
+            return null;
         }
     }
 }
