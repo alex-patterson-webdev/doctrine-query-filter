@@ -8,6 +8,7 @@ use Arp\DoctrineQueryFilter\Constant\WhereType;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
+use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
@@ -39,6 +40,11 @@ final class IsNotEqualTest extends TestCase
     private $queryBuilder;
 
     /**
+     * @var TypecasterInterface|MockObject
+     */
+    private TypecasterInterface $typecaster;
+
+    /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
@@ -48,6 +54,8 @@ final class IsNotEqualTest extends TestCase
         $this->metadata = $this->createMock(MetadataInterface::class);
 
         $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $this->typecaster = $this->createMock(TypecasterInterface::class);
     }
 
     /**
@@ -55,7 +63,7 @@ final class IsNotEqualTest extends TestCase
      */
     public function testImplementsFilterInterface(): void
     {
-        $filter = new IsNotEqual($this->queryFilterManager);
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
 
         $this->assertInstanceOf(FilterInterface::class, $filter);
     }
@@ -65,7 +73,7 @@ final class IsNotEqualTest extends TestCase
      */
     public function testFilterWillThrowInvalidArgumentExceptionIfTheRequiredFieldNameCriteriaIsMissing(): void
     {
-        $filter = new IsNotEqual($this->queryFilterManager);
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
 
         $criteria = [
             // No field 'name' will raise exception
@@ -86,7 +94,7 @@ final class IsNotEqualTest extends TestCase
      */
     public function testFilterWillApplyIsNotEqualFiltering(): void
     {
-        $filter = new IsNotEqual($this->queryFilterManager);
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
 
         $fieldName = 'FieldNameTest';
         $criteria = [
@@ -129,6 +137,11 @@ final class IsNotEqualTest extends TestCase
         $this->queryBuilder->expects($this->once())->method($methodName);
 
         if (array_key_exists('value', $criteria)) {
+            $this->typecaster->expects($this->once())
+                ->method('typecast')
+                ->with($this->metadata, $fieldName, $criteria['value'])
+                ->willReturn($criteria['value']);
+
             $this->queryBuilder->expects($this->once())
                 ->method('setParameter')
                 ->with($this->callback(static function ($argument) {

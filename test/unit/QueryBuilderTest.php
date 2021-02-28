@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -218,50 +219,42 @@ final class QueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var QueryBuilderInterface|MockObject $newQueryBuilder */
-        $newQueryBuilder = $this->createMock(QueryBuilderInterface::class);
-
-        $a = [
-            'baz' => 'Testing value',
-            'foo' => 123,
-            'test' => 'This is value from A'
-        ];
-
+        $bParams = $addArgs = [];
         $b = [
             'bar' => 456,
             'test' => 'This is value from B'
         ];
+        foreach ($b as $key => $value) {
+            /** @var Parameter|MockObject $parameter */
+            $parameter = $this->createMock(Parameter::class);
+            $bParams[] = $parameter;
+            $addArgs[] = [$parameter];
+        }
 
-        /**
-         * @var ArrayCollection|MockObject $aParams
-         */
-        $aParams = $this->createMock(ArrayCollection::class);
-        $aParams->expects($this->once())->method('toArray')->willReturn($a);
-
-        /** @var ArrayCollection|MockObject $bParams */
-        $bParams = $this->createMock(ArrayCollection::class);
-        $newQueryBuilder->expects($this->once())->method('getParameters')->willReturn($bParams);
-        $bParams->expects($this->once())->method('toArray')->willReturn($b);
-
-        $expectedParams = array_replace_recursive($a, $b);
-
+        /** @var ArrayCollection|MockObject $params */
+        $params = $this->createMock(ArrayCollection::class);
         $this->doctrineQueryBuilder->expects($this->once())
-            ->method('setParameters')
-            ->with($this->callback(function ($params) use ($expectedParams) {
-                return ($params instanceof ArrayCollection && $params->toArray() === $expectedParams);
-            }));
+            ->method('getParameters')
+            ->willReturn($params);
+
+        /** @var QueryBuilderInterface|MockObject $newQueryBuilder */
+        $newQueryBuilder = $this->createMock(QueryBuilderInterface::class);
 
         /** @var ArrayCollection|MockObject $newParams */
         $newParams = $this->createMock(ArrayCollection::class);
-        $this->doctrineQueryBuilder->expects($this->exactly(2))
+
+        $newQueryBuilder->expects($this->once())
             ->method('getParameters')
-            ->willReturnOnConsecutiveCalls($aParams, $newParams);
+            ->willReturn($newParams);
 
         $newParams->expects($this->once())
-            ->method('toArray')
-            ->willReturn($expectedParams);
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator($bParams));
+
+        $params->expects($this->exactly(count($bParams)))
+            ->method('add')
+            ->withConsecutive(...$addArgs);
 
         $this->assertSame($queryBuilder, $queryBuilder->mergeParameters($newQueryBuilder));
-        $this->assertSame($expectedParams, $queryBuilder->getParameters()->toArray());
     }
 }

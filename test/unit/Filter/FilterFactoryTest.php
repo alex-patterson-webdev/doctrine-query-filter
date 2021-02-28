@@ -22,6 +22,7 @@ use Arp\DoctrineQueryFilter\Filter\IsNotNull;
 use Arp\DoctrineQueryFilter\Filter\IsNull;
 use Arp\DoctrineQueryFilter\Filter\LeftJoin;
 use Arp\DoctrineQueryFilter\Filter\OrX;
+use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
@@ -42,11 +43,18 @@ final class FilterFactoryTest extends TestCase
     private $queryFilterManager;
 
     /**
+     * @var TypecasterInterface|MockObject
+     */
+    private $typecaster;
+
+    /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
     {
         $this->queryFilterManager = $this->createMock(QueryFilterManagerInterface::class);
+
+        $this->typecaster = $this->createMock(TypecasterInterface::class);
     }
 
     /**
@@ -54,7 +62,7 @@ final class FilterFactoryTest extends TestCase
      */
     public function testImplementsFilterFactory(): void
     {
-        $factory = new FilterFactory();
+        $factory = new FilterFactory($this->typecaster);
 
         $this->assertInstanceOf(FilterFactoryInterface::class, $factory);
     }
@@ -72,7 +80,9 @@ final class FilterFactoryTest extends TestCase
         string $name,
         string $className = null
     ): void {
-        $factory = new FilterFactory(isset($className) ? [$name => $className] : []);
+        $classMap = isset($className) ? [$name => $className] : [];
+
+        $factory = new FilterFactory($this->typecaster, $classMap);
 
         $this->expectException(FilterFactoryException::class);
         $this->expectExceptionMessage(
@@ -95,7 +105,7 @@ final class FilterFactoryTest extends TestCase
      */
     public function testCreateWillThrowAFilterFactoryExceptionIfTheFilterCannotBeCreated(): void
     {
-        $factory = new FilterFactory();
+        $factory = new FilterFactory($this->typecaster);
 
         // Defined at the bottom of this class
         $name = ThrowExceptionInConstructorFilterMock::class;
@@ -155,7 +165,7 @@ final class FilterFactoryTest extends TestCase
         array $options = [],
         array $classMap = []
     ): void {
-        $factory = new FilterFactory($classMap);
+        $factory = new FilterFactory($this->typecaster, $classMap);
 
         $queryFilter = $factory->create($this->queryFilterManager, $name, $options);
 
@@ -222,14 +232,17 @@ final class ThrowExceptionInConstructorFilterMock extends AbstractFilter
 {
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
+     * @param TypecasterInterface         $typecaster
      * @param array                       $options
      *
-     * @throws \RuntimeException
      * @noinspection PhpMissingParentConstructorInspection
      * @noinspection PhpUnusedParameterInspection
      */
-    public function __construct(QueryFilterManagerInterface $queryFilterManager, array $options = [])
-    {
+    public function __construct(
+        QueryFilterManagerInterface $queryFilterManager,
+        TypecasterInterface $typecaster,
+        array $options = []
+    ) {
         throw new \RuntimeException('This is is a test exception');
     }
 

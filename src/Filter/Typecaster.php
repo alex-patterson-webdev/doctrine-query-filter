@@ -14,7 +14,7 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-final class Typecast implements TypecastInterface
+final class Typecaster implements TypecasterInterface
 {
     /**
      * @var DateTimeFactoryInterface

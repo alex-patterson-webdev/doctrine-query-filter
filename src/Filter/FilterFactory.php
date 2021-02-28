@@ -17,9 +17,9 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 final class FilterFactory implements FilterFactoryInterface
 {
     /**
-     * @var TypecastInterface
+     * @var TypecasterInterface
      */
-    private TypecastInterface $typecaster;
+    private TypecasterInterface $typecaster;
 
     /**
      * @var array|string[]
@@ -47,13 +47,13 @@ final class FilterFactory implements FilterFactoryInterface
     private array $options = [];
 
     /**
-     * @param TypecastInterface|null $typecaster
-     * @param array                  $classMap
-     * @param array                  $options
+     * @param TypecasterInterface|null $typecaster
+     * @param array                    $classMap
+     * @param array                    $options
      */
-    public function __construct(?TypecastInterface $typecaster = null, array $classMap = [], array $options = [])
+    public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
     {
-        $this->typecaster = $typecaster ?? new Typecast(new DateTimeFactory());
+        $this->typecaster = $typecaster ?? new Typecaster(new DateTimeFactory());
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
         $this->options = $options;
     }

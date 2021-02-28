@@ -11,7 +11,7 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-interface TypecastInterface
+interface TypecasterInterface
 {
     /**
      * @param MetadataInterface $metadata

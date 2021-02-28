@@ -11,7 +11,8 @@
   ],
   "require": {
     "php": ">=7.4 || >=8.0",
-    "doctrine/orm": "^2.8"
+    "doctrine/orm": "^2.8",
+    "alex-patterson-webdev/date-time": "^2"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5"

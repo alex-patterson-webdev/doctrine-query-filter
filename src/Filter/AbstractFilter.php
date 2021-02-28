@@ -22,9 +22,9 @@ abstract class AbstractFilter implements FilterInterface
     protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
-     * @var TypecastInterface
+     * @var TypecasterInterface
      */
-    protected TypecastInterface $typecaster;
+    protected TypecasterInterface $typecaster;
 
     /**
      * @var array
@@ -33,12 +33,12 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecastInterface           $typecaster
+     * @param TypecasterInterface         $typecaster
      * @param array                       $options
      */
     public function __construct(
         QueryFilterManagerInterface $queryFilterManager,
-        TypecastInterface $typecaster,
+        TypecasterInterface $typecaster,
         array $options = []
     ) {
         $this->queryFilterManager = $queryFilterManager;
@@ -106,11 +106,12 @@ abstract class AbstractFilter implements FilterInterface
      * @param MetadataInterface $metadata
      * @param string            $fieldName
      * @param mixed             $value
-     * @param string|null       $format
+     * @param string|null       $type
+     * @param array             $options
      *
      * @return mixed
      *
-     * @noinspection PhpUnusedParameterInspection
+     * @throws FilterException
      */
     protected function formatValue(
         MetadataInterface $metadata,
