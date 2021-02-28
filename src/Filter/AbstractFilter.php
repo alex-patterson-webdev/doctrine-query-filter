@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
@@ -20,17 +22,27 @@ abstract class AbstractFilter implements FilterInterface
     protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
+     * @var TypecastInterface
+     */
+    protected TypecastInterface $typecaster;
+
+    /**
      * @var array
      */
     protected array $options = [];
 
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
+     * @param TypecastInterface           $typecaster
      * @param array                       $options
      */
-    public function __construct(QueryFilterManagerInterface $queryFilterManager, array $options = [])
-    {
+    public function __construct(
+        QueryFilterManagerInterface $queryFilterManager,
+        TypecastInterface $typecaster,
+        array $options = []
+    ) {
         $this->queryFilterManager = $queryFilterManager;
+        $this->typecaster = $typecaster;
         $this->options = $options;
     }
 
@@ -100,8 +112,26 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    protected function formatValue(MetadataInterface $metadata, string $fieldName, $value, ?string $format = null)
-    {
-        return $value;
+    protected function formatValue(
+        MetadataInterface $metadata,
+        string $fieldName,
+        $value,
+        ?string $type = null,
+        array $options = []
+    ) {
+        try {
+            return $this->typecaster->typecast($metadata, $fieldName, $value, $type, $options);
+        } catch (TypecastException $e) {
+            throw new FilterException(
+                sprintf(
+                    'Failed to format the value for field \'%s::%s\': %s',
+                    $metadata->getName(),
+                    $fieldName,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 }

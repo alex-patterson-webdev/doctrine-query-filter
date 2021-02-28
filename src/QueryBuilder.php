@@ -168,14 +168,10 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface
     {
-        $this->setParameters(
-            new ArrayCollection(
-                array_replace_recursive(
-                    $this->getParameters()->toArray(),
-                    $queryBuilder->getParameters()->toArray()
-                )
-            )
-        );
+        $parameters = $this->getParameters();
+        foreach ($queryBuilder->getParameters() as $parameter) {
+            $parameters->add($parameter);
+        }
 
         return $this;
     }

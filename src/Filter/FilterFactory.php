@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DateTime\DateTimeFactory;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
@@ -15,6 +16,11 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
  */
 final class FilterFactory implements FilterFactoryInterface
 {
+    /**
+     * @var TypecastInterface
+     */
+    private TypecastInterface $typecaster;
+
     /**
      * @var array|string[]
      */
@@ -41,11 +47,13 @@ final class FilterFactory implements FilterFactoryInterface
     private array $options = [];
 
     /**
-     * @param array $classMap
-     * @param array $options
+     * @param TypecastInterface|null $typecaster
+     * @param array                  $classMap
+     * @param array                  $options
      */
-    public function __construct(array $classMap = [], array $options = [])
+    public function __construct(?TypecastInterface $typecaster = null, array $classMap = [], array $options = [])
     {
+        $this->typecaster = $typecaster ?? new Typecast(new DateTimeFactory());
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
         $this->options = $options;
     }
@@ -83,7 +91,7 @@ final class FilterFactory implements FilterFactoryInterface
         );
 
         try {
-            return new $className($manager, $options);
+            return new $className($manager, $this->typecaster, $options);
         } catch (\Throwable $e) {
             throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Metadata;
 
+use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Doctrine\ORM\Mapping\MappingException;
 
 /**
@@ -23,6 +24,24 @@ interface MetadataInterface
      * @return bool
      */
     public function hasField(string $fieldName): bool;
+
+    /**
+     * @param string $fieldName
+     *
+     * @return array
+     *
+     * @throws MetadataException
+     */
+    public function getFieldMapping(string $fieldName): array;
+
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     *
+     * @throws MetadataException
+     */
+    public function getFieldType(string $fieldName): string;
 
     /**
      * @param string $fieldName
