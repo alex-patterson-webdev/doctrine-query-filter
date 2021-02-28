@@ -6,8 +6,11 @@ namespace ArpTest\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -155,5 +158,103 @@ final class QueryBuilderTest extends TestCase
             ->with($name, $alias, $type, $condition, $indexBy);
 
         $this->assertSame($queryBuilder, $queryBuilder->leftJoin($name, $alias, $type, $condition, $indexBy));
+    }
+
+    /**
+     * Assert that calls to getParameters() will proxy to the internal query builder
+     */
+    public function testGetParametersWillProxyToInternalQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        /** @var ArrayCollection|MockObject $parameters */
+        $parameters = $this->createMock(ArrayCollection::class);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($parameters);
+
+        $this->assertSame($parameters, $queryBuilder->getParameters());
+    }
+
+    /**
+     * Assert that calls to setParameters() will proxy to the internal query builder
+     */
+    public function testSetParametersWillProxyToInternalQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        /** @var ArrayCollection|MockObject $parameters */
+        $parameters = $this->createMock(ArrayCollection::class);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('setParameters')
+            ->with($parameters);
+
+        $this->assertSame($queryBuilder, $queryBuilder->setParameters($parameters));
+    }
+
+    /**
+     * Assert that calls to setParameter() will proxy to the internal query builder
+     */
+    public function testSetParameterWillProxyToInternalQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $name = 'Foo';
+        $value = 'This is a test value';
+        $type = Types::STRING;
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with($name, $value, $type);
+
+        $this->assertSame($queryBuilder, $queryBuilder->setParameter($name, $value, $type));
+    }
+
+    /**
+     * Assert that calls to mergeParameters() will proxy to the internal query builder
+     */
+    public function testMergeParametersWillProxyToInternalQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $bParams = $addArgs = [];
+        $b = [
+            'bar' => 456,
+            'test' => 'This is value from B'
+        ];
+        foreach ($b as $key => $value) {
+            /** @var Parameter|MockObject $parameter */
+            $parameter = $this->createMock(Parameter::class);
+            $bParams[] = $parameter;
+            $addArgs[] = [$parameter];
+        }
+
+        /** @var ArrayCollection|MockObject $params */
+        $params = $this->createMock(ArrayCollection::class);
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($params);
+
+        /** @var QueryBuilderInterface|MockObject $newQueryBuilder */
+        $newQueryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        /** @var ArrayCollection|MockObject $newParams */
+        $newParams = $this->createMock(ArrayCollection::class);
+
+        $newQueryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($newParams);
+
+        $newParams->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator($bParams));
+
+        $params->expects($this->exactly(count($bParams)))
+            ->method('add')
+            ->withConsecutive(...$addArgs);
+
+        $this->assertSame($queryBuilder, $queryBuilder->mergeParameters($newQueryBuilder));
     }
 }

@@ -6,6 +6,7 @@ namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Metadata\Metadata;
@@ -39,11 +40,11 @@ class QueryFilterManager implements QueryFilterManagerInterface
      * @param string                                     $entityName
      * @param array                                      $criteria
      *
-     * @return QueryBuilderInterface
+     * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface
+    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($queryBuilder);
 
@@ -54,7 +55,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
             }
         }
 
-        return $queryBuilder;
+        return $queryBuilder->getWrappedQueryBuilder();
     }
 
     /**
@@ -67,11 +68,11 @@ class QueryFilterManager implements QueryFilterManagerInterface
      *
      * @throws QueryFilterManagerException
      */
-    public function createFilter(string $name, array $options = []): FilterInterface
+    private function createFilter(string $name, array $options = []): FilterInterface
     {
         try {
             return $this->filterFactory->create($this, $name, $options);
-        } catch (\Throwable $e) {
+        } catch (FilterFactoryException $e) {
             throw new QueryFilterManagerException(
                 sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),

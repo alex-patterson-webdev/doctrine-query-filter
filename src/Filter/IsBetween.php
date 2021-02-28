@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
@@ -24,9 +25,21 @@ final class IsBetween extends AbstractFilter
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
+        if (empty($criteria['from'])) {
+            throw new FilterException(
+                sprintf('The required \'from\' criteria option is missing for filter \'%s\'', static::class)
+            );
+        }
+
+        if (empty($criteria['to'])) {
+            throw new FilterException(
+                sprintf('The required \'to\' criteria option is missing for filter \'%s\'', static::class)
+            );
+        }
+
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
-        $queryAlias = $criteria['alias'] ?? 'entity';
+        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? 'entity');
 
         $fromParamName = $this->createParamName($queryAlias);
         $toParamName = $this->createParamName($queryAlias);

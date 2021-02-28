@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
-use Arp\DoctrineQueryFilter\QueryFilterManager;
+use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
@@ -15,16 +17,41 @@ use Arp\DoctrineQueryFilter\QueryFilterManager;
 abstract class AbstractFilter implements FilterInterface
 {
     /**
-     * @var QueryFilterManager
+     * @var QueryFilterManagerInterface
      */
-    protected QueryFilterManager $queryFilterManager;
+    protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
-     * @param QueryFilterManager $queryFilterManager
+     * @var TypecasterInterface
      */
-    public function __construct(QueryFilterManager $queryFilterManager)
-    {
+    protected TypecasterInterface $typecaster;
+
+    /**
+     * @var array
+     */
+    protected array $options = [];
+
+    /**
+     * @param QueryFilterManagerInterface $queryFilterManager
+     * @param TypecasterInterface         $typecaster
+     * @param array                       $options
+     */
+    public function __construct(
+        QueryFilterManagerInterface $queryFilterManager,
+        TypecasterInterface $typecaster,
+        array $options = []
+    ) {
         $this->queryFilterManager = $queryFilterManager;
+        $this->typecaster = $typecaster;
+        $this->options = $options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**
@@ -36,7 +63,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createParamName(string $prefix = ''): string
     {
-        return uniqid($prefix);
+        return uniqid($prefix, false);
     }
 
     /**
@@ -79,14 +106,33 @@ abstract class AbstractFilter implements FilterInterface
      * @param MetadataInterface $metadata
      * @param string            $fieldName
      * @param mixed             $value
-     * @param string|null       $format
+     * @param string|null       $type
+     * @param array             $options
      *
      * @return mixed
      *
-     * @noinspection PhpUnusedParameterInspection
+     * @throws FilterException
      */
-    protected function formatValue(MetadataInterface $metadata, string $fieldName, $value, ?string $format = null)
-    {
-        return $value;
+    protected function formatValue(
+        MetadataInterface $metadata,
+        string $fieldName,
+        $value,
+        ?string $type = null,
+        array $options = []
+    ) {
+        try {
+            return $this->typecaster->typecast($metadata, $fieldName, $value, $type, $options);
+        } catch (TypecastException $e) {
+            throw new FilterException(
+                sprintf(
+                    'Failed to format the value for field \'%s::%s\': %s',
+                    $metadata->getName(),
+                    $fieldName,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Metadata;
 
+use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 
@@ -42,6 +43,51 @@ final class Metadata implements MetadataInterface
     public function hasField(string $fieldName): bool
     {
         return $this->metadata->hasField($fieldName);
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return array
+     *
+     * @throws MetadataException
+     */
+    public function getFieldMapping(string $fieldName): array
+    {
+        try {
+            return $this->metadata->getFieldMapping($fieldName);
+        } catch (MappingException $e) {
+            throw new MetadataException(
+                sprintf(
+                    'Unable to find field mapping for field \'%s::%s\': %s',
+                    $this->getName(),
+                    $fieldName,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     *
+     * @throws MetadataException
+     */
+    public function getFieldType(string $fieldName): string
+    {
+        $type = $this->getFieldMapping($fieldName)['type'] ?? '';
+
+        if (empty($type)) {
+            throw new MetadataException(
+                sprintf('Unable to resolve field data type for \'%s::%s\'', $this->getName(), $fieldName)
+            );
+        }
+
+        return $type;
     }
 
     /**

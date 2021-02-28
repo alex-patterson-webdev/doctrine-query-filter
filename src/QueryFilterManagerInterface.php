@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter;
 
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
-use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
 /**
@@ -21,21 +20,9 @@ interface QueryFilterManagerInterface
      * @param string                                     $entityName
      * @param array                                      $criteria
      *
-     * @return QueryBuilderInterface
+     * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): QueryBuilderInterface;
-
-    /**
-     * Create a new filter matching $name with the provided $options
-     *
-     * @param string $name
-     * @param array  $options
-     *
-     * @return FilterInterface
-     *
-     * @throws QueryFilterManagerException
-     */
-    public function createFilter(string $name, array $options = []): FilterInterface;
+    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder;
 }

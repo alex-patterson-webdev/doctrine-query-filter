@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
+use Arp\DateTime\DateTimeFactory;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
@@ -13,8 +14,13 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-class FilterFactory implements FilterFactoryInterface
+final class FilterFactory implements FilterFactoryInterface
 {
+    /**
+     * @var TypecasterInterface
+     */
+    private TypecasterInterface $typecaster;
+
     /**
      * @var array|string[]
      */
@@ -25,7 +31,8 @@ class FilterFactory implements FilterFactoryInterface
         'gte'       => IsGreaterThanOrEqual::class,
         'lt'        => IsLessThan::class,
         'lte'       => IsLessThanOrEqual::class,
-        'isnull'    => IsNull::class,
+        'null'      => IsNull::class,
+        'notnull'   => IsNotNull::class,
         'memberof'  => IsMemberOf::class,
         'between'   => IsBetween::class,
         'andx'      => AndX::class,
@@ -35,11 +42,20 @@ class FilterFactory implements FilterFactoryInterface
     ];
 
     /**
-     * @param array $classMap
+     * @var array
      */
-    public function __construct(array $classMap = [])
+    private array $options = [];
+
+    /**
+     * @param TypecasterInterface|null $typecaster
+     * @param array                    $classMap
+     * @param array                    $options
+     */
+    public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
     {
+        $this->typecaster = $typecaster ?? new Typecaster(new DateTimeFactory());
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
+        $this->options = $options;
     }
 
     /**
@@ -51,25 +67,33 @@ class FilterFactory implements FilterFactoryInterface
      *
      * @return FilterInterface
      *
-     * @throws FilterException
+     * @throws FilterFactoryException
      */
     public function create(QueryFilterManagerInterface $manager, string $name, array $options = []): FilterInterface
     {
         $className = $this->classMap[$name] ?? $name;
 
-        if (!is_a($className, FilterInterface::class, true)) {
-            throw new FilterException(
-                sprintf('The query filter \'%s\' must be an object which implements \'%s\'',
-                    $className,
+        if (!class_exists($className, true) || !is_a($className, FilterInterface::class, true)) {
+            throw new FilterFactoryException(
+                sprintf(
+                    'The query filter \'%s\' must be an object of type \'%s\'; '
+                    . 'The resolved class \'%s\' is invalid or cannot be found',
+                    $name,
                     FilterInterface::class,
+                    $className
                 )
             );
         }
 
+        $options = array_replace_recursive(
+            $this->options['default_filter_options'] ?? [],
+            $options
+        );
+
         try {
-            return new $className($manager);
+            return new $className($manager, $this->typecaster, $options);
         } catch (\Throwable $e) {
-            throw new FilterException(
+            throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),
                 $e

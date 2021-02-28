@@ -52,7 +52,7 @@ abstract class AbstractJoin extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
-        $alias = $criteria['alias'] ?? null;
+        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? null);
         if (null === $alias) {
             throw new InvalidArgumentException(
                 sprintf('The required \'alias\' criteria value is missing for filter \'%s\'', static::class)

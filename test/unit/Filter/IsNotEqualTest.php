@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Constant\WhereType;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
+use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
+use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsNotEqual
+ *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
@@ -35,6 +40,11 @@ final class IsNotEqualTest extends TestCase
     private $queryBuilder;
 
     /**
+     * @var TypecasterInterface|MockObject
+     */
+    private TypecasterInterface $typecaster;
+
+    /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
@@ -44,6 +54,8 @@ final class IsNotEqualTest extends TestCase
         $this->metadata = $this->createMock(MetadataInterface::class);
 
         $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
+
+        $this->typecaster = $this->createMock(TypecasterInterface::class);
     }
 
     /**
@@ -51,7 +63,7 @@ final class IsNotEqualTest extends TestCase
      */
     public function testImplementsFilterInterface(): void
     {
-        $filter = new IsNotEqual($this->queryFilterManager);
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
 
         $this->assertInstanceOf(FilterInterface::class, $filter);
     }
@@ -61,7 +73,7 @@ final class IsNotEqualTest extends TestCase
      */
     public function testFilterWillThrowInvalidArgumentExceptionIfTheRequiredFieldNameCriteriaIsMissing(): void
     {
-        $filter = new IsNotEqual($this->queryFilterManager);
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
 
         $criteria = [
             // No field 'name' will raise exception
@@ -71,6 +83,71 @@ final class IsNotEqualTest extends TestCase
         $this->expectExceptionMessage(
             sprintf('The required \'field\' criteria value is missing for filter \'%s\'', IsNotEqual::class)
         );
+
+        $filter->filter($this->queryBuilder, $this->metadata, $criteria);
+    }
+
+    /**
+     * Assert that the IsNotEqual query filter can be applied with the provided $criteria
+     *
+     * @throws InvalidArgumentException
+     */
+    public function testFilterWillApplyIsNotEqualFiltering(): void
+    {
+        $filter = new IsNotEqual($this->queryFilterManager, $this->typecaster);
+
+        $fieldName = 'FieldNameTest';
+        $criteria = [
+            'field'  => $fieldName,
+            'alias'  => 'test',
+            'where'  => WhereType::AND,
+            'value'  => 123,
+            'format' => null,
+        ];
+
+        $this->metadata->expects($this->once())
+            ->method('hasField')
+            ->with($fieldName)
+            ->willReturn(true);
+
+        /** @var Expr|MockObject $expr */
+        $expr = $this->createMock(Expr::class);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        /** @var Expr\Comparison|MockObject $neq */
+        $neq = $this->createMock(Expr\Comparison::class);
+
+        $isNotEqualString = $criteria['alias'] . '.' . $fieldName . '!=' . ':param_name';
+        $expr->expects($this->once())
+            ->method('neq')
+            ->with($criteria['alias'] . '.' . $fieldName, $this->stringStartsWith(':'))
+            ->willReturn($neq);
+
+        $neq->expects($this->once())
+            ->method('__toString')
+            ->willReturn($isNotEqualString);
+
+        $methodName = (!isset($criteria['where']) || WhereType::AND === $criteria['where'])
+            ? 'andWhere'
+            : 'orWhere';
+
+        $this->queryBuilder->expects($this->once())->method($methodName);
+
+        if (array_key_exists('value', $criteria)) {
+            $this->typecaster->expects($this->once())
+                ->method('typecast')
+                ->with($this->metadata, $fieldName, $criteria['value'])
+                ->willReturn($criteria['value']);
+
+            $this->queryBuilder->expects($this->once())
+                ->method('setParameter')
+                ->with($this->callback(static function ($argument) {
+                    return is_string($argument);
+                }), $criteria['value']);
+        }
 
         $filter->filter($this->queryBuilder, $this->metadata, $criteria);
     }

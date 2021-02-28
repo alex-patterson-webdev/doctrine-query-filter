@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
@@ -81,4 +82,11 @@ interface QueryBuilderInterface
      * @return Query
      */
     public function getQuery(): Query;
+
+    /**
+     * Return the wrapped Doctrine query builder instance
+     *
+     * @return DoctrineQueryBuilder
+     */
+    public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
 }
