@@ -22,17 +22,18 @@ final class IsBetween extends AbstractFilter
      * @param array                 $criteria
      *
      * @throws InvalidArgumentException
+     * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
         if (empty($criteria['from'])) {
-            throw new FilterException(
+            throw new InvalidArgumentException(
                 sprintf('The required \'from\' criteria option is missing for filter \'%s\'', static::class)
             );
         }
 
         if (empty($criteria['to'])) {
-            throw new FilterException(
+            throw new InvalidArgumentException(
                 sprintf('The required \'to\' criteria option is missing for filter \'%s\'', static::class)
             );
         }
