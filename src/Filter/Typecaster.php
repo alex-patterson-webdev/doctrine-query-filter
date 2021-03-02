@@ -53,29 +53,52 @@ final class Typecaster implements TypecasterInterface
             return $value;
         }
 
-        $castDates = isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true;
         switch ($type) {
             case 'integer':
             case 'smallint':
-            case 'bigint': // Remove?
-                $value = (int)$value;
-            break;
-
+                return (int)$value;
             case 'boolean':
-                $value = (bool)$value;
-            break;
-
+                return (bool)$value;
             case 'decimal':
             case 'float':
-                $value = (float)$value;
-            break;
-
+                return (float)$value;
             case 'string':
-                $value = (string)$value;
-            break;
+                return (string)$value;
+        }
 
+        $castDates = isset($options['cast_dates']) ? (boolean)$options['cast_dates'] : true;
+        $dateTypes = [
+            'date',
+            'date_immutable',
+            'datetime',
+            'datetime_immutable',
+            'time',
+        ];
+
+        return ($castDates && in_array($type, $dateTypes))
+            ? $this->castDateTime($type, $value,  $options['format'] ?? null)
+            : $value;
+    }
+
+    /**
+     * @param string      $type
+     * @param mixed       $value
+     * @param string|null $format
+     *
+     * @return \DateTimeInterface
+     *
+     * @throws TypecastException
+     */
+    private function castDateTime(string $type, $value, ?string $format = null): \DateTimeInterface
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value;
+        }
+
+        switch ($type) {
             case 'date':
             case 'date_immutable':
+                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
                 $value = $castDates
                     ? $this->castDateTime($value, $options['format'] ?? 'Y-m-d')
                     : $value;
@@ -87,31 +110,23 @@ final class Typecaster implements TypecasterInterface
 
             case 'datetime':
             case 'datetime_immutable':
+                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
                 $value = $castDates
                     ? $this->castDateTime($value, $options['format'] ?? 'Y-m-d H:i:s')
                     : $value;
             break;
 
             case 'time':
+                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
                 $value = $castDates
                     ? $this->castDateTime($value, $options['format'] ?? 'H:i:s')
                     : $value;
             break;
+
+            default:
+                throw new TypecastException(sprintf('Unable to cast invalid date type \'%s\'', $type));
         }
 
-        return $value;
-    }
-
-    /**
-     * @param mixed  $value
-     * @param string $format
-     *
-     * @return \DateTimeInterface
-     *
-     * @throws TypecastException
-     */
-    private function castDateTime($value, string $format): \DateTimeInterface
-    {
         try {
             return $this->dateTimeFactory->createFromFormat($value, $format);
         } catch (DateTimeFactoryException $e) {
