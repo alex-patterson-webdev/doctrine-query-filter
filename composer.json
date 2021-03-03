@@ -1,5 +1,6 @@
 {
   "name": "alex-patterson-webdev/doctrine-query-filter",
+  "description": "Query filtering components for Doctrine ORM",
   "minimum-stability": "dev",
   "prefer-stable": true,
   "license": "MIT",
