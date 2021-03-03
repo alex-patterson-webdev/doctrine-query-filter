@@ -13,6 +13,10 @@ build:
         override:
           - php-scrutinizer-run
           - command: phpcs-run
+          - command: composer test
+            coverage:
+              file: test/coverage/clover.xml
+              format: clover
 checks:
   php: true
 coding_style:

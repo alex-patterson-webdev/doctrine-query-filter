@@ -20,6 +20,6 @@
         </include>
     </coverage>
     <logging>
-        <testdoxXml outputFile="coverage.xml"/>
+        <testdoxXml outputFile="./test/coverage/clover.xml"/>
     </logging>
 </phpunit>
