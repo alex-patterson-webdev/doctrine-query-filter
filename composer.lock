@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3006729806cc6888a9c3a8c94f46c6c1",
+    "content-hash": "1d5e6a43fc3a4a2cb21e3e67b756c14e",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
-            "version": "2.0.0",
+            "version": "dev-feature/2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/date-time.git",
-                "reference": "162c9055262b8070e08ee61618d06f1549ecaeb3"
+                "reference": "d691703ea9fd2cb179ca05eed6bead938d86991e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/162c9055262b8070e08ee61618d06f1549ecaeb3",
-                "reference": "162c9055262b8070e08ee61618d06f1549ecaeb3",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/d691703ea9fd2cb179ca05eed6bead938d86991e",
+                "reference": "d691703ea9fd2cb179ca05eed6bead938d86991e",
                 "shasum": ""
             },
             "require": {
-                "alex-patterson-webdev/factory": "^1",
+                "alex-patterson-webdev/factory": "dev-feature/2.0.0",
                 "php": ">=7.4"
             },
             "require-dev": {
@@ -43,31 +43,32 @@
                     "email": "alex.patterson.webdev@gmail.com"
                 }
             ],
+            "description": "Components for creating PHP DateTime objects",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/date-time/issues",
-                "source": "https://github.com/alex-patterson-webdev/date-time/tree/master"
+                "source": "https://github.com/alex-patterson-webdev/date-time/tree/feature/2.0.0"
             },
-            "time": "2020-08-30T10:51:47+00:00"
+            "time": "2021-03-04T00:16:41+00:00"
         },
         {
             "name": "alex-patterson-webdev/factory",
-            "version": "1.0.0",
+            "version": "dev-feature/2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/factory.git",
-                "reference": "59815fc82ffe88e91e3ad45c93b6b3e0af9df1c0"
+                "reference": "eff3e647cae0f39dda5a98e98e9e03804cbc3883"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/factory/zipball/59815fc82ffe88e91e3ad45c93b6b3e0af9df1c0",
-                "reference": "59815fc82ffe88e91e3ad45c93b6b3e0af9df1c0",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/factory/zipball/eff3e647cae0f39dda5a98e98e9e03804cbc3883",
+                "reference": "eff3e647cae0f39dda5a98e98e9e03804cbc3883",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2"
+                "php": ">=7.4 || >=8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8"
+                "phpunit/phpunit": "^9.5"
             },
             "type": "library",
             "autoload": {
@@ -76,17 +77,21 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "Alex Patterson",
                     "email": "alex.patterson.webdev@gmail.com"
                 }
             ],
+            "description": "Generic interfaces and classes for creating other services",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/factory/issues",
-                "source": "https://github.com/alex-patterson-webdev/factory/tree/master"
+                "source": "https://github.com/alex-patterson-webdev/factory/tree/feature/2.0.0"
             },
-            "time": "2020-02-09T19:17:23+00:00"
+            "time": "2021-03-04T00:11:29+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
@@ -3855,7 +3860,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "alex-patterson-webdev/date-time": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
