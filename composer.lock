@@ -57,12 +57,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/factory.git",
-                "reference": "ef254538f72ca0fc5fd2e5b0760264b81c6e92b6"
+                "reference": "f4e81d8bc872362a3e0f02673363b43160401a3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/factory/zipball/ef254538f72ca0fc5fd2e5b0760264b81c6e92b6",
-                "reference": "ef254538f72ca0fc5fd2e5b0760264b81c6e92b6",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/factory/zipball/f4e81d8bc872362a3e0f02673363b43160401a3b",
+                "reference": "f4e81d8bc872362a3e0f02673363b43160401a3b",
                 "shasum": ""
             },
             "require": {
@@ -92,7 +92,7 @@
                 "issues": "https://github.com/alex-patterson-webdev/factory/issues",
                 "source": "https://github.com/alex-patterson-webdev/factory/tree/feature/2.0.0"
             },
-            "time": "2021-03-04T21:47:13+00:00"
+            "time": "2021-03-04T22:03:49+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",

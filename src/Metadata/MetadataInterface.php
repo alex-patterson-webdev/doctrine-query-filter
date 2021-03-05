@@ -57,5 +57,5 @@ interface MetadataInterface
      *
      * @throws MappingException
      */
-    public function getAssociationFiledMapping(string $fieldName): array;
+    public function getAssociationMapping(string $fieldName): array;
 }

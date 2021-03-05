@@ -17,9 +17,9 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 interface QueryBuilderInterface
 {
     /**
-     * @return Expr
+     * @return QueryBuilderInterface
      */
-    public function expr(): Expr;
+    public function createQueryBuilder(): QueryBuilderInterface;
 
     /**
      * @return EntityManager
@@ -27,14 +27,74 @@ interface QueryBuilderInterface
     public function getEntityManager(): EntityManager;
 
     /**
-     * @return QueryBuilderInterface
+     * @return Query
      */
-    public function createQueryBuilder(): QueryBuilderInterface;
+    public function getQuery(): Query;
+
+    /**
+     * Return the wrapped Doctrine query builder instance
+     *
+     * @return DoctrineQueryBuilder
+     */
+    public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
+
+    /**
+     * @return Expr
+     */
+    public function expr(): Expr;
 
     /**
      * @return array
      */
     public function getQueryParts(): array;
+
+    /**
+     * @param mixed ...$args
+     *
+     * @return QueryBuilderInterface
+     */
+    public function orWhere(...$args): QueryBuilderInterface;
+
+    /**
+     * @param mixed ...$args
+     *
+     * @return QueryBuilderInterface
+     */
+    public function andWhere(...$args): QueryBuilderInterface;
+
+    /**
+     * @param string      $name
+     * @param string      $alias
+     * @param string      $type
+     * @param string|null $condition
+     * @param string|null $indexBy
+     *
+     * @return QueryBuilderInterface
+     */
+    public function innerJoin(
+        string $name,
+        string $alias,
+        string $type,
+        $condition = null,
+        string $indexBy = null
+    ): QueryBuilderInterface;
+
+    /**
+     * @param string      $name
+     * @param string      $alias
+     * @param string      $type
+     * @param string|null $condition
+     * @param string|null $indexBy
+     *
+     * @return QueryBuilderInterface
+     */
+    public function leftJoin(
+        string $name,
+        string $alias,
+        string $type,
+        $condition = null,
+        string $indexBy = null
+    ): QueryBuilderInterface;
 
     /**
      * @return ArrayCollection
@@ -63,30 +123,4 @@ interface QueryBuilderInterface
      * @return QueryBuilderInterface
      */
     public function setParameter(string $name, $value, ?string $type = null): QueryBuilderInterface;
-
-    /**
-     * @param mixed ...$args
-     *
-     * @return QueryBuilderInterface
-     */
-    public function orWhere(...$args): QueryBuilderInterface;
-
-    /**
-     * @param mixed ...$args
-     *
-     * @return QueryBuilderInterface
-     */
-    public function andWhere(...$args): QueryBuilderInterface;
-
-    /**
-     * @return Query
-     */
-    public function getQuery(): Query;
-
-    /**
-     * Return the wrapped Doctrine query builder instance
-     *
-     * @return DoctrineQueryBuilder
-     */
-    public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
 }

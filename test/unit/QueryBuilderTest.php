@@ -8,7 +8,9 @@ use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -83,6 +85,16 @@ final class QueryBuilderTest extends TestCase
             ->willReturn($entityManager);
 
         $queryBuilder->getEntityManager();
+    }
+
+    /**
+     * Assert that calls to getQuery() will proxy and return the wrapped query builders query instance
+     */
+    public function testGetWrappedQueryBuilderWillReturnTheDoctrineQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->assertSame($this->doctrineQueryBuilder, $queryBuilder->getWrappedQueryBuilder());
     }
 
     /**

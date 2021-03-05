@@ -100,7 +100,7 @@ abstract class AbstractJoin extends AbstractFilter
     private function getAssociationMapping(MetadataInterface $metadata, string $fieldName): array
     {
         try {
-            return $metadata->getAssociationFiledMapping($fieldName);
+            return $metadata->getAssociationMapping($fieldName);
         } catch (MappingException $e) {
             throw new InvalidArgumentException(
                 sprintf(
