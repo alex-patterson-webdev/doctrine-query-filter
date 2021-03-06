@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
+use Arp\DoctrineQueryFilter\Filter\IsGreaterThan;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
-final class IsNotEqualTest extends AbstractComparisonTest
+final class IsGreaterThanTest extends AbstractComparisonTest
 {
     /**
      * @var string
      */
-    protected string $filterClassName = IsNotEqual::class;
+    protected string $filterClassName = IsGreaterThan::class;
 
     /**
      * @var string
      */
-    protected string $expressionMethodName = 'neq';
+    protected string $expressionMethodName = 'gt';
 
     /**
      * @var string
      */
-    protected string $expressionSymbol = '!=';
+    protected string $expressionSymbol = '>';
 
     /**
      * @return array

@@ -46,6 +46,14 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
+     * @return string
+     */
+    public function getRootAlias(): string
+    {
+        return $this->queryBuilder->getRootAliases()[0] ?? '';
+    }
+
+    /**
      * @return Query
      */
     public function getQuery(): Query

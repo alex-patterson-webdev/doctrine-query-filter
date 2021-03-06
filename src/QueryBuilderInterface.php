@@ -27,6 +27,11 @@ interface QueryBuilderInterface
     public function getEntityManager(): EntityManager;
 
     /**
+     * @return string
+     */
+    public function getRootAlias(): string;
+
+    /**
      * @return Query
      */
     public function getQuery(): Query;

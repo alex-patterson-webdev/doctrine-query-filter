@@ -8,6 +8,7 @@ use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
@@ -64,6 +65,22 @@ abstract class AbstractFilter implements FilterInterface
     protected function createParamName(string $prefix = ''): string
     {
         return uniqid($prefix, false);
+    }
+
+    /**
+     * @param QueryBuilderInterface $queryBuilder
+     * @param string|null           $alias
+     *
+     * @return string
+     */
+    protected function getAlias(QueryBuilderInterface $queryBuilder, ?string $alias = null): string
+    {
+        $alias = empty($alias) ? $queryBuilder->getRootAlias() : $alias;
+        if (!empty($alias)) {
+            return $alias;
+        }
+
+        return $this->options['alias'] ?? 'entity';
     }
 
     /**
