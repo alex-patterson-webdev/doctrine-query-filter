@@ -7,6 +7,8 @@ namespace ArpTest\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
 
 /**
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsNotEqual
+ *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */

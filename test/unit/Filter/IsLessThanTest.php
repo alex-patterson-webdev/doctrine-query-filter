@@ -7,6 +7,8 @@ namespace ArpTest\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Filter\IsLessThan;
 
 /**
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsLessThan
+ *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */

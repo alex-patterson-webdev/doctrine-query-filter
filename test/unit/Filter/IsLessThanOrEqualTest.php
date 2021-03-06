@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\IsGreaterThan;
+use Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\Filter\IsGreaterThan
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
-final class IsGreaterThanTest extends AbstractComparisonTest
+final class IsLessThanOrEqualTest extends AbstractComparisonTest
 {
     /**
      * @var string
      */
-    protected string $filterClassName = IsGreaterThan::class;
+    protected string $filterClassName = IsLessThanOrEqual::class;
 
     /**
      * @var string
      */
-    protected string $expressionMethodName = 'gt';
+    protected string $expressionMethodName = 'lte';
 
     /**
      * @var string
      */
-    protected string $expressionSymbol = '>';
+    protected string $expressionSymbol = '<=';
 
     /**
      * @return array

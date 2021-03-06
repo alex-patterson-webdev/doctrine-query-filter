@@ -87,11 +87,14 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
                 ->willReturn($alias);
         }
 
-        $expressionString = $alias . '.' . $fieldName . ' ' . $this->expressionSymbol . ' :param_name';
+        $expressionString = $alias . '.' . $fieldName . ' ' . $this->expressionSymbol;
+        if (array_key_exists('value', $criteria)) {
+            $expressionString .=  ' :param_name';
+        }
 
         $expr->expects($this->once())
             ->method($this->expressionMethodName)
-            ->with($alias . '.' . $fieldName, $this->stringStartsWith(':'))
+            ->with($alias . '.' . $fieldName)
             ->willReturn($comparisonExpr);
 
         $comparisonExpr->expects($this->once())
