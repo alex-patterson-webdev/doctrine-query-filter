@@ -39,7 +39,7 @@ final class IsNullTest extends AbstractComparisonTest
                 [
                     'name' => 'test',
                     'field' => 'hello',
-                    'value'=> 123,
+                    'value' => 123,
                 ],
             ],
         ];

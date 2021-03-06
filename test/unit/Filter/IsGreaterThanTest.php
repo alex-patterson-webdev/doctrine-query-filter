@@ -8,6 +8,8 @@ use Arp\DoctrineQueryFilter\Filter\IsGreaterThan;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\IsGreaterThan
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
@@ -39,7 +41,7 @@ final class IsGreaterThanTest extends AbstractComparisonTest
                 [
                     'name' => 'test',
                     'field' => 'hello',
-                    'value'=> 123,
+                    'value' => 123,
                 ],
             ],
         ];
