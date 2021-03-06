@@ -6,16 +6,16 @@
 
 ## About
 
-This package provides query filtering components for Doctrine ORM; allowing for the construction DQL from PHP array configuration.
+This package provides query filtering components for Doctrine ORM; converting array configuration into DQL queries. 
 
-This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project
-and provides similar functionality without the Laminas Framework dependency.
+The project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder); 
+providing similar functionality without the Laminas Framework dependency.
 
 ## Installation
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.2
+    require alex-patterson-webdev/doctrine-query-filter ^0.3
 
 ## Query Filter Manager
 
@@ -64,27 +64,31 @@ For example, we can execute a query to find customers named `Fred`.
     // SELECT x FROM customer x WHERE x.forename = 'Fred' 
     $customers = $queryBuilder->getQuery()->execute();
 
-Each filter defined must contain a `name` which is either the fully qualified class name of the filter or an alias defined 
+Each filter defined must contain a `name` which is either the fully qualified class name of the filter, or an alias defined 
 by the `FilterFactory`. 
 
 ### Filter Reference
 
-The table below defines the available query filters
+There are many types of query filters, the table below defines the defaults available.
 
 | Alias         | Class Name     | Description  | Required Options
 | --------------|:-------------:| :-----:| :-----:
-| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is A = B | `field`, `value` |
-| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is A != B | `field`, `value` |
-| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is A > B | `field`, `value` |
-| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is A >= B | `field`, `value` |
-| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is A < B | `field`, `value` |
-| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is A <= B | `field`, `value` |
+| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is a = b | `field`, `value` |
+| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is a != b | `field`, `value` |
+| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is a > b | `field`, `value` |
+| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is a >= b | `field`, `value` |
+| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is a < b | `field`, `value` |
+| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is a <= b | `field`, `value` |
 | andx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical AND | `conditions` |
 | orx    | Arp\DoctrineQueryFilter\Filter\OrX | Join two or more expressions using logical OR | `conditions` |
-| between    | Arp\DoctrineQueryFilter\Filter\IsBetween | Test if A => min and A <= max | `field`, `min`, `max` |
-| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Check if x exists within collection y | `field`, `value` |
-| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Check if A is NULL | `field` |
-| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Check if B is NOT NULL | `field` |
+| between    | Arp\DoctrineQueryFilter\Filter\IsBetween | Test if a => min and a <= max | `field`, `min`, `max` |
+| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Test if a exists within collection b | `field`, `value` |
+| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Test if a is NULL | `field` |
+| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Test if a is NOT NULL | `field` |
+| islike    | Arp\DoctrineQueryFilter\Filter\IsLike | Test if a is LIKE b | `field`, `value` |
+| isnotlike    | Arp\DoctrineQueryFilter\Filter\IsNotLike | Check if a is NOT LIKE b | `field`, `value` |
+| isin    | Arp\DoctrineQueryFilter\Filter\IsIn | Check if a is IN b | `field`, `value` |
+| isnotin    | Arp\DoctrineQueryFilter\Filter\IsNotIn | Check if a is NOT IN b | `field`, `value` |
 
 ### Composing filters
 
