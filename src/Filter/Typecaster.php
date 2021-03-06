@@ -66,7 +66,7 @@ final class Typecaster implements TypecasterInterface
                 return (string)$value;
         }
 
-        $castDates = isset($options['cast_dates']) ? (boolean)$options['cast_dates'] : true;
+        $castDates = isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true;
         $dateTypes = [
             'date',
             'date_immutable',
@@ -98,10 +98,7 @@ final class Typecaster implements TypecasterInterface
         switch ($type) {
             case 'date':
             case 'date_immutable':
-                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
-                $value = $castDates
-                    ? $this->castDateTime($value, $options['format'] ?? 'Y-m-d')
-                    : $value;
+                $value = $this->createDateTime($value, $options['format'] ?? 'Y-m-d');
 
                 if ($value instanceof \DateTime) {
                     $value->setTime(0, 0);
@@ -110,25 +107,34 @@ final class Typecaster implements TypecasterInterface
 
             case 'datetime':
             case 'datetime_immutable':
-                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
-                $value = $castDates
-                    ? $this->castDateTime($value, $options['format'] ?? 'Y-m-d H:i:s')
-                    : $value;
+                $value = $this->createDateTime($value, $options['format'] ?? 'Y-m-d H:i:s');
             break;
 
             case 'time':
-                $castDates = (isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true);
-                $value = $castDates
-                    ? $this->castDateTime($value, $options['format'] ?? 'H:i:s')
-                    : $value;
+                $value = $this->createDateTime($value, $options['format'] ?? 'H:i:s');
             break;
 
             default:
-                throw new TypecastException(sprintf('Unable to cast invalid date type \'%s\'', $type));
+                throw new TypecastException(
+                    sprintf('Unable to cast invalid date type \'%s\'', $type)
+                );
         }
 
+        return $value;
+    }
+
+    /**
+     * @param string $spec
+     * @param string $format
+     *
+     * @return \DateTimeInterface
+     *
+     * @throws TypecastException
+     */
+    private function createDateTime(string $spec, string $format): \DateTimeInterface
+    {
         try {
-            return $this->dateTimeFactory->createFromFormat($value, $format);
+            return $this->dateTimeFactory->createFromFormat($spec, $format);
         } catch (DateTimeFactoryException $e) {
             throw new TypecastException(
                 sprintf('Failed to cast date time to format \'%s\': %s', $format, $e->getMessage()),
