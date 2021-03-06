@@ -76,7 +76,7 @@ final class Typecaster implements TypecasterInterface
         ];
 
         return ($castDates && in_array($type, $dateTypes))
-            ? $this->castDateTime($type, $value,  $options['format'] ?? null)
+            ? $this->castDateTime($type, $value, $options['format'] ?? null)
             : $value;
     }
 
@@ -98,7 +98,7 @@ final class Typecaster implements TypecasterInterface
         switch ($type) {
             case 'date':
             case 'date_immutable':
-                $value = $this->createDateTime($value, $options['format'] ?? 'Y-m-d');
+                $value = $this->createDateTime($value, $format ?? 'Y-m-d');
 
                 if ($value instanceof \DateTime) {
                     $value->setTime(0, 0);
@@ -107,11 +107,11 @@ final class Typecaster implements TypecasterInterface
 
             case 'datetime':
             case 'datetime_immutable':
-                $value = $this->createDateTime($value, $options['format'] ?? 'Y-m-d H:i:s');
+                $value = $this->createDateTime($value, $format ?? 'Y-m-d H:i:s');
             break;
 
             case 'time':
-                $value = $this->createDateTime($value, $options['format'] ?? 'H:i:s');
+                $value = $this->createDateTime($value, $format ?? 'H:i:s');
             break;
 
             default:
