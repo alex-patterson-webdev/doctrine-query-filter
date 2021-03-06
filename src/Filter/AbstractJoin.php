@@ -52,13 +52,7 @@ abstract class AbstractJoin extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
-        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? null);
-        if (null === $alias) {
-            throw new InvalidArgumentException(
-                sprintf('The required \'alias\' criteria value is missing for filter \'%s\'', static::class)
-            );
-        }
-
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
         $conditions = $criteria['conditions'] ?? [];
         $condition = null;
 
@@ -72,7 +66,7 @@ abstract class AbstractJoin extends AbstractFilter
             $this->filterJoinCriteria(
                 $tempQueryBuilder,
                 $mapping['targetEntity'],
-                ['filters' => $this->createJoinFilters($conditions, $alias, $criteria)]
+                ['filters' => $this->createJoinFilters($conditions, $queryAlias, $criteria)]
             );
 
             $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
@@ -82,7 +76,7 @@ abstract class AbstractJoin extends AbstractFilter
         $this->applyJoin(
             $queryBuilder,
             $parentAlias . '.' . $fieldName,
-            $alias,
+            $queryAlias,
             $condition,
             $criteria['join_type'] ?? Join::WITH,
             $criteria['index_by'] ?? null
