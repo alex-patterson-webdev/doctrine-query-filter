@@ -79,22 +79,15 @@ final class IsBetweenTest extends AbstractFilterTest
     }
 
     /**
-     * @param array       $criteria
-     * @param string|null $whereType
-     * @param string|null $alias
-     * @param string|null $formatType
+     * @param array $criteria
      *
      * @throws FilterException
      * @throws InvalidArgumentException
      *
      * @dataProvider getFilterIsBetweenData
      */
-    public function testFilterIsBetween(
-        array $criteria,
-        ?string $whereType = null,
-        ?string $alias = null,
-        ?string $formatType = null
-    ): void {
+    public function testFilterIsBetween(array $criteria): void
+    {
         /** @var IsBetween|MockObject $filter */
         $filter = $this->getMockBuilder(IsBetween::class)
             ->setConstructorArgs([$this->queryFilterManager, $this->typecaster])
@@ -104,26 +97,16 @@ final class IsBetweenTest extends AbstractFilterTest
         $rootAlias = 'entity';
         $from = $criteria['from'] ?? '';
         $to = $criteria['to'] ?? '';
+        $alias = $criteria['alias'] ?? 'entity';
         $fieldName = $criteria['field'] = $criteria['field'] ?? 'test';
-
-        if (null !== $alias) {
-            $criteria['alias'] = $alias;
-        }
-
-        if (null !== $whereType) {
-            $criteria['where'] = $whereType;
-        }
-
-        if (null !== $formatType) {
-            $criteria['format'] = $formatType;
-        }
+        $formatType = $criteria['format'] ?? null;
 
         $this->metadata->expects($this->once())
             ->method('hasField')
             ->with($fieldName)
             ->willReturn(true);
 
-        if (empty($alias)) {
+        if (empty($criteria['alias'])) {
             $alias = $rootAlias;
 
             $this->queryBuilder->expects($this->once())
@@ -162,7 +145,7 @@ final class IsBetweenTest extends AbstractFilterTest
                 $isBetween
             );
 
-        if (null === $whereType || WhereType::AND === $whereType) {
+        if (empty($criteria['where']) || WhereType:: AND === $criteria['where']) {
             $this->queryBuilder->expects($this->once())
                 ->method('andWhere')
                 ->with($isBetween);
@@ -200,9 +183,33 @@ final class IsBetweenTest extends AbstractFilterTest
         return [
             [
                 [
-                    'to' => '2021-01-01 00:00:00',
+                    'to'   => '2021-01-01 00:00:00',
                     'from' => '2021-02-01 00:00:00',
-                ]
+                ],
+            ],
+
+            [
+                [
+                    'to'    => '2021-01-01 00:00:00',
+                    'from'  => '2021-02-01 00:00:00',
+                    'where' => WhereType:: AND,
+                ],
+            ],
+
+            [
+                [
+                    'to'    => '2021-01-01 00:00:00',
+                    'from'  => '2021-02-01 00:00:00',
+                    'where' => WhereType:: OR,
+                ],
+            ],
+
+            [
+                [
+                    'to'    => '2000-01-01 11:12:45',
+                    'from'  => '2021-01-01 07:35:17',
+                    'alias' => 'test_alias_123',
+                ],
             ],
         ];
     }
