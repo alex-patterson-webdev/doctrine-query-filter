@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
@@ -36,16 +37,16 @@ final class IsMemberOf extends AbstractExpression
      * @return string
      *
      * @throws InvalidArgumentException
+     * @throws MetadataException
      */
     protected function resolveFieldName(MetadataInterface $metadata, array $criteria, string $key = 'field'): string
     {
         $fieldName = parent::resolveFieldName($metadata, $criteria, $key);
 
         if ($metadata->hasAssociation($fieldName)) {
-            $associationType = $metadata->getAssociationMapping($fieldName)['type'];
+            $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';
 
-            $isCollection = ($associationType & ClassMetadata::TO_ONE) ? false : true;
-            if ($isCollection) {
+            if (!empty($associationType) && !($associationType & ClassMetadata::TO_ONE)) {
                 return $fieldName;
             }
 
@@ -53,7 +54,7 @@ final class IsMemberOf extends AbstractExpression
                 sprintf(
                     'Unable to apply query filter \'%s\': '
                     . 'The field \'%s\' is not a collection valued association',
-                    static::class,
+                    self::class,
                     $fieldName
                 )
             );
@@ -63,7 +64,7 @@ final class IsMemberOf extends AbstractExpression
             sprintf(
                 'Unable to apply query filter \'%s\': '
                 . 'The entity class \'%s\' has no association named \'%s\'',
-                static::class,
+                self::class,
                 $metadata->getName(),
                 $fieldName
             )

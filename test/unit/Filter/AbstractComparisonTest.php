@@ -54,7 +54,7 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
     }
 
     /**
-     * Assert that the IsGreaterThan query filter can be applied with the provided $criteria
+     * Assert that the query filter can be applied with the provided $criteria
      *
      * @param array $criteria
      *
