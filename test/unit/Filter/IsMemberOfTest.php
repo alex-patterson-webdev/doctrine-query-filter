@@ -32,6 +32,18 @@ final class IsMemberOfTest extends AbstractComparisonTest
     protected string $expressionSymbol = 'MEMBER OF';
 
     /**
+     * @param string      $fieldName
+     * @param string|null $alias
+     * @param array       $criteria
+     *
+     * @return string
+     */
+    protected function getExpressionString(string $fieldName, ?string $alias, array $criteria): string
+    {
+        return ':param_name ' . $this->expressionSymbol . $alias . '.' . $fieldName;
+    }
+
+    /**
      * @return array
      */
     public function getFilterWillApplyFilteringData(): array

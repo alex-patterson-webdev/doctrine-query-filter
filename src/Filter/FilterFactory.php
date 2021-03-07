@@ -39,6 +39,10 @@ final class FilterFactory implements FilterFactoryInterface
         'orx'       => OrX::class,
         'leftjoin'  => LeftJoin::class,
         'innerjoin' => InnerJoin::class,
+        'like'      => IsLike::class,
+        'notlike'   => IsNotLike::class,
+        'in'        => IsIn::class,
+        'notin'     => IsNotIn::class,
     ];
 
     /**
@@ -53,7 +57,7 @@ final class FilterFactory implements FilterFactoryInterface
      */
     public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
     {
-        $this->typecaster = $typecaster ?? new Typecaster(new DateTimeFactory());
+        $this->typecaster = $typecaster ?? new Typecaster();
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
         $this->options = $options;
     }
@@ -99,5 +103,30 @@ final class FilterFactory implements FilterFactoryInterface
                 $e
             );
         }
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function getClassMap(): array
+    {
+        return $this->classMap;
+    }
+
+    /**
+     * @param array $classMap
+     */
+    public function setClassMap(array $classMap): void
+    {
+        $this->classMap = $classMap;
+    }
+
+    /**
+     * @param string $alias
+     * @param string $className
+     */
+    public function addToClassMap(string $alias, string $className): void
+    {
+        $this->classMap[$alias] = $className;
     }
 }

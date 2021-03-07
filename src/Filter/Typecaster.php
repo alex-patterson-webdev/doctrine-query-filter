@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DateTime\DateTimeFactory;
 use Arp\DateTime\DateTimeFactoryInterface;
 use Arp\DateTime\Exception\DateTimeFactoryException;
 use Arp\DoctrineQueryFilter\Constant\TypecastType;
@@ -18,16 +19,16 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 final class Typecaster implements TypecasterInterface
 {
     /**
-     * @var DateTimeFactoryInterface
+     * @var DateTimeFactoryInterface|null
      */
-    private DateTimeFactoryInterface $dateTimeFactory;
+    private ?DateTimeFactoryInterface $dateTimeFactory;
 
     /**
-     * @param DateTimeFactoryInterface $dateTimeFactory
+     * @param DateTimeFactoryInterface|null $dateTimeFactory
      */
-    public function __construct(DateTimeFactoryInterface $dateTimeFactory)
+    public function __construct(?DateTimeFactoryInterface $dateTimeFactory = null)
     {
-        $this->dateTimeFactory = $dateTimeFactory;
+        $this->dateTimeFactory = $dateTimeFactory ?? new DateTimeFactory();
     }
 
     /**

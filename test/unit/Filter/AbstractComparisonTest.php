@@ -87,14 +87,10 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
                 ->willReturn($alias);
         }
 
-        $expressionString = $alias . '.' . $fieldName . ' ' . $this->expressionSymbol;
-        if (array_key_exists('value', $criteria)) {
-            $expressionString .=  ' :param_name';
-        }
+        $expressionString = $this->getExpressionString($fieldName, $alias, $criteria);
 
         $expr->expects($this->once())
             ->method($this->expressionMethodName)
-            ->with($alias . '.' . $fieldName)
             ->willReturn($comparisonExpr);
 
         $comparisonExpr->expects($this->once())
@@ -127,4 +123,20 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
      * @return array
      */
     abstract public function getFilterWillApplyFilteringData(): array;
+
+    /**
+     * @param string      $fieldName
+     * @param string|null $alias
+     * @param array       $criteria
+     *
+     * @return string
+     */
+    protected function getExpressionString(string $fieldName, ?string $alias, array $criteria): string
+    {
+        $expressionString = $alias . '.' . $fieldName . ' ' . $this->expressionSymbol;
+        if (array_key_exists('value', $criteria)) {
+            $expressionString .= ' :param_name';
+        }
+        return $expressionString;
+    }
 }
