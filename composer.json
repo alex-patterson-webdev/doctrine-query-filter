@@ -34,7 +34,7 @@
   "scripts": {
     "test": [
       "@test:phpcs",
-      "@test:phpcs-fixer",
+      "@test:phpcs-fix",
       "@test:phpstan",
       "@test:phpunit"
     ],
