@@ -20,8 +20,4 @@
             <directory suffix=".php">src</directory>
         </include>
     </coverage>
-
-    <logging>
-        <testdoxXml outputFile="./test/coverage/clover.xml"/>
-    </logging>
 </phpunit>
