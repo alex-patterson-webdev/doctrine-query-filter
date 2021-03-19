@@ -42,7 +42,7 @@ jobs:
         run: composer test:phpstan
 
       - name: "Running unit tests with code coverage"
-        run: composer test:with-coverage
+        run: composer test:phpunit
 
       - name: "Uploading code coverage report to Codecov"
         uses: codecov/codecov-action@v1.3.1
