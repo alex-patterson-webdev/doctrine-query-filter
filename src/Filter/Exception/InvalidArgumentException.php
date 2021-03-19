@@ -10,5 +10,4 @@ namespace Arp\DoctrineQueryFilter\Filter\Exception;
  */
 class InvalidArgumentException extends FilterException
 {
-
 }

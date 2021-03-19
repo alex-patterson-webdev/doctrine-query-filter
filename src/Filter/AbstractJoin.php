@@ -58,7 +58,7 @@ abstract class AbstractJoin extends AbstractFilter
 
         if (is_string($conditions)) {
             $condition = $conditions;
-        } elseif (is_object($condition)) {
+        } elseif (is_object($conditions)) {
             $condition = (string)$conditions;
         } elseif (is_array($conditions) && !empty($conditions)) {
             $tempQueryBuilder = $queryBuilder->createQueryBuilder();

@@ -14,7 +14,7 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Query
  */
-class QueryBuilder implements QueryBuilderInterface
+final class QueryBuilder implements QueryBuilderInterface
 {
     /**
      * @var DoctrineQueryBuilder

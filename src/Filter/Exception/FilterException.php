@@ -10,5 +10,4 @@ namespace Arp\DoctrineQueryFilter\Filter\Exception;
  */
 class FilterException extends \Exception
 {
-
 }

@@ -136,7 +136,7 @@ final class QueryFilterManagerTest extends TestCase
                 . '\'%s\' provided in \'%s\'',
                 QueryBuilderInterface::class,
                 DoctrineQueryBuilder::class,
-                is_object($invalidQueryBuilder) ? get_class($invalidQueryBuilder) : gettype($invalidQueryBuilder),
+                get_class($invalidQueryBuilder),
                 QueryFilterManager::class
             )
         );
@@ -228,7 +228,7 @@ final class QueryFilterManagerTest extends TestCase
             sprintf(
                 'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
                 FilterInterface::class,
-                is_object($filter) ? get_class($filter) : gettype($filter),
+                gettype($filter),
                 QueryFilterManager::class
             )
         );

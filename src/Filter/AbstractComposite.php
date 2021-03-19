@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
-use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr\Andx as DoctrineAndX;
@@ -64,7 +64,7 @@ abstract class AbstractComposite extends AbstractFilter
     /**
      * @param QueryBuilderInterface $qb
      * @param MetadataInterface     $metadata
-     * @param                       $conditions
+     * @param iterable|array[]      $conditions
      *
      * @throws FilterException
      */

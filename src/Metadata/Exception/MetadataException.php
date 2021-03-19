@@ -10,5 +10,4 @@ namespace Arp\DoctrineQueryFilter\Metadata\Exception;
  */
 class MetadataException extends \Exception
 {
-
 }

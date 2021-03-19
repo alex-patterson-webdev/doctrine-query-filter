@@ -104,16 +104,16 @@ final class Typecaster implements TypecasterInterface
                 if ($value instanceof \DateTime) {
                     $value->setTime(0, 0);
                 }
-            break;
+                break;
 
             case 'datetime':
             case 'datetime_immutable':
                 $value = $this->createDateTime($value, $format ?? 'Y-m-d H:i:s');
-            break;
+                break;
 
             case 'time':
                 $value = $this->createDateTime($value, $format ?? 'H:i:s');
-            break;
+                break;
 
             default:
                 throw new TypecastException(

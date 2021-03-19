@@ -101,7 +101,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
                     . '\'%s\' provided in \'%s\'',
                     QueryBuilderInterface::class,
                     DoctrineQueryBuilder::class,
-                    is_object($queryBuilder) ? get_class($queryBuilder) : gettype($queryBuilder),
+                    get_class($queryBuilder),
                     static::class
                 )
             );
@@ -137,7 +137,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
                 sprintf(
                     'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
                     FilterInterface::class,
-                    is_object($data) ? get_class($data) : gettype($data),
+                    gettype($data),
                     static::class
                 )
             );

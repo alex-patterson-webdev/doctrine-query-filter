@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <ruleset name="ARP">
     <description>ARP coding standard</description>
-    <rule ref="PSR1"/>
-    <rule ref="PSR2"/>
     <rule ref="PSR12"/>
 </ruleset>
