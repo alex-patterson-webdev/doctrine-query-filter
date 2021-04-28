@@ -14,9 +14,9 @@ interface FilterServiceInterface
 {
     /**
      * @param QueryFilterManagerInterface $filterManager
-     * @param array                       $criteria
+     * @param array<mixed>                $criteria
      *
-     * @return iterable
+     * @return iterable<mixed>
      *
      * @throws \Exception
      */
