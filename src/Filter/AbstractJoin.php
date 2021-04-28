@@ -72,10 +72,9 @@ abstract class AbstractJoin extends AbstractFilter
             $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
         }
 
-        $parentAlias = $criteria['parent_alias'] ?? 'entity';
         $this->applyJoin(
             $queryBuilder,
-            $parentAlias . '.' . $fieldName,
+            $queryBuilder->getRootAlias() . '.' . $fieldName,
             $queryAlias,
             $condition,
             $criteria['join_type'] ?? Join::WITH,
