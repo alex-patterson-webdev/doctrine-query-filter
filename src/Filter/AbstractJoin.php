@@ -42,7 +42,7 @@ abstract class AbstractJoin extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException
@@ -87,7 +87,7 @@ abstract class AbstractJoin extends AbstractFilter
      * @param MetadataInterface $metadata
      * @param string            $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws InvalidArgumentException
      */
@@ -110,7 +110,7 @@ abstract class AbstractJoin extends AbstractFilter
     /**
      * @param QueryBuilderInterface $qb
      * @param string                $targetEntity
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws FilterException
      */
@@ -133,11 +133,11 @@ abstract class AbstractJoin extends AbstractFilter
     }
 
     /**
-     * @param array  $conditions
+     * @param array<mixed>  $conditions
      * @param string $alias
-     * @param array  $criteria
+     * @param array<mixed>  $criteria
      *
-     * @return array
+     * @return  array<mixed>
      */
     private function createJoinFilters(array $conditions, string $alias, array $criteria): array
     {

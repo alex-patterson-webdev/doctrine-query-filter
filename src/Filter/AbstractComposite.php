@@ -9,8 +9,6 @@ use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
-use Doctrine\ORM\Query\Expr\Andx as DoctrineAndX;
-use Doctrine\ORM\Query\Expr\Andx as DoctrineOrX;
 use Doctrine\ORM\Query\Expr\Composite;
 
 /**
@@ -29,7 +27,7 @@ abstract class AbstractComposite extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws FilterException
      */
@@ -44,7 +42,8 @@ abstract class AbstractComposite extends AbstractFilter
         $parts = $qb->getQueryParts();
         if (
             !isset($parts['where'])
-            || (!$parts['where'] instanceof DoctrineAndx || !$parts['where'] instanceof DoctrineOrX)
+            || (!$parts['where'] instanceof Composite)
+            || (!method_exists($parts['where'], 'getParts'))
         ) {
             return;
         }

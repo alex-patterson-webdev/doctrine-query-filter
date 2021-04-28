@@ -31,7 +31,7 @@ final class IsMemberOf extends AbstractExpression
 
     /**
      * @param MetadataInterface $metadata
-     * @param array             $criteria
+     * @param array<mixed>             $criteria
      * @param string            $key
      *
      * @return string

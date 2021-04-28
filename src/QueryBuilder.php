@@ -34,7 +34,7 @@ final class QueryBuilder implements QueryBuilderInterface
      */
     public function createQueryBuilder(): QueryBuilderInterface
     {
-        return new static($this->getEntityManager()->createQueryBuilder());
+        return new self($this->getEntityManager()->createQueryBuilder());
     }
 
     /**
@@ -80,7 +80,7 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return array
+     * @return  array<mixed>
      */
     public function getQueryParts(): array
     {
@@ -154,7 +154,7 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<mixed, Query\Parameter>
      */
     public function getParameters(): ArrayCollection
     {
@@ -162,7 +162,7 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param ArrayCollection $parameters
+     * @param ArrayCollection<mixed, Query\Parameter> $parameters
      *
      * @return $this|QueryBuilderInterface
      */

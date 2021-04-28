@@ -71,7 +71,7 @@ final class AndXTest extends AbstractFilterTest
 
         $className = 'FooEntity';
 
-        /** @var QueryBuilderInterface|MockObject $qb */
+        /** @var QueryBuilderInterface&MockObject $qb */
         $qb = $this->createMock(QueryBuilderInterface::class);
 
         $this->queryBuilder->expects($this->once())
@@ -86,7 +86,7 @@ final class AndXTest extends AbstractFilterTest
             ->method('filter')
             ->with($qb, $className, ['filters' => $criteria['conditions']]);
 
-        /** @var DoctrineAndx|MockObject $where */
+        /** @var DoctrineAndx&MockObject $where */
         $where = $this->createMock(DoctrineAndx::class);
 
         $queryParts = [
@@ -97,14 +97,14 @@ final class AndXTest extends AbstractFilterTest
             ->method('getQueryParts')
             ->willReturn($queryParts);
 
-        /** @var Expr|MockObject $expr */
+        /** @var Expr&MockObject $expr */
         $expr = $this->createMock(Expr::class);
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
-        /** @var DoctrineAndx|MockObject $doctrineAndX */
+        /** @var DoctrineAndx&MockObject $doctrineAndX */
         $doctrineAndX = $this->createMock(DoctrineAndx::class);
 
         $expr->expects($this->once())
@@ -137,7 +137,7 @@ final class AndXTest extends AbstractFilterTest
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyTheProvidedConditionsData(): array
     {

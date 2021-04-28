@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 final class MetadataTest extends TestCase
 {
     /**
-     * @var ClassMetadata|MockObject
+     * @var ClassMetadata&MockObject
      */
     private $classMetadata;
 

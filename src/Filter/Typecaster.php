@@ -19,9 +19,9 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 final class Typecaster implements TypecasterInterface
 {
     /**
-     * @var DateTimeFactoryInterface|null
+     * @var DateTimeFactoryInterface
      */
-    private ?DateTimeFactoryInterface $dateTimeFactory;
+    private DateTimeFactoryInterface $dateTimeFactory;
 
     /**
      * @param DateTimeFactoryInterface|null $dateTimeFactory
@@ -36,7 +36,7 @@ final class Typecaster implements TypecasterInterface
      * @param string            $fieldName
      * @param mixed             $value
      * @param string|null       $type
-     * @param array             $options
+     * @param array<mixed>      $options
      *
      * @return mixed
      *
@@ -67,7 +67,7 @@ final class Typecaster implements TypecasterInterface
                 return (string)$value;
         }
 
-        $castDates = isset($options['cast_dates']) ? (bool)$options['cast_dates'] : true;
+        $castDates = !isset($options['cast_dates']) || $options['cast_dates'];
         $dateTypes = [
             'date',
             'date_immutable',

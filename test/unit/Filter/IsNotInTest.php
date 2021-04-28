@@ -32,7 +32,7 @@ final class IsNotInTest extends AbstractComparisonTest
     protected string $expressionSymbol = 'NOT IN';
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyFilteringData(): array
     {

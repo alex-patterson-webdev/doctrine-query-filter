@@ -79,7 +79,7 @@ final class IsBetweenTest extends AbstractFilterTest
     }
 
     /**
-     * @param array $criteria
+     * @param array<mixed> $criteria
      *
      * @throws FilterException
      * @throws InvalidArgumentException
@@ -88,7 +88,7 @@ final class IsBetweenTest extends AbstractFilterTest
      */
     public function testFilterIsBetween(array $criteria): void
     {
-        /** @var IsBetween|MockObject $filter */
+        /** @var IsBetween&MockObject $filter */
         $filter = $this->getMockBuilder(IsBetween::class)
             ->setConstructorArgs([$this->queryFilterManager, $this->typecaster])
             ->onlyMethods(['createParamName'])
@@ -114,7 +114,7 @@ final class IsBetweenTest extends AbstractFilterTest
                 ->willReturn($rootAlias);
         }
 
-        /** @var Expr|MockObject $expr */
+        /** @var Expr&MockObject $expr */
         $expr = $this->createMock(Expr::class);
 
         $this->queryBuilder->expects($this->once())
@@ -145,7 +145,7 @@ final class IsBetweenTest extends AbstractFilterTest
                 $isBetween
             );
 
-        if (empty($criteria['where']) || WhereType:: AND === $criteria['where']) {
+        if (empty($criteria['where']) || WhereType::AND === $criteria['where']) {
             $this->queryBuilder->expects($this->once())
                 ->method('andWhere')
                 ->with($isBetween);
@@ -176,7 +176,7 @@ final class IsBetweenTest extends AbstractFilterTest
     }
 
     /**
-     * @return array
+     * @return array<mixed><mixed>
      */
     public function getFilterIsBetweenData(): array
     {
@@ -192,7 +192,7 @@ final class IsBetweenTest extends AbstractFilterTest
                 [
                     'to'    => '2021-01-01 00:00:00',
                     'from'  => '2021-02-01 00:00:00',
-                    'where' => WhereType:: AND,
+                    'where' => WhereType::AND,
                 ],
             ],
 
@@ -200,7 +200,7 @@ final class IsBetweenTest extends AbstractFilterTest
                 [
                     'to'    => '2021-01-01 00:00:00',
                     'from'  => '2021-02-01 00:00:00',
-                    'where' => WhereType:: OR,
+                    'where' => WhereType::OR,
                 ],
             ],
 

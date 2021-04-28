@@ -18,22 +18,22 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractFilterTest extends TestCase
 {
     /**
-     * @var QueryFilterManagerInterface|MockObject
+     * @var QueryFilterManagerInterface&MockObject
      */
     protected $queryFilterManager;
 
     /**
-     * @var TypecasterInterface|MockObject
+     * @var TypecasterInterface&MockObject
      */
     protected $typecaster;
 
     /**
-     * @var QueryBuilderInterface|MockObject
+     * @var QueryBuilderInterface&MockObject
      */
     protected $queryBuilder;
 
     /**
-     * @var MetadataInterface|MockObject
+     * @var MetadataInterface&MockObject
      */
     protected $metadata;
 

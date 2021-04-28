@@ -37,7 +37,7 @@ final class IsMemberOfTest extends AbstractComparisonTest
     /**
      * Assert that the IsMemberOf query filter can be applied with the provided $criteria
      *
-     * @param array $criteria
+     * @param array<mixed>$criteria
      *
      * @dataProvider getFilterWillApplyFilteringData
      */
@@ -65,14 +65,14 @@ final class IsMemberOfTest extends AbstractComparisonTest
             ->with($fieldName)
             ->willReturn($mapping);
 
-        /** @var Expr|MockObject $expr */
+        /** @var Expr&MockObject $expr */
         $expr = $this->createMock(Expr::class);
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
-        /** @var Expr\Comparison|MockObject $comparisonExpr */
+        /** @var Expr\Comparison&MockObject $comparisonExpr */
         $comparisonExpr = $this->createMock(Expr\Comparison::class);
 
         if (null === $alias) {
@@ -117,7 +117,7 @@ final class IsMemberOfTest extends AbstractComparisonTest
     /**
      * @param string      $fieldName
      * @param string|null $alias
-     * @param array       $criteria
+     * @param array<mixed>      $criteria
      *
      * @return string
      */
@@ -127,7 +127,7 @@ final class IsMemberOfTest extends AbstractComparisonTest
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyFilteringData(): array
     {

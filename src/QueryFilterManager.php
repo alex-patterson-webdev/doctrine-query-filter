@@ -38,7 +38,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
      *
      * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
      * @param string                                     $entityName
-     * @param array                                      $criteria
+     * @param array<mixed>                               $criteria
      *
      * @return DoctrineQueryBuilder
      *
@@ -61,8 +61,8 @@ class QueryFilterManager implements QueryFilterManagerInterface
     /**
      * Create a new filter matching $name with the provided $options
      *
-     * @param string $name
-     * @param array  $options
+     * @param string       $name
+     * @param array<mixed> $options
      *
      * @return FilterInterface
      *
@@ -111,9 +111,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array|FilterInterface $data
+     * @param QueryBuilderInterface        $queryBuilder
+     * @param MetadataInterface            $metadata
+     * @param array<mixed>|FilterInterface $data
      *
      * @throws QueryFilterManagerException
      */

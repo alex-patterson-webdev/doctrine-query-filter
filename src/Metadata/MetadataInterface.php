@@ -27,7 +27,7 @@ interface MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */
@@ -52,7 +52,7 @@ interface MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */

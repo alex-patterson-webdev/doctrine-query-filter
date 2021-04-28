@@ -18,7 +18,7 @@ interface TypecasterInterface
      * @param string            $fieldName
      * @param mixed             $value
      * @param string|null       $type
-     * @param array             $options
+     * @param array<mixed>             $options
      *
      * @return mixed
      *

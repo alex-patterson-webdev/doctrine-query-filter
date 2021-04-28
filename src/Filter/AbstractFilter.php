@@ -28,14 +28,14 @@ abstract class AbstractFilter implements FilterInterface
     protected TypecasterInterface $typecaster;
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     protected array $options = [];
 
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
      * @param TypecasterInterface         $typecaster
-     * @param array                       $options
+     * @param array<mixed>                $options
      */
     public function __construct(
         QueryFilterManagerInterface $queryFilterManager,
@@ -48,7 +48,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getOptions(): array
     {
@@ -85,7 +85,7 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * @param MetadataInterface $metadata
-     * @param array             $criteria
+     * @param array<mixed>      $criteria
      * @param string            $key
      *
      * @return string
@@ -124,7 +124,7 @@ abstract class AbstractFilter implements FilterInterface
      * @param string            $fieldName
      * @param mixed             $value
      * @param string|null       $type
-     * @param array             $options
+     * @param array<mixed>      $options
      *
      * @return mixed
      *

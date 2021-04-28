@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Constant\WhereType;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -56,9 +57,11 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
     /**
      * Assert that the query filter can be applied with the provided $criteria
      *
-     * @param array $criteria
+     * @param array<mixed> $criteria
      *
      * @dataProvider getFilterWillApplyFilteringData
+     *
+     * @throws FilterException
      */
     public function testFilterWillApplyFiltering(array $criteria): void
     {
@@ -70,14 +73,14 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
             ->with($fieldName)
             ->willReturn(true);
 
-        /** @var Expr|MockObject $expr */
+        /** @var Expr&MockObject $expr */
         $expr = $this->createMock(Expr::class);
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
-        /** @var Expr\Comparison|MockObject $comparisonExpr */
+        /** @var Expr\Comparison&MockObject $comparisonExpr */
         $comparisonExpr = $this->createMock(Expr\Comparison::class);
 
         if (null === $alias) {
@@ -120,14 +123,14 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     abstract public function getFilterWillApplyFilteringData(): array;
 
     /**
      * @param string      $fieldName
      * @param string|null $alias
-     * @param array       $criteria
+     * @param array<mixed>      $criteria
      *
      * @return string
      */

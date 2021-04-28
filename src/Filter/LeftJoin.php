@@ -31,6 +31,12 @@ final class LeftJoin extends AbstractJoin
         string $joinType = Join::WITH,
         ?string $indexBy = null
     ): void {
-        $queryBuilder->leftJoin($fieldName, $alias, $joinType, $condition, $indexBy);
+        $queryBuilder->leftJoin(
+            $fieldName,
+            $alias,
+            $joinType,
+            isset($condition) ? (string)$condition : null,
+            $indexBy
+        );
     }
 }

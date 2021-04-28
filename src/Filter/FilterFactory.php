@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
-use Arp\DateTime\DateTimeFactory;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
@@ -46,14 +45,14 @@ final class FilterFactory implements FilterFactoryInterface
     ];
 
     /**
-     * @var array
+     * @var array<mixed>
      */
-    private array $options = [];
+    private array $options;
 
     /**
      * @param TypecasterInterface|null $typecaster
-     * @param array                    $classMap
-     * @param array                    $options
+     * @param array<mixed>             $classMap
+     * @param array<mixed>             $options
      */
     public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
     {
@@ -67,7 +66,7 @@ final class FilterFactory implements FilterFactoryInterface
      *
      * @param QueryFilterManagerInterface $manager
      * @param string                      $name
-     * @param array                       $options
+     * @param array<mixed>                $options
      *
      * @return FilterInterface
      *
@@ -114,7 +113,7 @@ final class FilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * @param array $classMap
+     * @param array<mixed> $classMap
      */
     public function setClassMap(array $classMap): void
     {

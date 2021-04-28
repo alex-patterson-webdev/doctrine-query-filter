@@ -48,7 +48,7 @@ final class Metadata implements MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */
@@ -103,7 +103,7 @@ final class Metadata implements MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */

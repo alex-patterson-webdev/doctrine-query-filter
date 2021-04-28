@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+use PhpCsFixer\Finder;
+
+$rules = [
+    '@PSR12' => true,
+];
+
+/** @var iterable<string> $finder */
+$finder = Finder::create()
+    ->exclude('node_modules')
+    ->exclude('vendor')
+    ->in([
+        __DIR__ . '/src/',
+        __DIR__ . '/test/unit/',
+    ]);
+
+return (new PhpCsFixer\Config())
+    ->setRules($rules)
+    ->setFinder($finder)
+    ->setUsingCache(false);
+

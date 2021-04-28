@@ -21,12 +21,12 @@ use PHPUnit\Framework\TestCase;
 final class TypecasterTest extends TestCase
 {
     /**
-     * @var DateTimeFactoryInterface|MockObject
+     * @var DateTimeFactoryInterface&MockObject
      */
     private $dateTimeFactory;
 
     /**
-     * @var MetadataInterface|MockObject
+     * @var MetadataInterface&MockObject
      */
     private $metadata;
 
@@ -68,7 +68,7 @@ final class TypecasterTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getTypecastWillNotCastValueData(): array
     {

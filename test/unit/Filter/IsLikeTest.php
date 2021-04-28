@@ -32,7 +32,7 @@ final class IsLikeTest extends AbstractComparisonTest
     protected string $expressionSymbol = 'LIKE';
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyFilteringData(): array
     {

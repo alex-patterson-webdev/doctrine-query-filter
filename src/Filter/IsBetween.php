@@ -19,7 +19,7 @@ class IsBetween extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException

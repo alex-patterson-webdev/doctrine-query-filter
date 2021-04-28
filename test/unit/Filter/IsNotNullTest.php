@@ -30,7 +30,7 @@ final class IsNotNullTest extends AbstractComparisonTest
     protected string $expressionSymbol = 'IS NOT NULL';
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyFilteringData(): array
     {

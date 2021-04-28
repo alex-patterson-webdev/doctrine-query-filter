@@ -49,7 +49,7 @@ interface QueryBuilderInterface
     public function expr(): Expr;
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getQueryParts(): array;
 
@@ -102,7 +102,7 @@ interface QueryBuilderInterface
     ): QueryBuilderInterface;
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<string, Query\Parameter>
      */
     public function getParameters(): ArrayCollection;
 
@@ -114,15 +114,15 @@ interface QueryBuilderInterface
     public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface;
 
     /**
-     * @param ArrayCollection $parameters
+     * @param ArrayCollection<int, Query\Parameter> $parameters
      *
      * @return QueryBuilderInterface
      */
     public function setParameters(ArrayCollection $parameters): QueryBuilderInterface;
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param string      $name
+     * @param mixed       $value
      * @param string|null $type
      *
      * @return QueryBuilderInterface

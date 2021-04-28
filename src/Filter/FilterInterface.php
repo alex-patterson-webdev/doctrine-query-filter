@@ -17,7 +17,7 @@ interface FilterInterface
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws FilterException
      */

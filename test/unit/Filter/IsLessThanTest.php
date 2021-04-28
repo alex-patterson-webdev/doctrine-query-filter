@@ -32,7 +32,7 @@ final class IsLessThanTest extends AbstractComparisonTest
     protected string $expressionSymbol = '<';
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getFilterWillApplyFilteringData(): array
     {
