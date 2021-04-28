@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/alex-patterson-webdev/doctrine-query-filter.svg?branch=master)](https://travis-ci.com/alex-patterson-webdev/doctrine-query-filter)
+![build](https://github.com/alex-patterson-webdev/doctrine-query-filter/actions/workflows/workflow.yml/badge.svg)
 [![codecov](https://codecov.io/gh/alex-patterson-webdev/doctrine-query-filter/branch/master/graph/badge.svg)](https://codecov.io/gh/alex-patterson-webdev/doctrine-query-filter)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alex-patterson-webdev/doctrine-query-filter/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alex-patterson-webdev/doctrine-query-filter/?branch=master)
 
@@ -6,115 +6,95 @@
 
 ## About
 
-The package provides Query filtering components for the Doctrine ORM QueryBuilder.
+This package provides query filtering components for Doctrine ORM; converting array configuration into DQL queries. 
 
-This project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder) project
-and provides similar functionality without the Laminas Framework dependency.
-
-## Theory and Use case
-
-When creating API's, developers often need to fetch resources from endpoints that allow for filtering of arbitrary criteria. 
-A simple example could be where a `Customer` endpoint allows query parameters to find `customer` resources that 
-match a given `forename`, `surname` and `age` range.
-
-Such a request could look like this
-
-    GET /api/v1/customers?forename=Fred&surname=Smith&age_min=18&age_max=65
-
-When using the Doctrine ORM query builder to handle the API's request we must resolve these query parameters 
-manually to construct a query.
-
-    $queryBuilder->where(
-        'c.forename = :forename AND c.surname = :surname AND age >= :age_min AND age <= :age_max'
-    )
-    ->setParameter('forename', $_GET['forename'])
-    ->setParameter('surname', $_GET['surname'])
-    ->setParameter('age_min', $_GET['age_min'])
-    ->setParameter('age_max', $_GET['age_max']);
-
-This package provides a generic structure to define query filter criteria when passing parameters via the URL. Essentially we group the
-filter requirements into query filter criteria, much like the below
-
-    GET /api/v1/customers
-        ?filters[0][name]=eq&filters[0][field]=forename&filters[0][value]=Fred
-        &filters[1][name]=eq&filters[1][field]=surname&filters[1][value]=Smith
-        &filters[2][name]=between&filters[2][field]=age&filters[2][min]=18&filters[2][max]=65
-
-The request parameters would resolve as a `array` like below. Each filter requires at a minimum a `name`
-which will determine the type of filtering to create and then apply.
-
-    $criteria = [
-        'filters' => [
-            [
-                'name' => 'eq',
-                'field' => 'forename',
-                'value' => 'Fred',
-            ],
-            [
-                'name' => 'eq',
-                'field' => 'surname',
-                'value' => 'Smith',
-            ],
-            [
-                'name' => 'between',
-                'field' => 'age',
-                'min' => 18,
-                'max' => 65,
-            ],
-        ],
-    ],
-
-This approach provides a number of benefits:
-
-- Provides an intuitive and consistent API for query filtering that can be used for all of your endpoints.
-- No need to create any doctrine queries as they can now be created directly from the filter criteria.  
-- We can implement query filtering logic in a single place for all entities/resources.
-- Complex query filters can be created by _nesting_ query filter components.
-- Dynamically validate the query filters fields using Doctrine metadata to prevent filtering on invalid fields.
+The project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder); 
+providing similar functionality without the Laminas Framework dependency.
 
 ## Installation
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.2
+    require alex-patterson-webdev/doctrine-query-filter ^0.3
 
-## Documentation
+## Query Filter Manager
 
-### Query Filter Manager
+All filtering is performed via the `Arp\DoctrineQueryFilter\QueryFilterManager`.
 
-We require a new `Arp\DoctrineQueryFilter\QueryFilterManager` instance in order to apply query filters to a Doctrine QueryBuilder instance. 
-The `QueryFilterManager` has a single dependency of a `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface`. The 
-FilterFactory allows the QueryFilterManager to internally resolve and create filters we want to apply in an abstract way.
-
-You can use the default `Arp\DoctrineQueryFilter\Filter\FilterFactory` to get started; or if required this can be  
-swapped for a custom implementation of `FilterFactoryInterface`.
-
+The `QueryFilterManager` requires an implementation of  `Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface` to 
+create different types of filters. The `Arp\DoctrineQueryFilter\Filter\FilterFactory` can be used as a default implementation.
+    
     use Arp\DoctrineQueryFilter\Filter\FilterFactory;
     use Arp\DoctrineQueryFilter\QueryFilterManager;
     
     $queryFilterManager = new QueryFilterManager(new FilterFactory());
 
-The `QueryFilterManager` exposes a single public method, `QueryFilterManagerInterface::filter`. 
+The `QueryFilterManager` exposes a single public method, `QueryFilterManagerInterface::filter`. The `filter` method accepts
+a `Doctring\ORM\QueryBuilder` instance to which it will apply filtering.
 
-    use Arp\DoctrineQueryFilter\QueryBuilderInterface;
-    use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
+    // A Doctrine QueryBuilder instance for a customer query
+    $queryBuilder = $entityManager->getRepository('Customer')->createQueryBuilder('c');
 
-    interface QueryFilterManagerInterface
-    {
-        public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder;
-    }
+    // Apply the filters to the $queryBuilder
+    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
 
-The `filter()` method will accept a query builder instance and query filter criteria. The query filters closely match
-existing criteria offered by `Doctrine\ORM\QueryBuilder`, however we are able to provide the criteria as array configuration. 
-Internally the query filter manager will work out what filters should be applied to the provided `$queryBuilder`.
+    // Fetch the constructed query and execute it
+    $customers = $queryBuilder->getQuery()->execute();
 
-For example, we can create a query to fetch customers named "Fred Smith" using the following criteria. The `eq` query filter
-will map to Doctrine's `Doctrine\ORM\Query\Expr\Comparison::EQ`.
+## Query Criteria
 
-> When adding more than one query filter, the conditions will be explicitly `AND` together. If you wish to construct a 
-> logical `OR` please use the `Orx` query filter documented below.
+### Query Filters
 
-    $queryFilterManager = new QueryFilterManager(new FilterFactory());
+Query filters are objects that implement `Arp\DoctrineQueryFilter\Filter\QueryFilterInterface` and are used apply specific
+filtering on the `$queryBuilder` passed to the `QueryFilterManager`.
+
+To avoid the need to construct many query filter objects, we can define our filter criteria using array configuration. 
+The options required for each filter will depend on type of filtering being performed. All filters require  
+a `name` option, which denotes the filter that should be created.
+
+For example, we can define a `eq` filter to find customers who have a forename equal to `Fred`.
+
+    $criteria = [
+        'filters' => [
+            [
+                'name' => 'eq',
+                'field' => 'forename',
+                'value' => 'Fred',
+            ],
+        ],
+    ],
+    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
+
+    // SELECT x FROM customer x WHERE x.forename = 'Fred' 
+    $customers = $queryBuilder->getQuery()->execute();
+
+### Filter Reference
+
+There are many types of query filters, the table below defines the defaults available.
+
+| Alias         | Class Name     | Description  | Required Options
+| --------------|:-------------:| :-----:| :-----:
+| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is a = b | `field`, `value` |
+| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is a != b | `field`, `value` |
+| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is a > b | `field`, `value` |
+| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is a >= b | `field`, `value` |
+| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is a < b | `field`, `value` |
+| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is a <= b | `field`, `value` |
+| andx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical AND | `conditions` |
+| orx    | Arp\DoctrineQueryFilter\Filter\OrX | Join two or more expressions using logical OR | `conditions` |
+| between    | Arp\DoctrineQueryFilter\Filter\IsBetween | Test if a => min and a <= max | `field`, `from`, `to` |
+| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Test if a exists within collection b | `field`, `value` |
+| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Test if a is NULL | `field` |
+| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Test if a is NOT NULL | `field` |
+| islike    | Arp\DoctrineQueryFilter\Filter\IsLike | Test if a is LIKE b | `field`, `value` |
+| isnotlike    | Arp\DoctrineQueryFilter\Filter\IsNotLike | Check if a is NOT LIKE b | `field`, `value` |
+| isin    | Arp\DoctrineQueryFilter\Filter\IsIn | Check if a is IN b | `field`, `value` |
+| isnotin    | Arp\DoctrineQueryFilter\Filter\IsNotIn | Check if a is NOT IN b | `field`, `value` |
+
+### Composing filters
+
+The true power of the library is the ability to nest and compose multiple query filters together to further filter a collection.
+
     $criteria = [
         'filters' => [
             [
@@ -123,69 +103,39 @@ will map to Doctrine's `Doctrine\ORM\Query\Expr\Comparison::EQ`.
                 'value' => 'Fred',
             ],
             [
-                'name' => 'eq',
-                'field' => 'surname',
-                'value' => 'Smith',
-            ],
-            [
-                'name' => 'between',
-                'field' => 'age',
-                'min' => 18,
-                'max' => 65,
+                'name' => 'eq'
+                'field' => 'gender',
+                'value' => 'Male',
             ],
         ],
     ],
 
-    // @var \Doctrine\ORM\QueryBuilder $queryBuilder
-    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
-    $customers = $queryBuilder->getQuery()->execute();
+When defining more than one filter, conditions will be explicitly `AND` together using the `AndX` composite query filter. 
+To instead create an `OR` condition, we must define a `orx` filter and provide it with the required `conditions` array.
 
-If you require greater control on the construction of the query filters, it is possible to provide `QueryFilter` instances directly
-to the `$criteria['filters']` array.
-
-The example below is equivalent
-
-    $filterFactory = new FilterFactory();
-    $queryFilterManager = new QueryFilterManager($filterFactory);
     $criteria = [
         'filters' => [
-            $filterFactory->create('eq', ['field' => 'forename', 'value' => 'Fred']),
             [
-                'name' => 'eq',
-                'field' => 'surname',
-                'value' => 'Smith',
-            ],
-            $filterFactory->create('between', ['field' => 'age', 'min' => 18, 'max' => 65]),
+                'name' => 'orx',
+                'conditions' => [
+                    [
+                        'name' => 'eq',
+                        'field' => 'surname',
+                        'value' => 'Smith',
+                    ],
+                    [
+                        'name' => 'eq'
+                        'field' => 'gender',
+                        'value' => 'Male',
+                    ],
+                ]
+            ]
         ],
-    ],
+    ];
 
-### Query Filters 
+You can also nest a combination of the `andX` and `orX`, the generated DQL will include the correct grouping.
 
-There are many query filters that can be used, each can be referenced by an alias, or alternatively fully qualified class name.
-The alias or name must be provided for all filters with key `name`.
-
-
-| Alias         | Class Name     | Description  | Required Options
-| --------------|:-------------:| :-----:| :-----:
-| eq    | Arp\DoctrineQueryFilter\Filter\IsEqual | Test is A = B | `field`, `value` |
-| neq    | Arp\DoctrineQueryFilter\Filter\IsNotEqual | Test is A != B | `field`, `value` |
-| gt    | Arp\DoctrineQueryFilter\Filter\IsGreaterThan | Test is A > B | `field`, `value` |
-| gte    | Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual | Test is A >= B | `field`, `value` |
-| lt    | Arp\DoctrineQueryFilter\Filter\IsLessThan | Test is A < B | `field`, `value` |
-| lte    | Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual | Test is A <= B | `field`, `value` |
-| andx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical AND | `conditions` |
-| orx    | Arp\DoctrineQueryFilter\Filter\AndX | Join two or more expressions using logical OR | `conditions` |
-| between    | Arp\DoctrineQueryFilter\Filter\IsBetween | Test if A => min and A <= max | `field`, `min`, `max` |
-| ismemberof    | Arp\DoctrineQueryFilter\Filter\IsMemberOf | Check if x exists within collection y | `field`, `value` |
-| isnull    | Arp\DoctrineQueryFilter\Filter\IsNull | Check if A is NULL | `field` |
-| isnotnull    | Arp\DoctrineQueryFilter\Filter\IsNotNull | Check if B is NOT NULL | `field` |
-
-### Composite Query Filters
-
-The composite query filters are designed to allow for other query filters
-to be nested together. Filters will explicitly use the `AndX` composite when passed to `filter()`.
-To join filters using an OR condition we must nest it within a `OrX` filter.
-
+    // WHERE x.surname = 'Smith' OR (x.age > 18 AND x.gender = 'Male')
     $criteria = [
         'filters' => [
             [
@@ -197,16 +147,42 @@ To join filters using an OR condition we must nest it within a `OrX` filter.
                         'value' => 'Smith',
                     ],
                     [
-                        'name' => 'eq',
-                        'field' => 'surname',
-                        'value' => 'Doe',
+                        'name' => 'andx',
+                        'conditions' => [
+                            [
+                                'name' => 'gt',
+                                'field' => 'age',
+                                'value' => 18,
+                            ],
+                            [
+                                'name' => 'eq'
+                                'field' => 'gender',
+                                'value' => 'Male',
+                            ],
+                        ]
                     ],
                 ]
             ]
         ],
     ];
+    
+## Filtering examples
 
-This is equivalent to a `(surname = 'Smith' OR surname = 'Doe')` DQL condition.
+@todo More filtering examples
+
+## FilterFactory
+
+If you require greater control on the construction of the query filters, it is possible to provide `QueryFilter` 
+instances directly to the `$criteria['filters']` array instead of using the array format.
+
+    $filterFactory = new FilterFactory();
+    $queryFilterManager = new QueryFilterManager($filterFactory);
+    $criteria = [
+        'filters' => [
+            $filterFactory->create('eq', ['field' => 'surname', 'value => 'Smith']),
+            $filterFactory->create('between', ['field' => 'age', 'from => 18, 'to' => 65]),
+        ],
+    ],
 
 ## Unit tests
 

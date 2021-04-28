@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\IsEqual;
+use Arp\DoctrineQueryFilter\Filter\IsLike;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\Filter\IsEqual
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsLike
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
-final class IsEqualTest extends AbstractComparisonTest
+final class IsLikeTest extends AbstractComparisonTest
 {
     /**
      * @var string
      */
-    protected string $filterClassName = IsEqual::class;
+    protected string $filterClassName = IsLike::class;
 
     /**
      * @var string
      */
-    protected string $expressionMethodName = 'eq';
+    protected string $expressionMethodName = 'like';
 
     /**
      * @var string
      */
-    protected string $expressionSymbol = '=';
+    protected string $expressionSymbol = 'LIKE';
 
     /**
      * @return array<mixed>

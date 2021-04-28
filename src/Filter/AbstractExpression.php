@@ -37,7 +37,7 @@ abstract class AbstractExpression extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException
@@ -46,7 +46,7 @@ abstract class AbstractExpression extends AbstractFilter
     {
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
-        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? 'entity');
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
         $paramName = $this->createParamName($queryAlias);
 
         $expression = $this->createExpression($queryBuilder->expr(), $fieldName, $paramName, $queryAlias);

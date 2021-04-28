@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 final class QueryBuilderTest extends TestCase
 {
     /**
-     * @var DoctrineQueryBuilder
+     * @var DoctrineQueryBuilder&MockObject
      */
     private DoctrineQueryBuilder $doctrineQueryBuilder;
 
@@ -51,10 +51,10 @@ final class QueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var EntityManager|MockObject $entityManager */
+        /** @var EntityManager&MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
 
-        /** @var DoctrineQueryBuilder|MockObject $newDoctrineQueryBuilder */
+        /** @var DoctrineQueryBuilder&MockObject $newDoctrineQueryBuilder */
         $newDoctrineQueryBuilder = $this->createMock(DoctrineQueryBuilder::class);
 
         $this->doctrineQueryBuilder->expects($this->once())
@@ -75,7 +75,7 @@ final class QueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var EntityManager|MockObject $entityManager */
+        /** @var EntityManager&MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
 
         $this->doctrineQueryBuilder->expects($this->once())
@@ -86,13 +86,23 @@ final class QueryBuilderTest extends TestCase
     }
 
     /**
+     * Assert that calls to getQuery() will proxy and return the wrapped query builders query instance
+     */
+    public function testGetWrappedQueryBuilderWillReturnTheDoctrineQueryBuilder(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->assertSame($this->doctrineQueryBuilder, $queryBuilder->getWrappedQueryBuilder());
+    }
+
+    /**
      * Assert that calls to expr() will return the internal query builder's Expr instance
      */
     public function testGetQueryBuilderWillReturnTheConfiguredExprInstance(): void
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var Expr|MockObject $expr */
+        /** @var Expr&MockObject $expr */
         $expr = $this->createMock(Expr::class);
 
         $this->doctrineQueryBuilder->expects($this->once())
@@ -167,7 +177,7 @@ final class QueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var ArrayCollection|MockObject $parameters */
+        /** @var ArrayCollection<int, Parameter>&MockObject $parameters */
         $parameters = $this->createMock(ArrayCollection::class);
 
         $this->doctrineQueryBuilder->expects($this->once())
@@ -184,7 +194,7 @@ final class QueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
-        /** @var ArrayCollection|MockObject $parameters */
+        /** @var ArrayCollection<int, Parameter>&MockObject $parameters */
         $parameters = $this->createMock(ArrayCollection::class);
 
         $this->doctrineQueryBuilder->expects($this->once())
@@ -221,26 +231,27 @@ final class QueryBuilderTest extends TestCase
 
         $bParams = $addArgs = [];
         $b = [
-            'bar' => 456,
-            'test' => 'This is value from B'
+            'bar'  => 456,
+            'test' => 'This is value from B',
         ];
-        foreach ($b as $key => $value) {
-            /** @var Parameter|MockObject $parameter */
+        $count = count($b);
+        for ($x = 1; $x < $count; $x++) {
+            /** @var Parameter&MockObject $parameter */
             $parameter = $this->createMock(Parameter::class);
             $bParams[] = $parameter;
             $addArgs[] = [$parameter];
         }
 
-        /** @var ArrayCollection|MockObject $params */
+        /** @var ArrayCollection<int, Parameter>&MockObject $params */
         $params = $this->createMock(ArrayCollection::class);
         $this->doctrineQueryBuilder->expects($this->once())
             ->method('getParameters')
             ->willReturn($params);
 
-        /** @var QueryBuilderInterface|MockObject $newQueryBuilder */
+        /** @var QueryBuilderInterface&MockObject $newQueryBuilder */
         $newQueryBuilder = $this->createMock(QueryBuilderInterface::class);
 
-        /** @var ArrayCollection|MockObject $newParams */
+        /** @var ArrayCollection<int, Parameter>&MockObject $newParams */
         $newParams = $this->createMock(ArrayCollection::class);
 
         $newQueryBuilder->expects($this->once())

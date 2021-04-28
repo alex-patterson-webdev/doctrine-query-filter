@@ -42,7 +42,7 @@ abstract class AbstractJoin extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException
@@ -52,19 +52,13 @@ abstract class AbstractJoin extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
-        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? null);
-        if (null === $alias) {
-            throw new InvalidArgumentException(
-                sprintf('The required \'alias\' criteria value is missing for filter \'%s\'', static::class)
-            );
-        }
-
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
         $conditions = $criteria['conditions'] ?? [];
         $condition = null;
 
         if (is_string($conditions)) {
             $condition = $conditions;
-        } elseif (is_object($condition)) {
+        } elseif (is_object($conditions)) {
             $condition = (string)$conditions;
         } elseif (is_array($conditions) && !empty($conditions)) {
             $tempQueryBuilder = $queryBuilder->createQueryBuilder();
@@ -72,17 +66,16 @@ abstract class AbstractJoin extends AbstractFilter
             $this->filterJoinCriteria(
                 $tempQueryBuilder,
                 $mapping['targetEntity'],
-                ['filters' => $this->createJoinFilters($conditions, $alias, $criteria)]
+                ['filters' => $this->createJoinFilters($conditions, $queryAlias, $criteria)]
             );
 
             $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
         }
 
-        $parentAlias = $criteria['parent_alias'] ?? 'entity';
         $this->applyJoin(
             $queryBuilder,
-            $parentAlias . '.' . $fieldName,
-            $alias,
+            $queryBuilder->getRootAlias() . '.' . $fieldName,
+            $queryAlias,
             $condition,
             $criteria['join_type'] ?? Join::WITH,
             $criteria['index_by'] ?? null
@@ -93,14 +86,14 @@ abstract class AbstractJoin extends AbstractFilter
      * @param MetadataInterface $metadata
      * @param string            $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws InvalidArgumentException
      */
     private function getAssociationMapping(MetadataInterface $metadata, string $fieldName): array
     {
         try {
-            return $metadata->getAssociationFiledMapping($fieldName);
+            return $metadata->getAssociationMapping($fieldName);
         } catch (MappingException $e) {
             throw new InvalidArgumentException(
                 sprintf(
@@ -116,7 +109,7 @@ abstract class AbstractJoin extends AbstractFilter
     /**
      * @param QueryBuilderInterface $qb
      * @param string                $targetEntity
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws FilterException
      */
@@ -139,11 +132,11 @@ abstract class AbstractJoin extends AbstractFilter
     }
 
     /**
-     * @param array  $conditions
+     * @param array<mixed>  $conditions
      * @param string $alias
-     * @param array  $criteria
+     * @param array<mixed>  $criteria
      *
-     * @return array
+     * @return  array<mixed>
      */
     private function createJoinFilters(array $conditions, string $alias, array $criteria): array
     {

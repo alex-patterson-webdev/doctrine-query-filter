@@ -14,32 +14,32 @@ use Arp\DoctrineQueryFilter\QueryBuilderInterface;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Filter
  */
-final class IsBetween extends AbstractFilter
+class IsBetween extends AbstractFilter
 {
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array                 $criteria
+     * @param array<mixed>                 $criteria
      *
      * @throws InvalidArgumentException
+     * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
         if (empty($criteria['from'])) {
-            throw new FilterException(
-                sprintf('The required \'from\' criteria option is missing for filter \'%s\'', static::class)
+            throw new InvalidArgumentException(
+                sprintf('The required \'from\' criteria option is missing for filter \'%s\'', self::class)
             );
         }
 
         if (empty($criteria['to'])) {
-            throw new FilterException(
-                sprintf('The required \'to\' criteria option is missing for filter \'%s\'', static::class)
+            throw new InvalidArgumentException(
+                sprintf('The required \'to\' criteria option is missing for filter \'%s\'', self::class)
             );
         }
 
         $fieldName = $this->resolveFieldName($metadata, $criteria);
-
-        $queryAlias = (($criteria['alias'] ?? $this->options['alias']) ?? 'entity');
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
 
         $fromParamName = $this->createParamName($queryAlias);
         $toParamName = $this->createParamName($queryAlias);
@@ -56,14 +56,16 @@ final class IsBetween extends AbstractFilter
             $queryBuilder->orWhere($expression);
         }
 
+        $format = $criteria['format'] ?? null;
+
         $queryBuilder->setParameter(
             $fromParamName,
-            $this->formatValue($metadata, $fieldName, $criteria['from'], $criteria['format'] ?? null)
+            $this->formatValue($metadata, $fieldName, $criteria['from'], $format)
         );
 
         $queryBuilder->setParameter(
             $toParamName,
-            $this->formatValue($metadata, $fieldName, $criteria['to'], $criteria['format'] ?? null)
+            $this->formatValue($metadata, $fieldName, $criteria['to'], $format)
         );
     }
 }

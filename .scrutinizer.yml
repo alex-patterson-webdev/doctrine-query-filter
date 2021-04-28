@@ -22,6 +22,8 @@ coding_style:
         linefeed_character: return-newline
       before_parentheses:
         closure_definition: true
+      around_operators:
+        concatenation: true
 filter:
   dependency_paths:
     - "vendor/"

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\AbstractFilter;
 use Arp\DoctrineQueryFilter\Filter\AndX;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
@@ -23,8 +22,6 @@ use Arp\DoctrineQueryFilter\Filter\IsNull;
 use Arp\DoctrineQueryFilter\Filter\LeftJoin;
 use Arp\DoctrineQueryFilter\Filter\OrX;
 use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
-use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
-use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -38,12 +35,12 @@ use PHPUnit\Framework\TestCase;
 final class FilterFactoryTest extends TestCase
 {
     /**
-     * @var QueryFilterManagerInterface|MockObject
+     * @var QueryFilterManagerInterface&MockObject
      */
     private $queryFilterManager;
 
     /**
-     * @var TypecasterInterface|MockObject
+     * @var TypecasterInterface&MockObject
      */
     private $typecaster;
 
@@ -120,7 +117,7 @@ final class FilterFactoryTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return array<mixed><mixed>
      */
     public function getCreateWillThrowAFilterFactoryExceptionIfTheResolvedClassNameIsInvalidData(): array
     {
@@ -152,12 +149,14 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert the expected query filter is created using the provided $name and $options and optional $classMap.
      *
-     * @param string $expected
-     * @param string $name
-     * @param array  $options
-     * @param array  $classMap
+     * @param class-string   $expected
+     * @param string         $name
+     * @param array<mixed>   $options
+     * @param array<mixed>   $classMap
      *
      * @dataProvider getCreateWillReturnFilterInstanceData
+     *
+     * @throws FilterFactoryException
      */
     public function testCreateWillReturnFilterInstance(
         string $expected,
@@ -171,11 +170,10 @@ final class FilterFactoryTest extends TestCase
 
         /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf($expected, $queryFilter);
-        $this->assertSame($options, $queryFilter->getOptions());
     }
 
     /**
-     * @return array
+     * @return array<mixed><mixed>
      */
     public function getCreateWillReturnFilterInstanceData(): array
     {
@@ -219,40 +217,5 @@ final class FilterFactoryTest extends TestCase
             [LeftJoin::class, 'leftjoin'],
             [LeftJoin::class, LeftJoin::class],
         ];
-    }
-}
-
-/**
- * @internal
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
- */
-final class ThrowExceptionInConstructorFilterMock extends AbstractFilter
-{
-    /**
-     * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecasterInterface         $typecaster
-     * @param array                       $options
-     *
-     * @noinspection PhpMissingParentConstructorInspection
-     * @noinspection PhpUnusedParameterInspection
-     */
-    public function __construct(
-        QueryFilterManagerInterface $queryFilterManager,
-        TypecasterInterface $typecaster,
-        array $options = []
-    ) {
-        throw new \RuntimeException('This is is a test exception');
-    }
-
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array                 $criteria
-     */
-    public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
-    {
-
     }
 }

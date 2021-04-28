@@ -4,32 +4,30 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\IsEqual;
+use Arp\DoctrineQueryFilter\Filter\IsNotNull;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\Filter\IsEqual
- * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
- * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsNotNull
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
-final class IsEqualTest extends AbstractComparisonTest
+final class IsNotNullTest extends AbstractComparisonTest
 {
     /**
      * @var string
      */
-    protected string $filterClassName = IsEqual::class;
+    protected string $filterClassName = IsNotNull::class;
 
     /**
      * @var string
      */
-    protected string $expressionMethodName = 'eq';
+    protected string $expressionMethodName = 'isnotnull';
 
     /**
      * @var string
      */
-    protected string $expressionSymbol = '=';
+    protected string $expressionSymbol = 'IS NOT NULL';
 
     /**
      * @return array<mixed>

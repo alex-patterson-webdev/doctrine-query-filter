@@ -17,9 +17,9 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 interface QueryBuilderInterface
 {
     /**
-     * @return Expr
+     * @return QueryBuilderInterface
      */
-    public function expr(): Expr;
+    public function createQueryBuilder(): QueryBuilderInterface;
 
     /**
      * @return EntityManager
@@ -27,42 +27,31 @@ interface QueryBuilderInterface
     public function getEntityManager(): EntityManager;
 
     /**
-     * @return QueryBuilderInterface
+     * @return string
      */
-    public function createQueryBuilder(): QueryBuilderInterface;
+    public function getRootAlias(): string;
 
     /**
-     * @return array
+     * @return Query
+     */
+    public function getQuery(): Query;
+
+    /**
+     * Return the wrapped Doctrine query builder instance
+     *
+     * @return DoctrineQueryBuilder
+     */
+    public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
+
+    /**
+     * @return Expr
+     */
+    public function expr(): Expr;
+
+    /**
+     * @return array<mixed>
      */
     public function getQueryParts(): array;
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getParameters(): ArrayCollection;
-
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     */
-    public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface;
-
-    /**
-     * @param ArrayCollection $parameters
-     *
-     * @return QueryBuilderInterface
-     */
-    public function setParameters(ArrayCollection $parameters): QueryBuilderInterface;
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @param string|null $type
-     *
-     * @return QueryBuilderInterface
-     */
-    public function setParameter(string $name, $value, ?string $type = null): QueryBuilderInterface;
 
     /**
      * @param mixed ...$args
@@ -79,14 +68,64 @@ interface QueryBuilderInterface
     public function andWhere(...$args): QueryBuilderInterface;
 
     /**
-     * @return Query
+     * @param string      $name
+     * @param string      $alias
+     * @param string      $type
+     * @param string|null $condition
+     * @param string|null $indexBy
+     *
+     * @return QueryBuilderInterface
      */
-    public function getQuery(): Query;
+    public function innerJoin(
+        string $name,
+        string $alias,
+        string $type,
+        $condition = null,
+        string $indexBy = null
+    ): QueryBuilderInterface;
 
     /**
-     * Return the wrapped Doctrine query builder instance
+     * @param string      $name
+     * @param string      $alias
+     * @param string      $type
+     * @param string|null $condition
+     * @param string|null $indexBy
      *
-     * @return DoctrineQueryBuilder
+     * @return QueryBuilderInterface
      */
-    public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
+    public function leftJoin(
+        string $name,
+        string $alias,
+        string $type,
+        $condition = null,
+        string $indexBy = null
+    ): QueryBuilderInterface;
+
+    /**
+     * @return ArrayCollection<string, Query\Parameter>
+     */
+    public function getParameters(): ArrayCollection;
+
+    /**
+     * @param QueryBuilderInterface $queryBuilder
+     *
+     * @return QueryBuilderInterface
+     */
+    public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface;
+
+    /**
+     * @param ArrayCollection<int, Query\Parameter> $parameters
+     *
+     * @return QueryBuilderInterface
+     */
+    public function setParameters(ArrayCollection $parameters): QueryBuilderInterface;
+
+    /**
+     * @param string      $name
+     * @param mixed       $value
+     * @param string|null $type
+     *
+     * @return QueryBuilderInterface
+     */
+    public function setParameter(string $name, $value, ?string $type = null): QueryBuilderInterface;
 }

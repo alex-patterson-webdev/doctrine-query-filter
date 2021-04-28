@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Metadata;
 
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
-use Doctrine\ORM\Mapping\MappingException;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
@@ -28,7 +27,7 @@ interface MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */
@@ -53,9 +52,9 @@ interface MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
-     * @throws MappingException
+     * @throws MetadataException
      */
-    public function getAssociationFiledMapping(string $fieldName): array;
+    public function getAssociationMapping(string $fieldName): array;
 }

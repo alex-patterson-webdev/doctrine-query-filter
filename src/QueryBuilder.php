@@ -14,7 +14,7 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package Arp\DoctrineQueryFilter\Query
  */
-class QueryBuilder implements QueryBuilderInterface
+final class QueryBuilder implements QueryBuilderInterface
 {
     /**
      * @var DoctrineQueryBuilder
@@ -34,7 +34,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function createQueryBuilder(): QueryBuilderInterface
     {
-        return new static($this->getEntityManager()->createQueryBuilder());
+        return new self($this->getEntityManager()->createQueryBuilder());
     }
 
     /**
@@ -46,6 +46,32 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
+     * @return string
+     */
+    public function getRootAlias(): string
+    {
+        return $this->queryBuilder->getRootAliases()[0] ?? '';
+    }
+
+    /**
+     * @return Query
+     */
+    public function getQuery(): Query
+    {
+        return $this->queryBuilder->getQuery();
+    }
+
+    /**
+     * Return the wrapped Doctrine query builder instance
+     *
+     * @return DoctrineQueryBuilder
+     */
+    public function getWrappedQueryBuilder(): DoctrineQueryBuilder
+    {
+        return $this->queryBuilder;
+    }
+
+    /**
      * @return Expr
      */
     public function expr(): Expr
@@ -54,11 +80,35 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return array
+     * @return  array<mixed>
      */
     public function getQueryParts(): array
     {
         return $this->queryBuilder->getDQLParts();
+    }
+
+    /**
+     * @param mixed ...$args
+     *
+     * @return $this
+     */
+    public function orWhere(...$args): QueryBuilderInterface
+    {
+        $this->queryBuilder->orWhere(...$args);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$args
+     *
+     * @return $this
+     */
+    public function andWhere(...$args): QueryBuilderInterface
+    {
+        $this->queryBuilder->andWhere(...$args);
+
+        return $this;
     }
 
     /**
@@ -76,7 +126,7 @@ class QueryBuilder implements QueryBuilderInterface
         string $type,
         $condition = null,
         string $indexBy = null
-    ): QueryBuilder {
+    ): QueryBuilderInterface {
         $this->queryBuilder->innerJoin($name, $alias, $type, $condition, $indexBy);
 
         return $this;
@@ -97,38 +147,14 @@ class QueryBuilder implements QueryBuilderInterface
         string $type,
         $condition = null,
         string $indexBy = null
-    ): QueryBuilder {
+    ): QueryBuilderInterface {
         $this->queryBuilder->leftJoin($name, $alias, $type, $condition, $indexBy);
 
         return $this;
     }
 
     /**
-     * @param mixed ...$args
-     *
-     * @return $this
-     */
-    public function orWhere(...$args): QueryBuilder
-    {
-        $this->queryBuilder->orWhere(...$args);
-
-        return $this;
-    }
-
-    /**
-     * @param mixed ...$args
-     *
-     * @return $this
-     */
-    public function andWhere(...$args): QueryBuilder
-    {
-        $this->queryBuilder->andWhere(...$args);
-
-        return $this;
-    }
-
-    /**
-     * @return ArrayCollection
+     * @return ArrayCollection<mixed, Query\Parameter>
      */
     public function getParameters(): ArrayCollection
     {
@@ -136,7 +162,7 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param ArrayCollection $parameters
+     * @param ArrayCollection<mixed, Query\Parameter> $parameters
      *
      * @return $this|QueryBuilderInterface
      */
@@ -174,23 +200,5 @@ class QueryBuilder implements QueryBuilderInterface
         }
 
         return $this;
-    }
-
-    /**
-     * @return Query
-     */
-    public function getQuery(): Query
-    {
-        return $this->queryBuilder->getQuery();
-    }
-
-    /**
-     * Return the wrapped Doctrine query builder instance
-     *
-     * @return DoctrineQueryBuilder
-     */
-    public function getWrappedQueryBuilder(): DoctrineQueryBuilder
-    {
-        return $this->queryBuilder;
     }
 }

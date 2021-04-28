@@ -1,0 +1,52 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - feature/*
+  pull_request:
+    branches:
+      - master
+      - feature/*
+
+jobs:
+  test:
+    name: "Integration Test Suite"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Validate composer.json and composer.lock"
+        run: composer validate --strict
+
+      - name: "Cache Composer packages"
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: "Install dependencies"
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: "Check coding standards"
+        run: composer arp:check
+
+      - name: "Checking for solutions to code formatting"
+        run: composer arp:lint
+
+      - name: "Running static analysis checks"
+        run: composer arp:analyse
+
+      - name: "Running unit tests with code coverage"
+        run: composer arp:unit-test-with-coverage
+
+      - name: "Uploading code coverage report to Codecov"
+        uses: codecov/codecov-action@v1.3.1
+        with:
+          files: ./test/coverage/clover.xml
+          fail_ci_if_error: true
+          verbose: true

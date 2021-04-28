@@ -18,7 +18,7 @@ interface QueryFilterManagerInterface
      *
      * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
      * @param string                                     $entityName
-     * @param array                                      $criteria
+     * @param array<mixed>                                      $criteria
      *
      * @return DoctrineQueryBuilder
      *

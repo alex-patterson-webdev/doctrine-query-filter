@@ -18,7 +18,7 @@ interface FilterFactoryInterface
      *
      * @param QueryFilterManagerInterface $manager
      * @param string                      $name
-     * @param array                       $options
+     * @param array<mixed>                       $options
      *
      * @return FilterInterface
      *

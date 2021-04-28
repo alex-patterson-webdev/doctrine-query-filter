@@ -48,7 +48,7 @@ final class Metadata implements MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
      * @throws MetadataException
      */
@@ -103,12 +103,25 @@ final class Metadata implements MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return array
+     * @return  array<mixed>
      *
-     * @throws MappingException
+     * @throws MetadataException
      */
-    public function getAssociationFiledMapping(string $fieldName): array
+    public function getAssociationMapping(string $fieldName): array
     {
-        return $this->metadata->getAssociationMapping($fieldName);
+        try {
+            return $this->metadata->getAssociationMapping($fieldName);
+        } catch (MappingException $e) {
+            throw new MetadataException(
+                sprintf(
+                    'Unable to find association mapping for field \'%s::%s\': %s',
+                    $this->getName(),
+                    $fieldName,
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 }

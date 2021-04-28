@@ -38,7 +38,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
      *
      * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
      * @param string                                     $entityName
-     * @param array                                      $criteria
+     * @param array<mixed>                               $criteria
      *
      * @return DoctrineQueryBuilder
      *
@@ -61,8 +61,8 @@ class QueryFilterManager implements QueryFilterManagerInterface
     /**
      * Create a new filter matching $name with the provided $options
      *
-     * @param string $name
-     * @param array  $options
+     * @param string       $name
+     * @param array<mixed> $options
      *
      * @return FilterInterface
      *
@@ -101,7 +101,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
                     . '\'%s\' provided in \'%s\'',
                     QueryBuilderInterface::class,
                     DoctrineQueryBuilder::class,
-                    is_object($queryBuilder) ? get_class($queryBuilder) : gettype($queryBuilder),
+                    get_class($queryBuilder),
                     static::class
                 )
             );
@@ -111,9 +111,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array|FilterInterface $data
+     * @param QueryBuilderInterface        $queryBuilder
+     * @param MetadataInterface            $metadata
+     * @param array<mixed>|FilterInterface $data
      *
      * @throws QueryFilterManagerException
      */
@@ -137,7 +137,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
                 sprintf(
                     'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
                     FilterInterface::class,
-                    is_object($data) ? get_class($data) : gettype($data),
+                    gettype($data),
                     static::class
                 )
             );

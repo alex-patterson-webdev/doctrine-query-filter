@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\IsEqual;
+use Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\Filter\IsEqual
+ * @covers \Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Filter
  */
-final class IsEqualTest extends AbstractComparisonTest
+final class IsLessThanOrEqualTest extends AbstractComparisonTest
 {
     /**
      * @var string
      */
-    protected string $filterClassName = IsEqual::class;
+    protected string $filterClassName = IsLessThanOrEqual::class;
 
     /**
      * @var string
      */
-    protected string $expressionMethodName = 'eq';
+    protected string $expressionMethodName = 'lte';
 
     /**
      * @var string
      */
-    protected string $expressionSymbol = '=';
+    protected string $expressionSymbol = '<=';
 
     /**
      * @return array<mixed>

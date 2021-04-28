@@ -31,6 +31,12 @@ final class InnerJoin extends AbstractJoin
         string $joinType = Join::WITH,
         ?string $indexBy = null
     ): void {
-        $queryBuilder->innerJoin($fieldName, $alias, $joinType, $condition, $indexBy);
+        $queryBuilder->innerJoin(
+            $fieldName,
+            $alias,
+            $joinType,
+            isset($condition) ? (string)$condition : null,
+            $indexBy
+        );
     }
 }
