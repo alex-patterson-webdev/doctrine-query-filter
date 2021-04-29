@@ -8,7 +8,11 @@ use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -128,6 +132,40 @@ final class QueryBuilderTest extends TestCase
             ->willReturn($parts);
 
         $this->assertSame($parts, $queryBuilder->getQueryParts());
+    }
+
+    /**
+     * Assert the Query instance is returned from getQuery()
+     */
+    public function testGetQuery(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        /** @var EntityManagerInterface&MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        /** @var Configuration&MockObject $configuration */
+        $configuration = $this->createMock(Configuration::class);
+
+        $entityManager->expects($this->exactly(2))
+            ->method('getConfiguration')
+            ->willReturn($configuration);
+
+        $configuration->expects($this->once())
+            ->method('getDefaultQueryHints')
+            ->willReturn([]);
+
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->willReturn(false);
+
+        $query = new Query($entityManager);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->assertSame($query, $queryBuilder->getQuery());
     }
 
     /**
