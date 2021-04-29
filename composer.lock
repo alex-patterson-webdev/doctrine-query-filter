@@ -57,12 +57,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/enum.git",
-                "reference": "74c3af7669f806d337136b9296209b6f00104cae"
+                "reference": "dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/74c3af7669f806d337136b9296209b6f00104cae",
-                "reference": "74c3af7669f806d337136b9296209b6f00104cae",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2",
+                "reference": "dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2",
                 "shasum": ""
             },
             "require": {
@@ -95,7 +95,7 @@
                 "issues": "https://github.com/alex-patterson-webdev/enum/issues",
                 "source": "https://github.com/alex-patterson-webdev/enum/tree/feature/0.1.0"
             },
-            "time": "2021-04-08T21:40:13+00:00"
+            "time": "2021-04-29T11:29:33+00:00"
         },
         {
             "name": "alex-patterson-webdev/factory",

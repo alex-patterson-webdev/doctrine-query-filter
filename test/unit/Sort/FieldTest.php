@@ -14,6 +14,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Arp\DoctrineQueryFilter\Sort\Field
+ *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Sort
  */

@@ -8,7 +8,6 @@ use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
