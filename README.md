@@ -41,6 +41,40 @@ a `Doctring\ORM\QueryBuilder` instance to which it will apply filtering.
     // Fetch the constructed query and execute it
     $customers = $queryBuilder->getQuery()->execute();
 
+## Doctrine\ORM\EntityRepository
+
+We can add the filtering functionality to any class that has access to a query builder instance using the `FilterServiceInterface`. 
+Ideally this would be inside a class that extends from `Doctrine\ORM\EntityRepository`.
+
+For example
+
+    use Arp\DoctrineQueryFilter\FilterServiceInterface;
+    use Doctrine\ORM\EntityReposiotry;
+    use User\Entity\User;
+
+    class UserRepository extends EntityRepository implements FilterServiceInterface
+    {
+        public function filter(QueryFilterManagerInterface $filterManager, array $criteria, array $options = []): iterable
+        {
+            $queryBuilder = $filterManager->filter(
+                $this->createQueryBuilder('u'),
+                User::class,
+                $criteria
+            );
+    
+            return $queryBuilder->getQuery()->execute();
+        }
+    }
+
+We can then use the new repository `filter()` method by passing in the required `QueryFilterManager` and required `$criteria`.
+
+    $criteria = [
+        'filters' => [
+            //...filtering criteria
+        ]
+    ];
+    $users = $entityManager->getRepository('User')->filter($filterManager, $criteria);
+
 ## Query Criteria
 
 ### Query Filters
