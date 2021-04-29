@@ -95,7 +95,7 @@ final class FilterFactory implements FilterFactoryInterface
 
         try {
             return new $className($manager, $this->typecaster, $options);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),
                 $e->getCode(),

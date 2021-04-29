@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Constant\WhereType;
+use Arp\DoctrineQueryFilter\Enum\WhereType;
 use Arp\DoctrineQueryFilter\Filter\AndX;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;

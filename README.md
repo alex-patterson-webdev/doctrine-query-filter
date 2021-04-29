@@ -91,7 +91,7 @@ There are many types of query filters, the table below defines the defaults avai
 | isin    | Arp\DoctrineQueryFilter\Filter\IsIn | Check if a is IN b | `field`, `value` |
 | isnotin    | Arp\DoctrineQueryFilter\Filter\IsNotIn | Check if a is NOT IN b | `field`, `value` |
 
-### Composing filters
+### Composing Filters
 
 The true power of the library is the ability to nest and compose multiple query filters together to further filter a collection.
 
@@ -166,7 +166,7 @@ You can also nest a combination of the `andX` and `orX`, the generated DQL will 
         ],
     ];
     
-## Filtering examples
+## Filtering Examples
 
 @todo More filtering examples
 
@@ -183,6 +183,27 @@ instances directly to the `$criteria['filters']` array instead of using the arra
             $filterFactory->create('between', ['field' => 'age', 'from => 18, 'to' => 65]),
         ],
     ],
+
+## Sorting Results
+
+In addition to filtering collections, we can also define how they should be sorted by using the `sort` criteria key. 
+Each sort filter requires a `field` and `direction` key.
+
+    $criteria = [
+        'filters' => [
+            //....
+        ],
+        'sort' => [
+            [
+                'field' => 'age',
+                'direction' => SortDirection::DESC,
+            ],
+            [
+                'field' => 'createdDate',
+                'direction' => SortDirection::ASC,
+            ]
+        ],
+    ];
 
 ## Unit tests
 

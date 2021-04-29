@@ -11,6 +11,11 @@ use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Metadata\Metadata;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Sort\Exception\SortException;
+use Arp\DoctrineQueryFilter\Sort\Exception\SortFactoryException;
+use Arp\DoctrineQueryFilter\Sort\Field;
+use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
+use Arp\DoctrineQueryFilter\Sort\SortInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
@@ -26,11 +31,18 @@ class QueryFilterManager implements QueryFilterManagerInterface
     private FilterFactoryInterface $filterFactory;
 
     /**
-     * @param FilterFactoryInterface $filterFactory
+     * @var SortFactoryInterface
      */
-    public function __construct(FilterFactoryInterface $filterFactory)
+    private SortFactoryInterface $sortFactory;
+
+    /**
+     * @param FilterFactoryInterface $filterFactory
+     * @param SortFactoryInterface   $sortFactory
+     */
+    public function __construct(FilterFactoryInterface $filterFactory, SortFactoryInterface $sortFactory)
     {
         $this->filterFactory = $filterFactory;
+        $this->sortFactory = $sortFactory;
     }
 
     /**
@@ -47,67 +59,21 @@ class QueryFilterManager implements QueryFilterManagerInterface
     public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder
     {
         $queryBuilder = $this->getQueryBuilder($queryBuilder);
+        $metadata = $this->createMetadataProxy($queryBuilder->getEntityManager(), $entityName);
 
         if (!empty($criteria['filters']) && is_array($criteria['filters'])) {
-            $metadata = $this->createMetadataProxy($queryBuilder->getEntityManager(), $entityName);
-            foreach ($criteria['filters'] as $data) {
-                $this->applyFilter($queryBuilder, $metadata, $data);
+            foreach ($criteria['filters'] as $filterCriteria) {
+                $this->applyFilter($queryBuilder, $metadata, $filterCriteria);
+            }
+        }
+
+        if (!empty($criteria['sort']) && is_array($criteria['sort'])) {
+            foreach ($criteria['sort'] as $sortCriteria) {
+                $this->applySort($queryBuilder, $metadata, $sortCriteria);
             }
         }
 
         return $queryBuilder->getWrappedQueryBuilder();
-    }
-
-    /**
-     * Create a new filter matching $name with the provided $options
-     *
-     * @param string       $name
-     * @param array<mixed> $options
-     *
-     * @return FilterInterface
-     *
-     * @throws QueryFilterManagerException
-     */
-    private function createFilter(string $name, array $options = []): FilterInterface
-    {
-        try {
-            return $this->filterFactory->create($this, $name, $options);
-        } catch (FilterFactoryException $e) {
-            throw new QueryFilterManagerException(
-                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
-        }
-    }
-
-    /**
-     * @param QueryBuilderInterface|DoctrineQueryBuilder $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     *
-     * @throws QueryFilterManagerException
-     */
-    private function getQueryBuilder($queryBuilder): QueryBuilderInterface
-    {
-        if ($queryBuilder instanceof DoctrineQueryBuilder) {
-            $queryBuilder = $this->createQueryBuilderProxy($queryBuilder);
-        }
-
-        if (!$queryBuilder instanceof QueryBuilderInterface) {
-            throw new QueryFilterManagerException(
-                sprintf(
-                    'The \'queryBuilder\' argument must be an object of type \'%s\' or \'%s\'; '
-                    . '\'%s\' provided in \'%s\'',
-                    QueryBuilderInterface::class,
-                    DoctrineQueryBuilder::class,
-                    get_class($queryBuilder),
-                    static::class
-                )
-            );
-        }
-
-        return $queryBuilder;
     }
 
     /**
@@ -155,6 +121,134 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
+     * Create a new filter matching $name with the provided $options
+     *
+     * @param string       $name
+     * @param array<mixed> $options
+     *
+     * @return FilterInterface
+     *
+     * @throws QueryFilterManagerException
+     */
+    private function createFilter(string $name, array $options = []): FilterInterface
+    {
+        try {
+            return $this->filterFactory->create($this, $name, $options);
+        } catch (FilterFactoryException $e) {
+            throw new QueryFilterManagerException(
+                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * @param QueryBuilderInterface      $queryBuilder
+     * @param MetadataInterface          $metadata
+     * @param array<mixed>|SortInterface $data
+     *
+     * @throws QueryFilterManagerException
+     */
+    public function applySort(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
+    {
+        if ($data instanceof SortInterface) {
+            $sort = $data;
+            $data = [];
+        } elseif (is_array($data)) {
+            $sortName = $data['name'] ?? Field::class;
+
+            if (empty($sortName)) {
+                throw new QueryFilterManagerException(
+                    sprintf('The required \'name\' configuration option cannot be empty in \'%s\'', static::class)
+                );
+            }
+            $sort = $this->createSort($sortName, $data['options'] ?? []);
+        } else {
+            throw new QueryFilterManagerException(
+                sprintf(
+                    'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
+                    SortInterface::class,
+                    gettype($data),
+                    static::class
+                )
+            );
+        }
+
+        try {
+            $sort->sort($queryBuilder, $metadata, $data);
+        } catch (SortException $e) {
+            throw new QueryFilterManagerException(
+                sprintf('Failed to apply query sorting for entity \'%s\': %s', $metadata->getName(), $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * Create a new sorting filter matching $name with the provided $options
+     *
+     * @param string       $name
+     * @param array<mixed> $options
+     *
+     * @return SortInterface
+     *
+     * @throws QueryFilterManagerException
+     */
+    private function createSort(string $name, array $options = []): SortInterface
+    {
+        try {
+            return $this->sortFactory->create($this, $name, $options);
+        } catch (SortFactoryException $e) {
+            throw new QueryFilterManagerException(
+                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * @param QueryBuilderInterface|DoctrineQueryBuilder $queryBuilder
+     *
+     * @return QueryBuilderInterface
+     *
+     * @throws QueryFilterManagerException
+     */
+    private function getQueryBuilder($queryBuilder): QueryBuilderInterface
+    {
+        if ($queryBuilder instanceof DoctrineQueryBuilder) {
+            $queryBuilder = $this->createQueryBuilderProxy($queryBuilder);
+        }
+
+        if (!$queryBuilder instanceof QueryBuilderInterface) {
+            throw new QueryFilterManagerException(
+                sprintf(
+                    'The \'queryBuilder\' argument must be an object of type \'%s\' or \'%s\'; '
+                    . '\'%s\' provided in \'%s\'',
+                    QueryBuilderInterface::class,
+                    DoctrineQueryBuilder::class,
+                    get_class($queryBuilder),
+                    static::class
+                )
+            );
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param DoctrineQueryBuilder $queryBuilder
+     *
+     * @return QueryBuilderInterface
+     */
+    private function createQueryBuilderProxy(DoctrineQueryBuilder $queryBuilder): QueryBuilderInterface
+    {
+        return new QueryBuilder($queryBuilder);
+    }
+
+    /**
      * @param EntityManager $entityManager
      * @param string        $entityName
      *
@@ -173,15 +267,5 @@ class QueryFilterManager implements QueryFilterManagerInterface
                 $e
             );
         }
-    }
-
-    /**
-     * @param DoctrineQueryBuilder $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     */
-    private function createQueryBuilderProxy(DoctrineQueryBuilder $queryBuilder): QueryBuilderInterface
-    {
-        return new QueryBuilder($queryBuilder);
     }
 }

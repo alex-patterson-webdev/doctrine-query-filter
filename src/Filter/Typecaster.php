@@ -7,7 +7,7 @@ namespace Arp\DoctrineQueryFilter\Filter;
 use Arp\DateTime\DateTimeFactory;
 use Arp\DateTime\DateTimeFactoryInterface;
 use Arp\DateTime\Exception\DateTimeFactoryException;
-use Arp\DoctrineQueryFilter\Constant\TypecastType;
+use Arp\DoctrineQueryFilter\Enum\TypecastType;
 use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
