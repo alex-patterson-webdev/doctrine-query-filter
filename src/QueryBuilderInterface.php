@@ -103,19 +103,19 @@ interface QueryBuilderInterface
 
     /**
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $order
+     * @param string|null         $direction
      *
      * @return QueryBuilderInterface
      */
-    public function orderBy($sort, ?string $order = null): QueryBuilderInterface;
+    public function orderBy($sort, ?string $direction = null): QueryBuilderInterface;
 
     /**
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $order
+     * @param string|null         $direction
      *
      * @return QueryBuilderInterface
      */
-    public function addOrderBy($sort, ?string $order = null): QueryBuilderInterface;
+    public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface;
 
     /**
      * @return ArrayCollection<string, Query\Parameter>

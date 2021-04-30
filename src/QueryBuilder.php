@@ -155,26 +155,34 @@ final class QueryBuilder implements QueryBuilderInterface
 
     /**
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $order
+     * @param string|null         $direction
      *
      * @return QueryBuilderInterface
      */
-    public function orderBy($sort, ?string $order = null): QueryBuilderInterface
+    public function orderBy($sort, ?string $direction = null): QueryBuilderInterface
     {
-        $this->queryBuilder->orderBy($sort, $order);
+        if ($sort instanceof Expr\OrderBy) {
+            $direction = null;
+        }
+
+        $this->queryBuilder->orderBy($sort, $direction);
 
         return $this;
     }
 
     /**
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $order
+     * @param string|null         $direction
      *
      * @return QueryBuilderInterface
      */
-    public function addOrderBy($sort, ?string $order = null): QueryBuilderInterface
+    public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface
     {
-        $this->queryBuilder->addOrderBy($sort, $order);
+        if ($sort instanceof Expr\OrderBy) {
+            $direction = null;
+        }
+
+        $this->queryBuilder->addOrderBy($sort, $direction);
 
         return $this;
     }
