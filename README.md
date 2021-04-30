@@ -66,7 +66,7 @@ For example
         }
     }
 
-We can then use the new repository `filter()` method by passing in the required `QueryFilterManager` and required `$criteria`.
+We can then use the new repository `filter()` method by passing in the required `QueryFilterManager` and `$criteria`.
 
     $criteria = [
         'filters' => [
@@ -79,7 +79,7 @@ We can then use the new repository `filter()` method by passing in the required 
 
 ### Query Filters
 
-Query filters are objects that implement `Arp\DoctrineQueryFilter\Filter\QueryFilterInterface` and are used apply specific
+Query filters are objects that implement `Arp\DoctrineQueryFilter\Filter\QueryFilterInterface` and are used to apply specific
 filtering on the `$queryBuilder` passed to the `QueryFilterManager`.
 
 To avoid the need to construct many query filter objects, we can define our filter criteria using array configuration. 
