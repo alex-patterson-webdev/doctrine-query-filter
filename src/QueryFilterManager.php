@@ -144,32 +144,28 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface      $queryBuilder
-     * @param MetadataInterface          $metadata
-     * @param array<mixed>|SortInterface $data
+     * @param QueryBuilderInterface            $queryBuilder
+     * @param MetadataInterface                $metadata
+     * @param array<mixed>|SortInterface|mixed $data
      *
      * @throws QueryFilterManagerException
      */
-    public function applySort(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
+    private function applySort(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
     {
         if ($data instanceof SortInterface) {
             $sort = $data;
             $data = [];
         } elseif (is_array($data)) {
-            $sortName = $data['name'] ?? Field::class;
-
-            if (empty($sortName)) {
-                throw new QueryFilterManagerException(
-                    sprintf('The required \'name\' configuration option cannot be empty in \'%s\'', static::class)
-                );
-            }
-            $sort = $this->createSort($sortName, $data['options'] ?? []);
+            $sort = $this->createSort(
+                empty($data['name']) ? Field::class : $data['name'],
+                $data['options'] ?? []
+            );
         } else {
             throw new QueryFilterManagerException(
                 sprintf(
                     'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
                     SortInterface::class,
-                    gettype($data),
+                    is_object($data) ? get_class($data) : gettype($data),
                     static::class
                 )
             );

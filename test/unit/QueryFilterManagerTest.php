@@ -16,7 +16,9 @@ use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
+use Arp\DoctrineQueryFilter\Sort\SortInterface;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -41,12 +43,37 @@ final class QueryFilterManagerTest extends TestCase
     private $sortFactory;
 
     /**
+     * @var EntityManagerInterface&MockObject
+     */
+    private $entityManager;
+
+    /**
+     * @var QueryBuilderInterface&MockObject
+     */
+    private $queryBuilder;
+
+    /**
+     * @var ClassMetadata&MockObject
+     */
+    private $metadata;
+
+    /**
+     * @var string
+     */
+    private string $entityName;
+
+    /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
     {
+        $this->entityName = 'TestEntityName';
+
         $this->filterFactory = $this->createMock(FilterFactoryInterface::class);
         $this->sortFactory = $this->createMock(SortFactoryInterface::class);
+        $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->metadata = $this->createMock(ClassMetadata::class);
     }
 
     /**
@@ -67,29 +94,19 @@ final class QueryFilterManagerTest extends TestCase
     public function testFilterWillNotPerformFilteringWithoutFilterKey(): void
     {
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
-        $entityName = 'Test';
 
-        /** @var DoctrineQueryBuilder&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(DoctrineQueryBuilder::class);
-
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $this->filterFactory->expects($this->never())->method('create');
 
-        $this->assertSame($queryBuilder, $manager->filter($queryBuilder, $entityName, []));
+        $manager->filter($this->queryBuilder, $this->entityName, []);
     }
 
     /**
@@ -100,7 +117,6 @@ final class QueryFilterManagerTest extends TestCase
      */
     public function testFilterWillThrowQueryFilterManagerExceptionIfProvidedWithAnInvalidEntityName(): void
     {
-        $entityName = 'Test';
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
         $criteria = [
@@ -111,32 +127,26 @@ final class QueryFilterManagerTest extends TestCase
             ],
         ];
 
-        /** @var DoctrineQueryBuilder&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(DoctrineQueryBuilder::class);
-
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
         $exceptionMessage = 'This is an exception message';
         $exceptionCode = 123;
         $exception = new \Exception($exceptionMessage, $exceptionCode);
 
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
+            ->with($this->entityName)
             ->willThrowException($exception);
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionCode($exceptionCode);
         $this->expectExceptionMessage(
-            sprintf('Failed to fetch entity metadata for class \'%s\': %s', $entityName, $exceptionMessage),
+            sprintf('Failed to fetch entity metadata for class \'%s\': %s', $this->entityName, $exceptionMessage),
         );
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 
     /**
@@ -149,7 +159,6 @@ final class QueryFilterManagerTest extends TestCase
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
         $invalidQueryBuilder = new \stdClass();
-        $entityName = 'EntityTestName';
         $criteria = [];
 
         $this->expectException(QueryFilterManagerException::class);
@@ -165,7 +174,7 @@ final class QueryFilterManagerTest extends TestCase
         );
 
         /** @noinspection PhpParamsInspection */
-        $manager->filter($invalidQueryBuilder, $entityName, $criteria);/** @phpstan-ignore-line */
+        $manager->filter($invalidQueryBuilder, $this->entityName, $criteria);/** @phpstan-ignore-line */
     }
 
     /**
@@ -178,37 +187,27 @@ final class QueryFilterManagerTest extends TestCase
     {
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
-        /** @var QueryBuilderInterface&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
-        $entityName = 'TestClass';
         $criteria = [
             'filters' => [
                 [],
             ],
         ];
 
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionMessage(
             sprintf('The required \'name\' configuration option is missing in \'%s\'', QueryFilterManager::class)
         );
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 
     /**
@@ -220,31 +219,21 @@ final class QueryFilterManagerTest extends TestCase
     {
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
-        /** @var QueryBuilderInterface&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
         $filter = new \stdClass();
-        $entityName = 'TestClass';
         $criteria = [
             'filters' => [
                 $filter,
             ],
         ];
 
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionMessage(
@@ -256,7 +245,7 @@ final class QueryFilterManagerTest extends TestCase
             )
         );
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 
     /**
@@ -282,28 +271,18 @@ final class QueryFilterManagerTest extends TestCase
 
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
-        /** @var QueryBuilderInterface&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
-        $entityName = 'TestClass';
         $criteria = [
             'filters' => $filters,
         ];
 
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $exceptionMessage = 'This is a test filter factory exception message';
         $exceptionCode = 456;
@@ -320,7 +299,7 @@ final class QueryFilterManagerTest extends TestCase
             sprintf('Failed to create filter \'%s\': %s', $filterName, $exceptionMessage),
         );
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 
     /**
@@ -338,28 +317,18 @@ final class QueryFilterManagerTest extends TestCase
 
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
-        /** @var QueryBuilderInterface&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
-        $entityName = 'TestClass';
         $criteria = [
             'filters' => $filters,
         ];
 
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $exceptionMessage = 'This is a test filter exception message';
         $exceptionCode = 999;
@@ -367,20 +336,20 @@ final class QueryFilterManagerTest extends TestCase
 
         $filters[0]->expects($this->once())
             ->method('filter')
-            ->with($queryBuilder, $this->isInstanceOf(MetadataInterface::class), [])
+            ->with($this->queryBuilder, $this->isInstanceOf(MetadataInterface::class), [])
             ->willThrowException($filterException);
 
-        $metadata->expects($this->once())
+        $this->metadata->expects($this->once())
             ->method('getName')
-            ->willReturn($entityName);
+            ->willReturn($this->entityName);
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionCode($exceptionCode);
         $this->expectExceptionMessage(
-            sprintf('Failed to apply query filter for entity \'%s\': %s', $entityName, $exceptionMessage)
+            sprintf('Failed to apply query filter for entity \'%s\': %s', $this->entityName, $exceptionMessage)
         );
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 
     /**
@@ -405,28 +374,18 @@ final class QueryFilterManagerTest extends TestCase
 
         $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
 
-        /** @var QueryBuilderInterface&MockObject $queryBuilder */
-        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
-        $entityName = 'TestClass';
         $criteria = [
             'filters' => $filterData,
         ];
 
-        /** @var EntityManager&MockObject $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
-            ->willReturn($entityManager);
+            ->willReturn($this->entityManager);
 
-        /** @var ClassMetadata&MockObject $metadata */
-        $metadata = $this->createMock(ClassMetadata::class);
-
-        $entityManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with($entityName)
-            ->willReturn($metadata);
+            ->with($this->entityName)
+            ->willReturn($this->metadata);
 
         $factoryArgs = $createdFilters = [];
         foreach ($filterData as $data) {
@@ -437,7 +396,7 @@ final class QueryFilterManagerTest extends TestCase
 
             $createdFilter->expects($this->once())
                 ->method('filter')
-                ->with($queryBuilder, $this->isInstanceOf(MetadataInterface::class), $data);
+                ->with($this->queryBuilder, $this->isInstanceOf(MetadataInterface::class), $data);
 
             $createdFilters[] = $createdFilter;
         }
@@ -447,6 +406,41 @@ final class QueryFilterManagerTest extends TestCase
             ->withConsecutive(...$factoryArgs)
             ->willReturnOnConsecutiveCalls(...$createdFilters);
 
-        $manager->filter($queryBuilder, $entityName, $criteria);
+        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
+    }
+
+    /**
+     * @throws QueryFilterManagerException
+     */
+    public function testEmptySortNameWillThrowQueryFilterManagerException(): void
+    {
+        $filterManager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
+
+        $sortFilter = new \stdClass();
+        $criteria = [
+            'sort' => [
+                $sortFilter
+            ],
+        ];
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($this->entityManager);
+
+        $this->entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($this->metadata);
+
+        $this->expectException(QueryFilterManagerException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
+                SortInterface::class,
+                get_class($sortFilter),
+                QueryFilterManager::class
+            )
+        );
+
+        $filterManager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 }
