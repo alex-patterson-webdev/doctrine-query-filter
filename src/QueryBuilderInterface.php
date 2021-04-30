@@ -102,6 +102,22 @@ interface QueryBuilderInterface
     ): QueryBuilderInterface;
 
     /**
+     * @param Expr\OrderBy|string $sort
+     * @param string|null         $direction
+     *
+     * @return QueryBuilderInterface
+     */
+    public function orderBy($sort, ?string $direction = null): QueryBuilderInterface;
+
+    /**
+     * @param Expr\OrderBy|string $sort
+     * @param string|null         $direction
+     *
+     * @return QueryBuilderInterface
+     */
+    public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface;
+
+    /**
      * @return ArrayCollection<string, Query\Parameter>
      */
     public function getParameters(): ArrayCollection;

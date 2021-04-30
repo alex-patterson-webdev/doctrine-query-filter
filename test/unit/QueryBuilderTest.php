@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter;
 
+use Arp\DoctrineQueryFilter\Enum\SortDirection;
 use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -82,7 +86,55 @@ final class QueryBuilderTest extends TestCase
             ->method('getEntityManager')
             ->willReturn($entityManager);
 
-        $queryBuilder->getEntityManager();
+        $this->assertSame($entityManager, $queryBuilder->getEntityManager());
+    }
+
+    /**
+     * Assert that the root alias returned from calls to getRootAlias()
+     *
+     * @dataProvider getGetRootAliasWillReturnQueryBuilderAliasAtIndexZeroData
+     *
+     * @param array<mixed> $aliases
+     */
+    public function testGetRootAliasWillReturnQueryBuilderAliasAtIndexZero(array $aliases = []): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        if (empty($aliases[0])) {
+            $expected = '';
+        } else {
+            $expected = $aliases[0];
+        }
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn($aliases);
+
+        $this->assertSame($expected, $queryBuilder->getRootAlias());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getGetRootAliasWillReturnQueryBuilderAliasAtIndexZeroData(): array
+    {
+        return [
+            [
+                [],
+            ],
+            [
+                [
+                    'foo',
+                ],
+            ],
+            [
+                [
+                    'baz',
+                    'foo',
+                    'bar',
+                ],
+            ],
+        ];
     }
 
     /**
@@ -131,6 +183,105 @@ final class QueryBuilderTest extends TestCase
     }
 
     /**
+     * Assert the Query instance is returned from getQuery()
+     */
+    public function testGetQuery(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        /** @var EntityManagerInterface&MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        /** @var Configuration&MockObject $configuration */
+        $configuration = $this->createMock(Configuration::class);
+
+        $entityManager->expects($this->exactly(2))
+            ->method('getConfiguration')
+            ->willReturn($configuration);
+
+        $configuration->expects($this->once())
+            ->method('getDefaultQueryHints')
+            ->willReturn([]);
+
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->willReturn(false);
+
+        $query = new Query($entityManager);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->assertSame($query, $queryBuilder->getQuery());
+    }
+
+    /**
+     * Assert that arguments passed to orWhere() will proxy to the internal query builder's orWhere() method
+     *
+     * @param array<mixed> $orWhere
+     *
+     * @dataProvider getWhereWillProxyToInternalQueryBuilderData
+     */
+    public function testOrWhereWillProxyToInternalQueryBuilder(array $orWhere): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('orWhere')
+            ->with($orWhere);
+
+        $this->assertSame($queryBuilder, $queryBuilder->orWhere($orWhere));
+    }
+
+    /**
+     * Assert that arguments passed to andWhere() will proxy to the internal query builder's andWhere() method
+     *
+     * @param array<mixed> $orWhere
+     *
+     * @dataProvider getWhereWillProxyToInternalQueryBuilderData
+     */
+    public function testAndWhereWillProxyToInternalQueryBuilder(array $orWhere): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with($orWhere);
+
+        $this->assertSame($queryBuilder, $queryBuilder->andWhere($orWhere));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getWhereWillProxyToInternalQueryBuilderData(): array
+    {
+        $expr = new Expr();
+
+        return [
+            [
+                [
+                    '2 = 2',
+                ],
+            ],
+            [
+                [
+                    'a.bar = :bar',
+                    'a.test != :test AND b.foo = :foo',
+                ],
+            ],
+            [
+                [
+                    $expr->eq('t.foo', ':foo'),
+                    't.bar = 123',
+                    $expr->eq('b.baz', ':baz'),
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Assert that calls to innerJoin() will proxy to the internal query builder
      */
     public function testInnerJoinWillProxyToInternalQueryBuilder(): void
@@ -168,6 +319,62 @@ final class QueryBuilderTest extends TestCase
             ->with($name, $alias, $type, $condition, $indexBy);
 
         $this->assertSame($queryBuilder, $queryBuilder->leftJoin($name, $alias, $type, $condition, $indexBy));
+    }
+
+    /**
+     * Assert that calls to orderBy() will proxy to the internal query builder instance
+     *
+     * @param Expr\OrderBy|string $sort
+     * @param string|null         $direction
+     *
+     * @dataProvider getOrderByWillProxyToInternalQueryBuilderData
+     */
+    public function testOrderByWillProxyToInternalQueryBuilder($sort, ?string $direction = null): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->assertSame($queryBuilder, $queryBuilder->orderBy($sort, $direction));
+    }
+
+    /**
+     * Assert that calls to addOrderBy() will proxy to the internal query builder instance
+     *
+     * @param Expr\OrderBy|string $sort
+     * @param string|null         $direction
+     *
+     * @dataProvider getOrderByWillProxyToInternalQueryBuilderData
+     */
+    public function testAddOrderByWillProxyToInternalQueryBuilder($sort, ?string $direction = null): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $this->assertSame($queryBuilder, $queryBuilder->addOrderBy($sort, $direction));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getOrderByWillProxyToInternalQueryBuilderData(): array
+    {
+        $expr = new Expr();
+
+        return [
+            [
+                'a.test',
+                SortDirection::DESC,
+            ],
+            [
+                'b.foo',
+                null
+            ],
+            [
+                $expr->asc('a.bar')
+            ],
+            [
+                $expr->desc('a.baz'),
+                null
+            ]
+        ];
     }
 
     /**

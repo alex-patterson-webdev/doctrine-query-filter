@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "80a9eb56d0d7af6828303ee7866f5cc3",
+    "content-hash": "6f9aec322eacbf669ec6be1857154db7",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
@@ -50,6 +50,52 @@
                 "source": "https://github.com/alex-patterson-webdev/date-time/tree/feature/3.0.0"
             },
             "time": "2021-03-04T23:12:19+00:00"
+        },
+        {
+            "name": "alex-patterson-webdev/enum",
+            "version": "dev-feature/0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alex-patterson-webdev/enum.git",
+                "reference": "dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2",
+                "reference": "dfff7c9e95ac834b01112b10bbfc7ac796fb1bf2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4 || >=8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "phpstan/phpstan": ">=0.12",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Arp\\Enum\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alex Patterson",
+                    "email": "alex.patterson.webdev@gmail.com"
+                }
+            ],
+            "description": "Component library for Enum classes",
+            "support": {
+                "issues": "https://github.com/alex-patterson-webdev/enum/issues",
+                "source": "https://github.com/alex-patterson-webdev/enum/tree/feature/0.1.0"
+            },
+            "time": "2021-04-29T11:29:33+00:00"
         },
         {
             "name": "alex-patterson-webdev/factory",
@@ -5107,7 +5153,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "alex-patterson-webdev/date-time": 20
+        "alex-patterson-webdev/date-time": 20,
+        "alex-patterson-webdev/enum": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

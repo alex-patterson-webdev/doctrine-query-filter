@@ -41,11 +41,45 @@ a `Doctring\ORM\QueryBuilder` instance to which it will apply filtering.
     // Fetch the constructed query and execute it
     $customers = $queryBuilder->getQuery()->execute();
 
+## Doctrine\ORM\EntityRepository
+
+We can add the filtering functionality to any class that has access to a query builder instance using the `FilterServiceInterface`. 
+Ideally this would be inside a class that extends from `Doctrine\ORM\EntityRepository`.
+
+For example
+
+    use Arp\DoctrineQueryFilter\FilterServiceInterface;
+    use Doctrine\ORM\EntityReposiotry;
+    use User\Entity\User;
+
+    class UserRepository extends EntityRepository implements FilterServiceInterface
+    {
+        public function filter(QueryFilterManagerInterface $filterManager, array $criteria, array $options = []): iterable
+        {
+            $queryBuilder = $filterManager->filter(
+                $this->createQueryBuilder('u'),
+                User::class,
+                $criteria
+            );
+    
+            return $queryBuilder->getQuery()->execute();
+        }
+    }
+
+We can then use the new repository `filter()` method by passing in the required `QueryFilterManager` and `$criteria`.
+
+    $criteria = [
+        'filters' => [
+            //...filtering criteria
+        ]
+    ];
+    $users = $entityManager->getRepository('User')->filter($filterManager, $criteria);
+
 ## Query Criteria
 
 ### Query Filters
 
-Query filters are objects that implement `Arp\DoctrineQueryFilter\Filter\QueryFilterInterface` and are used apply specific
+Query filters are objects that implement `Arp\DoctrineQueryFilter\Filter\QueryFilterInterface` and are used to apply specific
 filtering on the `$queryBuilder` passed to the `QueryFilterManager`.
 
 To avoid the need to construct many query filter objects, we can define our filter criteria using array configuration. 
@@ -91,7 +125,7 @@ There are many types of query filters, the table below defines the defaults avai
 | isin    | Arp\DoctrineQueryFilter\Filter\IsIn | Check if a is IN b | `field`, `value` |
 | isnotin    | Arp\DoctrineQueryFilter\Filter\IsNotIn | Check if a is NOT IN b | `field`, `value` |
 
-### Composing filters
+### Composing Filters
 
 The true power of the library is the ability to nest and compose multiple query filters together to further filter a collection.
 
@@ -166,7 +200,7 @@ You can also nest a combination of the `andX` and `orX`, the generated DQL will 
         ],
     ];
     
-## Filtering examples
+## Filtering Examples
 
 @todo More filtering examples
 
@@ -183,6 +217,27 @@ instances directly to the `$criteria['filters']` array instead of using the arra
             $filterFactory->create('between', ['field' => 'age', 'from => 18, 'to' => 65]),
         ],
     ],
+
+## Sorting Results
+
+In addition to filtering collections, we can also define how they should be sorted by using the `sort` criteria key. 
+Each sort filter requires a `field` and `direction` key.
+
+    $criteria = [
+        'filters' => [
+            //....
+        ],
+        'sort' => [
+            [
+                'field' => 'age',
+                'direction' => SortDirection::DESC,
+            ],
+            [
+                'field' => 'createdDate',
+                'direction' => SortDirection::ASC,
+            ]
+        ],
+    ];
 
 ## Unit tests
 
