@@ -13,7 +13,7 @@
   "require": {
     "php": ">=7.4 || >=8.0",
     "doctrine/orm": "^2.8",
-    "alex-patterson-webdev/date-time": "dev-feature/3.0.0",
+    "alex-patterson-webdev/date-time": "^0.4",
     "alex-patterson-webdev/enum": "dev-feature/0.1.0"
   },
   "require-dev": {
