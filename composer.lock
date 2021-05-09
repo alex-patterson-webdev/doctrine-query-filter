@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab6755e5a89d853b7f9516d38295dbca",
+    "content-hash": "f5a44167eb00caca87ef345828fc492e",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
@@ -54,16 +54,16 @@
         },
         {
             "name": "alex-patterson-webdev/enum",
-            "version": "0.1.0",
+            "version": "dev-feature/0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/enum.git",
-                "reference": "5e9a03392232df986f64357cb27a469e780305f4"
+                "reference": "ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/5e9a03392232df986f64357cb27a469e780305f4",
-                "reference": "5e9a03392232df986f64357cb27a469e780305f4",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078",
+                "reference": "ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078",
                 "shasum": ""
             },
             "require": {
@@ -94,9 +94,9 @@
             "description": "Component library for Enum classes",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/enum/issues",
-                "source": "https://github.com/alex-patterson-webdev/enum/tree/0.1.0"
+                "source": "https://github.com/alex-patterson-webdev/enum/tree/feature/0.2.0"
             },
-            "time": "2021-05-07T23:45:51+00:00"
+            "time": "2021-05-07T23:49:04+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
@@ -5116,7 +5116,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "alex-patterson-webdev/date-time": 20
+        "alex-patterson-webdev/date-time": 20,
+        "alex-patterson-webdev/enum": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
