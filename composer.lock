@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "581f2fe8b7d08a6ceb36abf76b097a8c",
+    "content-hash": "ab6755e5a89d853b7f9516d38295dbca",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
-            "version": "0.4.0",
+            "version": "dev-feature/0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/date-time.git",
-                "reference": "8e931422a893ba256e17aba645604568a8f74f8b"
+                "reference": "954eea2db1d85d498dba5f41aa3ef49b76a6e947"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/8e931422a893ba256e17aba645604568a8f74f8b",
-                "reference": "8e931422a893ba256e17aba645604568a8f74f8b",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/954eea2db1d85d498dba5f41aa3ef49b76a6e947",
+                "reference": "954eea2db1d85d498dba5f41aa3ef49b76a6e947",
                 "shasum": ""
             },
             "require": {
@@ -48,9 +48,9 @@
             "description": "DateTime factory components for PHP",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/date-time/issues",
-                "source": "https://github.com/alex-patterson-webdev/date-time/tree/0.4.0"
+                "source": "https://github.com/alex-patterson-webdev/date-time/tree/feature/0.5.0"
             },
-            "time": "2021-05-01T17:17:43+00:00"
+            "time": "2021-05-07T22:45:33+00:00"
         },
         {
             "name": "alex-patterson-webdev/enum",
@@ -2714,16 +2714,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.85",
+            "version": "0.12.86",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "20e6333c0067875ad7697cd8acdf245c6ef69d03"
+                "reference": "a84fdc53ecca7643dbc89ef8880d8b393a6c155a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/20e6333c0067875ad7697cd8acdf245c6ef69d03",
-                "reference": "20e6333c0067875ad7697cd8acdf245c6ef69d03",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a84fdc53ecca7643dbc89ef8880d8b393a6c155a",
+                "reference": "a84fdc53ecca7643dbc89ef8880d8b393a6c155a",
                 "shasum": ""
             },
             "require": {
@@ -2754,7 +2754,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.85"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.86"
             },
             "funding": [
                 {
@@ -2770,7 +2770,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-04-27T14:13:16+00:00"
+            "time": "2021-05-08T11:29:01+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -5115,7 +5115,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "alex-patterson-webdev/date-time": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
