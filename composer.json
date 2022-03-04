@@ -17,6 +17,7 @@
     "alex-patterson-webdev/enum": "dev-feature/0.2.0"
   },
   "require-dev": {
+    "phpspec/prophecy": "^1.15.0",
     "phpunit/phpunit": "^9.5",
     "squizlabs/php_codesniffer": "^3.5",
     "phpstan/phpstan": ">=0.12",
