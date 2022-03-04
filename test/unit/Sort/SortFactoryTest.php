@@ -6,6 +6,7 @@ namespace ArpTest\DoctrineQueryFilter\Sort;
 
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use Arp\DoctrineQueryFilter\Sort\Exception\SortFactoryException;
+use Arp\DoctrineQueryFilter\Sort\Field;
 use Arp\DoctrineQueryFilter\Sort\SortFactory;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
 use Arp\DoctrineQueryFilter\Sort\SortInterface;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Arp\DoctrineQueryFilter\Sort\SortFactory
+ * @covers  \Arp\DoctrineQueryFilter\Sort\SortFactory
  *
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
  * @package ArpTest\DoctrineQueryFilter\Sort
@@ -67,4 +68,50 @@ final class SortFactoryTest extends TestCase
 
         $factory->create($this->queryFilterManager, $name);
     }
+
+    /**
+     * Assert that the factory will return a Field sort filter
+     *
+     * @param string               $name
+     * @param array<string, mixed> $options
+     *
+     * @dataProvider getFactoryWillCreateFieldSortFilterData
+     * @throws SortFactoryException
+     */
+    public function testFactoryWillCreateFieldSortFilterWithOptions(string $name, array $options = []): void
+    {
+        $defaultOptions = [
+            'default_sort_options' => [
+                'foo' => 123,
+                'bar' => [
+                    'test' => 'Hello',
+                ],
+            ],
+        ];
+
+        $factory = new SortFactory([], $defaultOptions);
+
+        $this->assertInstanceOf(Field::class, $factory->create($this->queryFilterManager, $name, $options));
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getFactoryWillCreateFieldSortFilterData(): array
+    {
+        return [
+            [
+                'field',
+                [],
+            ],
+            [
+
+                Field::class,
+                [],
+
+            ],
+        ];
+    }
+
+
 }

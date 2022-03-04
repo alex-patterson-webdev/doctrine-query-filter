@@ -14,20 +14,20 @@ use Arp\DoctrineQueryFilter\Sort\Exception\SortFactoryException;
 final class SortFactory implements SortFactoryInterface
 {
     /**
-     * @var array|string[]
+     * @var array<string, string>
      */
     private array $classMap = [
         'field' => Field::class,
     ];
 
     /**
-     * @var array<mixed>
+     * @var array<string, mixed>
      */
     private array $options;
 
     /**
-     * @param array<string> $classMap
-     * @param array<mixed>  $options
+     * @param array<string, string> $classMap
+     * @param array<string, mixed>  $options
      */
     public function __construct(array $classMap = [], array $options = [])
     {
