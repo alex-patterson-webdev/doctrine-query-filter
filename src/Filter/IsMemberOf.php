@@ -7,7 +7,7 @@ namespace Arp\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 
 /**
@@ -46,7 +46,7 @@ final class IsMemberOf extends AbstractExpression
         if ($metadata->hasAssociation($fieldName)) {
             $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';
 
-            if (!empty($associationType) && !($associationType & ClassMetadata::TO_ONE)) {
+            if (!empty($associationType) && !($associationType & ClassMetadataInfo::TO_ONE)) {
                 return $fieldName;
             }
 
