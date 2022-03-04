@@ -4,23 +4,10 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\AndX;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
-use Arp\DoctrineQueryFilter\Filter\FilterInterface;
-use Arp\DoctrineQueryFilter\Filter\InnerJoin;
-use Arp\DoctrineQueryFilter\Filter\IsEqual;
-use Arp\DoctrineQueryFilter\Filter\IsGreaterThan;
-use Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual;
-use Arp\DoctrineQueryFilter\Filter\IsLessThan;
-use Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual;
-use Arp\DoctrineQueryFilter\Filter\IsMemberOf;
-use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
-use Arp\DoctrineQueryFilter\Filter\IsNotNull;
-use Arp\DoctrineQueryFilter\Filter\IsNull;
-use Arp\DoctrineQueryFilter\Filter\LeftJoin;
-use Arp\DoctrineQueryFilter\Filter\OrX;
+use Arp\DoctrineQueryFilter\Filter as Filters;
 use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -45,6 +32,30 @@ final class FilterFactoryTest extends TestCase
     private $typecaster;
 
     /**
+     * @var array<string, string>
+     */
+    private array $defaultClassMap = [
+        'eq'        => Filters\IsEqual::class,
+        'neq'       => Filters\IsNotEqual::class,
+        'gt'        => Filters\IsGreaterThan::class,
+        'gte'       => Filters\IsGreaterThanOrEqual::class,
+        'lt'        => Filters\IsLessThan::class,
+        'lte'       => Filters\IsLessThanOrEqual::class,
+        'null'      => Filters\IsNull::class,
+        'notnull'   => Filters\IsNotNull::class,
+        'memberof'  => Filters\IsMemberOf::class,
+        'between'   => Filters\IsBetween::class,
+        'andx'      => Filters\AndX::class,
+        'orx'       => Filters\OrX::class,
+        'leftjoin'  => Filters\LeftJoin::class,
+        'innerjoin' => Filters\InnerJoin::class,
+        'like'      => Filters\IsLike::class,
+        'notlike'   => Filters\IsNotLike::class,
+        'in'        => Filters\IsIn::class,
+        'notin'     => Filters\IsNotIn::class,
+    ];
+
+    /**
      * Prepare the test case dependencies
      */
     public function setUp(): void
@@ -62,6 +73,39 @@ final class FilterFactoryTest extends TestCase
         $factory = new FilterFactory($this->typecaster);
 
         $this->assertInstanceOf(FilterFactoryInterface::class, $factory);
+    }
+
+    /**
+     * Assert the class map can be set and fetched via getClassMap() and setClassMap()
+     */
+    public function testGetAndSetClassMap(): void
+    {
+        $factory = new FilterFactory($this->typecaster);
+
+        $this->assertSame($this->defaultClassMap, $factory->getClassMap());
+
+        $replacementClassMap = [
+            'eq' => Filters\IsEqual::class,
+        ];
+
+        $factory->setClassMap($replacementClassMap);
+
+        $this->assertSame($replacementClassMap, $factory->getClassMap());
+    }
+
+    /**
+     * Assert that the default class map can be added to
+     */
+    public function testAddToClassMap(): void
+    {
+        $factory = new FilterFactory($this->typecaster);
+
+        $factory->addToClassMap('test', 'foo');
+
+        $this->assertSame(
+            array_merge($this->defaultClassMap, ['test' => 'foo']),
+            $factory->getClassMap()
+        );
     }
 
     /**
@@ -87,7 +131,7 @@ final class FilterFactoryTest extends TestCase
                 'The query filter \'%s\' must be an object of type \'%s\'; '
                 . 'The resolved class \'%s\' is invalid or cannot be found',
                 $name,
-                FilterInterface::class,
+                Filters\FilterInterface::class,
                 $className ?? $name
             )
         );
@@ -178,44 +222,44 @@ final class FilterFactoryTest extends TestCase
     public function getCreateWillReturnFilterInstanceData(): array
     {
         return [
-            [AndX::class, 'andx'],
-            [AndX::class, AndX::class],
+            [Filters\AndX::class, 'andx'],
+            [Filters\AndX::class, Filters\AndX::class],
 
-            [OrX::class, 'orx'],
-            [OrX::class, OrX::class],
+            [Filters\OrX::class, 'orx'],
+            [Filters\OrX::class, Filters\OrX::class],
 
-            [IsEqual::class, 'eq'],
-            [IsEqual::class, IsEqual::class],
+            [Filters\IsEqual::class, 'eq'],
+            [Filters\IsEqual::class, Filters\IsEqual::class],
 
-            [IsNotEqual::class, 'neq'],
-            [IsNotEqual::class, IsNotEqual::class],
+            [Filters\IsNotEqual::class, 'neq'],
+            [Filters\IsNotEqual::class, Filters\IsNotEqual::class],
 
-            [IsGreaterThan::class, 'gt'],
-            [IsGreaterThan::class, IsGreaterThan::class],
+            [Filters\IsGreaterThan::class, 'gt'],
+            [Filters\IsGreaterThan::class, Filters\IsGreaterThan::class],
 
-            [IsGreaterThanOrEqual::class, 'gte'],
-            [IsGreaterThanOrEqual::class, IsGreaterThanOrEqual::class],
+            [Filters\IsGreaterThanOrEqual::class, 'gte'],
+            [Filters\IsGreaterThanOrEqual::class, Filters\IsGreaterThanOrEqual::class],
 
-            [IsLessThan::class, 'lt'],
-            [IsLessThan::class, IsLessThan::class],
+            [Filters\IsLessThan::class, 'lt'],
+            [Filters\IsLessThan::class, Filters\IsLessThan::class],
 
-            [IsLessThanOrEqual::class, 'lte'],
-            [IsLessThanOrEqual::class, IsLessThanOrEqual::class],
+            [Filters\IsLessThanOrEqual::class, 'lte'],
+            [Filters\IsLessThanOrEqual::class, Filters\IsLessThanOrEqual::class],
 
-            [IsMemberOf::class, 'memberof'],
-            [IsMemberOf::class, IsMemberOf::class],
+            [Filters\IsMemberOf::class, 'memberof'],
+            [Filters\IsMemberOf::class, Filters\IsMemberOf::class],
 
-            [IsNull::class, 'null'],
-            [IsNull::class, IsNull::class],
+            [Filters\IsNull::class, 'null'],
+            [Filters\IsNull::class, Filters\IsNull::class],
 
-            [IsNotNull::class, 'notnull'],
-            [IsNotNull::class, IsNotNull::class],
+            [Filters\IsNotNull::class, 'notnull'],
+            [Filters\IsNotNull::class, Filters\IsNotNull::class],
 
-            [InnerJoin::class, 'innerjoin'],
-            [InnerJoin::class, InnerJoin::class],
+            [Filters\InnerJoin::class, 'innerjoin'],
+            [Filters\InnerJoin::class, Filters\InnerJoin::class],
 
-            [LeftJoin::class, 'leftjoin'],
-            [LeftJoin::class, LeftJoin::class],
+            [Filters\LeftJoin::class, 'leftjoin'],
+            [Filters\LeftJoin::class, Filters\LeftJoin::class],
         ];
     }
 }

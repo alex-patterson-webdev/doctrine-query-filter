@@ -9,13 +9,15 @@
 This package provides query filtering components for Doctrine ORM; converting array configuration into DQL queries. 
 
 The project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder); 
-providing similar functionality without the Laminas Framework dependency.
+providing similar functionality without the Laminas Framework dependency. If you are using a framework, checkout the integration packages for this library
+
+- [alex-patterson-webdev/laminas-doctrine-query-filter](https://github.com/alex-patterson-webdev/laminas-doctrine-query-filter) to integrate with Laminas Framework Applications
 
 ## Installation
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.3
+    require alex-patterson-webdev/doctrine-query-filter ^0.5
 
 ## Query Filter Manager
 

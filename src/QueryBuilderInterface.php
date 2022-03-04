@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -22,9 +22,9 @@ interface QueryBuilderInterface
     public function createQueryBuilder(): QueryBuilderInterface;
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
-    public function getEntityManager(): EntityManager;
+    public function getEntityManager(): EntityManagerInterface;
 
     /**
      * @return string
@@ -71,7 +71,7 @@ interface QueryBuilderInterface
      * @param string      $name
      * @param string      $alias
      * @param string      $type
-     * @param string|null $condition
+     * @param mixed       $condition
      * @param string|null $indexBy
      *
      * @return QueryBuilderInterface
@@ -88,7 +88,7 @@ interface QueryBuilderInterface
      * @param string      $name
      * @param string      $alias
      * @param string      $type
-     * @param string|null $condition
+     * @param mixed       $condition
      * @param string|null $indexBy
      *
      * @return QueryBuilderInterface
@@ -118,7 +118,7 @@ interface QueryBuilderInterface
     public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface;
 
     /**
-     * @return ArrayCollection<string, Query\Parameter>
+     * @return ArrayCollection<int, Query\Parameter>
      */
     public function getParameters(): ArrayCollection;
 

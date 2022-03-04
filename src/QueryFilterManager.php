@@ -17,6 +17,7 @@ use Arp\DoctrineQueryFilter\Sort\Field;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
 use Arp\DoctrineQueryFilter\Sort\SortInterface;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
 /**
@@ -245,14 +246,14 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param EntityManager $entityManager
-     * @param string        $entityName
+     * @param EntityManagerInterface $entityManager
+     * @param string                 $entityName
      *
      * @return MetadataInterface
      *
      * @throws QueryFilterManagerException
      */
-    private function createMetadataProxy(EntityManager $entityManager, string $entityName): MetadataInterface
+    private function createMetadataProxy(EntityManagerInterface $entityManager, string $entityName): MetadataInterface
     {
         try {
             return new Metadata($entityManager->getClassMetadata($entityName));

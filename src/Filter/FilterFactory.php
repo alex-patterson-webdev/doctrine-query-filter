@@ -94,6 +94,7 @@ final class FilterFactory implements FilterFactoryInterface
         );
 
         try {
+            /** @throws \Exception */
             return new $className($manager, $this->typecaster, $options);
         } catch (\Exception $e) {
             throw new FilterFactoryException(

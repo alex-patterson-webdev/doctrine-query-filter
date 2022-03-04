@@ -7,6 +7,7 @@ namespace Arp\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
+use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Mapping\MappingException;
@@ -94,7 +95,7 @@ abstract class AbstractJoin extends AbstractFilter
     {
         try {
             return $metadata->getAssociationMapping($fieldName);
-        } catch (MappingException $e) {
+        } catch (MetadataException $e) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Failed to load association field mapping for field \'%s::%s\' in filter \'%s\'',

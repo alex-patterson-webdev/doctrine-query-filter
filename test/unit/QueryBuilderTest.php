@@ -253,7 +253,7 @@ final class QueryBuilderTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getWhereWillProxyToInternalQueryBuilderData(): array
     {
@@ -352,7 +352,7 @@ final class QueryBuilderTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getOrderByWillProxyToInternalQueryBuilderData(): array
     {
