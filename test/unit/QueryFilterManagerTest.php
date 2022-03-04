@@ -53,7 +53,7 @@ final class QueryFilterManagerTest extends TestCase
     private $queryBuilder;
 
     /**
-     * @var ClassMetadata&MockObject
+     * @var ClassMetadata<object>&MockObject
      */
     private $metadata;
 
@@ -392,7 +392,7 @@ final class QueryFilterManagerTest extends TestCase
             /** @var FilterInterface&MockObject $createdFilter */
             $createdFilter = $this->createMock(FilterInterface::class);
 
-            $factoryArgs[] = [$manager, $data['name'], $data['options'] ?? []];
+            $factoryArgs[] = [$manager, $data['name'], []];
 
             $createdFilter->expects($this->once())
                 ->method('filter')

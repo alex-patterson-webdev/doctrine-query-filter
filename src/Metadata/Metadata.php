@@ -15,12 +15,12 @@ use Doctrine\ORM\Mapping\MappingException;
 final class Metadata implements MetadataInterface
 {
     /**
-     * @var ClassMetadata
+     * @var ClassMetadata<object>
      */
     private ClassMetadata $metadata;
 
     /**
-     * @param ClassMetadata $metadata
+     * @param ClassMetadata<object> $metadata
      */
     public function __construct(ClassMetadata $metadata)
     {

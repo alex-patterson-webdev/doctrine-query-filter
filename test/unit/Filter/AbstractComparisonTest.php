@@ -43,7 +43,9 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
     {
         parent::setUp();
 
-        $this->filter = new $this->filterClassName($this->queryFilterManager, $this->typecaster);
+        /** @var FilterInterface $filter */
+        $filter = new $this->filterClassName($this->queryFilterManager, $this->typecaster);
+        $this->filter = $filter;
     }
 
     /**

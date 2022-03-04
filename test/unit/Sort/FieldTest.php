@@ -173,7 +173,7 @@ final class FieldTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<int, mixed>
      */
     public function getSortWillApplySortCriteriaData(): array
     {

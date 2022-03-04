@@ -27,7 +27,7 @@ abstract class AbstractComposite extends AbstractFilter
     /**
      * @param QueryBuilderInterface $queryBuilder
      * @param MetadataInterface     $metadata
-     * @param array<mixed>                 $criteria
+     * @param array<mixed>          $criteria
      *
      * @throws FilterException
      */
@@ -61,9 +61,9 @@ abstract class AbstractComposite extends AbstractFilter
     }
 
     /**
-     * @param QueryBuilderInterface $qb
-     * @param MetadataInterface     $metadata
-     * @param iterable|array[]      $conditions
+     * @param QueryBuilderInterface        $qb
+     * @param MetadataInterface            $metadata
+     * @param iterable<mixed>|array<mixed> $conditions
      *
      * @throws FilterException
      */

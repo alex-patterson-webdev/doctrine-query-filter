@@ -68,6 +68,7 @@ final class SortFactory implements SortFactoryInterface
         );
 
         try {
+            /** @throws \Exception */
             return new $className($manager, $options);
         } catch (\Exception $e) {
             throw new SortFactoryException(

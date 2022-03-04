@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -38,9 +38,9 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
-    public function getEntityManager(): EntityManager
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->queryBuilder->getEntityManager();
     }
@@ -188,7 +188,7 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return ArrayCollection<mixed, Query\Parameter>
+     * @return ArrayCollection<int, Query\Parameter>
      */
     public function getParameters(): ArrayCollection
     {
@@ -196,7 +196,7 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param ArrayCollection<mixed, Query\Parameter> $parameters
+     * @param ArrayCollection<int, Query\Parameter> $parameters
      *
      * @return $this|QueryBuilderInterface
      */
