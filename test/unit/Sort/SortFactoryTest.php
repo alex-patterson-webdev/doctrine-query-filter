@@ -113,5 +113,24 @@ final class SortFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * Assert that the factory will throw an exception if it is unable to create the sort filter
+     *
+     * @throws SortFactoryException
+     */
+    public function testCreateWillThrowSortFactoryExceptionIfUnableToCreateTheSortFilter(): void
+    {
+        $factory = new SortFactory(
+            [
+                'error' => SortCreationErrorMock::class,
+            ]
+        );
 
+        $this->expectException(SortFactoryException::class);
+        $this->expectExceptionMessage(
+            'Failed to create sort filter \'error\': Failed to create sort filter'
+        );
+
+        $factory->create($this->queryFilterManager, 'error');
+    }
 }
