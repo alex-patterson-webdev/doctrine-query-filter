@@ -17,7 +17,7 @@ providing similar functionality without the Laminas Framework dependency. If you
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.5
+    require alex-patterson-webdev/doctrine-query-filter ^0.6
 
 ## Query Filter Manager
 
