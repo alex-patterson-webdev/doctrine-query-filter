@@ -4,30 +4,31 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "645e4f711a51d4b38a99755f2a60331f",
+    "content-hash": "3c2df0d277f00642d2e7816196b88886",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
-            "version": "dev-feature/0.5.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/date-time.git",
-                "reference": "954eea2db1d85d498dba5f41aa3ef49b76a6e947"
+                "reference": "cd8c925b657db10c75f6534c2d774c626bd49da5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/954eea2db1d85d498dba5f41aa3ef49b76a6e947",
-                "reference": "954eea2db1d85d498dba5f41aa3ef49b76a6e947",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/cd8c925b657db10c75f6534c2d774c626bd49da5",
+                "reference": "cd8c925b657db10c75f6534c2d774c626bd49da5",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4 || >=8.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.18",
-                "phpstan/phpstan": ">=0.12",
+                "friendsofphp/php-cs-fixer": "^3.6.0",
+                "phpspec/prophecy": "^1.15.0",
+                "phpstan/phpstan": "^1.4.8",
                 "phpunit/phpunit": "^9.5",
-                "squizlabs/php_codesniffer": "^3.5"
+                "squizlabs/php_codesniffer": "^3.6"
             },
             "type": "library",
             "autoload": {
@@ -48,32 +49,33 @@
             "description": "DateTime factory components for PHP",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/date-time/issues",
-                "source": "https://github.com/alex-patterson-webdev/date-time/tree/feature/0.5.0"
+                "source": "https://github.com/alex-patterson-webdev/date-time/tree/0.5.0"
             },
-            "time": "2021-05-07T22:45:33+00:00"
+            "time": "2022-03-06T23:18:44+00:00"
         },
         {
             "name": "alex-patterson-webdev/enum",
-            "version": "dev-feature/0.2.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex-patterson-webdev/enum.git",
-                "reference": "ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078"
+                "reference": "d1e7eb2a1675dba5f0b6c03d11e35d1dcdf8f179"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078",
-                "reference": "ea20b2dc7ef70ecf2e6f3943d4d02acb5f1b7078",
+                "url": "https://api.github.com/repos/alex-patterson-webdev/enum/zipball/d1e7eb2a1675dba5f0b6c03d11e35d1dcdf8f179",
+                "reference": "d1e7eb2a1675dba5f0b6c03d11e35d1dcdf8f179",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4 || >=8.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.18",
-                "phpstan/phpstan": ">=0.12",
+                "friendsofphp/php-cs-fixer": "^3.6.0",
+                "phpspec/prophecy": "^1.15.0",
+                "phpstan/phpstan": "^1.4.8",
                 "phpunit/phpunit": "^9.5",
-                "squizlabs/php_codesniffer": "^3.5"
+                "squizlabs/php_codesniffer": "^3.6"
             },
             "type": "library",
             "autoload": {
@@ -94,9 +96,9 @@
             "description": "Component library for Enum classes",
             "support": {
                 "issues": "https://github.com/alex-patterson-webdev/enum/issues",
-                "source": "https://github.com/alex-patterson-webdev/enum/tree/feature/0.2.0"
+                "source": "https://github.com/alex-patterson-webdev/enum/tree/0.2.0"
             },
-            "time": "2021-05-07T23:49:04+00:00"
+            "time": "2022-03-07T00:02:24+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -3348,16 +3350,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.16",
+            "version": "9.5.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "5ff8c545a50226c569310a35f4fa89d79f1ddfdc"
+                "reference": "5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/5ff8c545a50226c569310a35f4fa89d79f1ddfdc",
-                "reference": "5ff8c545a50226c569310a35f4fa89d79f1ddfdc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f",
+                "reference": "5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f",
                 "shasum": ""
             },
             "require": {
@@ -3435,7 +3437,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.16"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.17"
             },
             "funding": [
                 {
@@ -3447,7 +3449,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-23T17:10:58+00:00"
+            "time": "2022-03-05T16:54:31+00:00"
         },
         {
             "name": "psr/event-dispatcher",
@@ -4685,16 +4687,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v5.4.5",
+            "version": "v5.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "797680071ea8f71b94eb958680c50d0e002638f5"
+                "reference": "d53a45039974952af7f7ebc461ccdd4295e29440"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/797680071ea8f71b94eb958680c50d0e002638f5",
-                "reference": "797680071ea8f71b94eb958680c50d0e002638f5",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d53a45039974952af7f7ebc461ccdd4295e29440",
+                "reference": "d53a45039974952af7f7ebc461ccdd4295e29440",
                 "shasum": ""
             },
             "require": {
@@ -4729,7 +4731,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v5.4.5"
+                "source": "https://github.com/symfony/filesystem/tree/v5.4.6"
             },
             "funding": [
                 {
@@ -4745,7 +4747,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-02-27T10:31:47+00:00"
+            "time": "2022-03-02T12:42:23+00:00"
         },
         {
             "name": "symfony/finder",
@@ -5193,10 +5195,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "alex-patterson-webdev/date-time": 20,
-        "alex-patterson-webdev/enum": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
