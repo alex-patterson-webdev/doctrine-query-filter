@@ -53,7 +53,7 @@ abstract class AbstractJoin extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
-        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
         $conditions = $criteria['conditions'] ?? [];
         $condition = null;
 

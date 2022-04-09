@@ -46,7 +46,7 @@ abstract class AbstractExpression extends AbstractFilter
     {
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
-        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
         $paramName = $this->createParamName($queryAlias);
 
         $expression = $this->createExpression($queryBuilder->expr(), $fieldName, $paramName, $queryAlias);
@@ -58,7 +58,15 @@ abstract class AbstractExpression extends AbstractFilter
 
         // Some comparisons will not require a value to be provided
         if (array_key_exists('value', $criteria)) {
-            $value = $this->formatValue($metadata, $fieldName, $criteria['value'], $criteria['format'] ?? null);
+            $value = $this->formatValue(
+                $metadata,
+                $fieldName,
+                $criteria['value'],
+                $criteria['type'] ?? null,
+                [
+                    'format' => $criteria['format'] ?? null,
+                ]
+            );
             $queryBuilder->setParameter($paramName, $value);
         }
     }

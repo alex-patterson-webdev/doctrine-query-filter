@@ -135,7 +135,7 @@ final class Typecaster implements TypecasterInterface
     private function createDateTime(string $spec, string $format): \DateTimeInterface
     {
         try {
-            return $this->dateTimeFactory->createFromFormat($spec, $format);
+            return $this->dateTimeFactory->createFromFormat($format, $spec);
         } catch (DateTimeFactoryException $e) {
             throw new TypecastException(
                 sprintf('Failed to cast date time to format \'%s\': %s', $format, $e->getMessage()),
@@ -156,7 +156,7 @@ final class Typecaster implements TypecasterInterface
      */
     private function getType(MetadataInterface $metadata, string $fieldName, ?string $type): ?string
     {
-        if (null === $type || !in_array($type, TypecastType::getValues(), true)) {
+        if (null !== $type && in_array($type, TypecastType::getValues(), true)) {
             return $type;
         }
 
