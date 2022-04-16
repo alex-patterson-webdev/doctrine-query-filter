@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Filter as Filters;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
-use Arp\DoctrineQueryFilter\Filter as Filters;
-use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
+use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -100,10 +100,10 @@ final class FilterFactoryTest extends TestCase
     {
         $factory = new FilterFactory($this->typecaster);
 
-        $factory->addToClassMap('test', 'foo');
+        $factory->addToClassMap('test', Filters\FilterInterface::class);
 
         $this->assertSame(
-            array_merge($this->defaultClassMap, ['test' => 'foo']),
+            array_merge($this->defaultClassMap, ['test' => Filters\FilterInterface::class]),
             $factory->getClassMap()
         );
     }
@@ -111,8 +111,8 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert that if the factory resolves to an invalid filter class a QueryFactoryException will be thrown
      *
-     * @param string  $name
-     * @param ?string $className
+     * @param string            $name
+     * @param class-string<Filters\FilterInterface>|null $className
      *
      * @throws FilterFactoryException
      * @dataProvider getCreateWillThrowAFilterFactoryExceptionIfTheResolvedClassNameIsInvalidData
@@ -193,10 +193,10 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert the expected query filter is created using the provided $name and $options and optional $classMap.
      *
-     * @param class-string   $expected
-     * @param string         $name
-     * @param array<mixed>   $options
-     * @param array<mixed>   $classMap
+     * @param class-string $expected
+     * @param string       $name
+     * @param array<mixed> $options
+     * @param array<mixed> $classMap
      *
      * @dataProvider getCreateWillReturnFilterInstanceData
      *

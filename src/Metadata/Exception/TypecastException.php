@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Arp\DoctrineQueryFilter\Filter\Exception;
+namespace Arp\DoctrineQueryFilter\Metadata\Exception;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter\Exception
+ * @package Arp\DoctrineQueryFilter\Metadata\Exception
  */
 class TypecastException extends \Exception
 {

@@ -16,7 +16,6 @@ use Arp\DoctrineQueryFilter\Sort\Exception\SortFactoryException;
 use Arp\DoctrineQueryFilter\Sort\Field;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
 use Arp\DoctrineQueryFilter\Sort\SortInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
