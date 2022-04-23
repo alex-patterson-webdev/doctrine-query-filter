@@ -90,6 +90,26 @@ final class QueryBuilderTest extends TestCase
     }
 
     /**
+     * Assert that the root alias can be set and fetched from setRootAlias() and getRootAlias()
+     */
+    public function testSetAndGetRootAlias(): void
+    {
+        $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
+
+        $alias = 'test';
+
+        $this->doctrineQueryBuilder->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn([]);
+
+        $this->assertSame('', $queryBuilder->getRootAlias());
+
+        $queryBuilder->setRootAlias($alias);
+
+        $this->assertSame($alias, $queryBuilder->getRootAlias());
+    }
+
+    /**
      * Assert that the root alias returned from calls to getRootAlias()
      *
      * @dataProvider getGetRootAliasWillReturnQueryBuilderAliasAtIndexZeroData

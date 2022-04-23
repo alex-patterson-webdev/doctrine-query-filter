@@ -36,7 +36,7 @@ abstract class AbstractComposite extends AbstractFilter
         if (empty($criteria['conditions'])) {
             return;
         }
-        $qb = $queryBuilder->createQueryBuilder();
+        $qb = $this->createNewQueryBuilder($queryBuilder);
         $this->applyConditions($qb, $metadata, $criteria['conditions']);
 
         $parts = $qb->getQueryParts();
@@ -58,6 +58,18 @@ abstract class AbstractComposite extends AbstractFilter
         }
 
         $queryBuilder->mergeParameters($qb);
+    }
+
+    protected function createNewQueryBuilder(QueryBuilderInterface $queryBuilder): QueryBuilderInterface
+    {
+        $qb = $queryBuilder->createQueryBuilder();
+
+        $alias = $queryBuilder->getRootAlias();
+        if (!empty($alias)) {
+            $qb->setRootAlias($alias);
+        }
+
+        return $qb;
     }
 
     /**

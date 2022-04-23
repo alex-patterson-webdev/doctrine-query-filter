@@ -32,6 +32,11 @@ interface QueryBuilderInterface
     public function getRootAlias(): string;
 
     /**
+     * @param string $rootAlias
+     */
+    public function setRootAlias(string $rootAlias): void;
+
+    /**
      * @return Query
      */
     public function getQuery(): Query;

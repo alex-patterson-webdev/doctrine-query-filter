@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Arp\DoctrineQueryFilter\Filter;
+namespace Arp\DoctrineQueryFilter\Metadata;
 
-use Arp\DoctrineQueryFilter\Filter\Exception\TypecastException;
-use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException;
 
 /**
  * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
+ * @package Arp\DoctrineQueryFilter\Metadata
  */
 interface TypecasterInterface
 {
@@ -22,7 +21,7 @@ interface TypecasterInterface
      *
      * @return mixed
      *
-     * @throws TypecastException
+     * @throws \Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException
      */
     public function typecast(
         MetadataInterface $metadata,

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\AbstractFilter;
-use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
@@ -17,13 +17,13 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 final class ThrowExceptionInConstructorFilterMock extends AbstractFilter
 {
     /**
-     * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecasterInterface         $typecaster
-     * @param array<mixed>                $options
+     * @param QueryFilterManagerInterface                           $queryFilterManager
+     * @param \Arp\DoctrineQueryFilter\Metadata\TypecasterInterface $typecaster
+     * @param array<mixed>                                          $options
      */
     public function __construct(
         QueryFilterManagerInterface $queryFilterManager,
-        TypecasterInterface $typecaster,
+        \Arp\DoctrineQueryFilter\Metadata\TypecasterInterface $typecaster,
         array $options = []
     ) {
         parent::__construct($queryFilterManager, $typecaster, $options);

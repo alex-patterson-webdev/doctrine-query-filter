@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
-use Arp\DoctrineQueryFilter\Filter\TypecasterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,7 +23,7 @@ abstract class AbstractFilterTest extends TestCase
     protected $queryFilterManager;
 
     /**
-     * @var TypecasterInterface&MockObject
+     * @var \Arp\DoctrineQueryFilter\Metadata\TypecasterInterface&MockObject
      */
     protected $typecaster;
 
@@ -44,7 +44,7 @@ abstract class AbstractFilterTest extends TestCase
     {
         $this->queryFilterManager = $this->createMock(QueryFilterManagerInterface::class);
 
-        $this->typecaster = $this->createMock(TypecasterInterface::class);
+        $this->typecaster = $this->createMock(\Arp\DoctrineQueryFilter\Metadata\TypecasterInterface::class);
 
         $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
 

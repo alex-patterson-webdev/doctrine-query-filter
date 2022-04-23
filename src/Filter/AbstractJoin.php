@@ -10,7 +10,6 @@ use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
-use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx as DoctrineAndX;
 use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Composite;
@@ -53,7 +52,7 @@ abstract class AbstractJoin extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
-        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? '');
+        $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
         $conditions = $criteria['conditions'] ?? [];
         $condition = null;
 

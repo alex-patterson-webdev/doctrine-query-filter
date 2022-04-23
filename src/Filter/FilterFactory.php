@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
+use Arp\DoctrineQueryFilter\Metadata\Typecaster;
+use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 /**
@@ -21,7 +23,7 @@ final class FilterFactory implements FilterFactoryInterface
     private TypecasterInterface $typecaster;
 
     /**
-     * @var array|string[]
+     * @var array<string, class-string<FilterInterface>>
      */
     private array $classMap = [
         'eq'        => IsEqual::class,
@@ -50,9 +52,9 @@ final class FilterFactory implements FilterFactoryInterface
     private array $options;
 
     /**
-     * @param TypecasterInterface|null $typecaster
-     * @param array<mixed>             $classMap
-     * @param array<mixed>             $options
+     * @param TypecasterInterface|null                     $typecaster
+     * @param array<string, class-string<FilterInterface>> $classMap
+     * @param array<mixed>                                 $options
      */
     public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
     {
@@ -122,11 +124,21 @@ final class FilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * @param string $alias
-     * @param string $className
+     * @param string                        $alias
+     * @param class-string<FilterInterface> $className
      */
     public function addToClassMap(string $alias, string $className): void
     {
         $this->classMap[$alias] = $className;
+    }
+
+    /**
+     * @param TypecasterInterface $typecaster
+     *
+     * @return void
+     */
+    public function setTypecaster(TypecasterInterface $typecaster): void
+    {
+        $this->typecaster = $typecaster;
     }
 }

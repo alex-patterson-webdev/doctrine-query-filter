@@ -16,7 +16,6 @@ use Arp\DoctrineQueryFilter\Sort\Exception\SortFactoryException;
 use Arp\DoctrineQueryFilter\Sort\Field;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
 use Arp\DoctrineQueryFilter\Sort\SortInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
@@ -26,20 +25,10 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
  */
 class QueryFilterManager implements QueryFilterManagerInterface
 {
-    /**
-     * @var FilterFactoryInterface
-     */
     private FilterFactoryInterface $filterFactory;
 
-    /**
-     * @var SortFactoryInterface
-     */
     private SortFactoryInterface $sortFactory;
 
-    /**
-     * @param FilterFactoryInterface $filterFactory
-     * @param SortFactoryInterface   $sortFactory
-     */
     public function __construct(FilterFactoryInterface $filterFactory, SortFactoryInterface $sortFactory)
     {
         $this->filterFactory = $filterFactory;
@@ -62,16 +51,12 @@ class QueryFilterManager implements QueryFilterManagerInterface
         $queryBuilder = $this->getQueryBuilder($queryBuilder);
         $metadata = $this->createMetadataProxy($queryBuilder->getEntityManager(), $entityName);
 
-        if (!empty($criteria['filters']) && is_array($criteria['filters'])) {
-            foreach ($criteria['filters'] as $filterCriteria) {
-                $this->applyFilter($queryBuilder, $metadata, $filterCriteria);
-            }
+        foreach ($criteria['filters'] ?? [] as $filterCriteria) {
+            $this->applyFilter($queryBuilder, $metadata, $filterCriteria);
         }
 
-        if (!empty($criteria['sort']) && is_array($criteria['sort'])) {
-            foreach ($criteria['sort'] as $sortCriteria) {
-                $this->applySort($queryBuilder, $metadata, $sortCriteria);
-            }
+        foreach ($criteria['sort'] ?? [] as $sortCriteria) {
+            $this->applySort($queryBuilder, $metadata, $sortCriteria);
         }
 
         return $queryBuilder->getWrappedQueryBuilder();
@@ -216,7 +201,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
     private function getQueryBuilder($queryBuilder): QueryBuilderInterface
     {
         if ($queryBuilder instanceof DoctrineQueryBuilder) {
-            $queryBuilder = $this->createQueryBuilderProxy($queryBuilder);
+            $queryBuilder = new QueryBuilder($queryBuilder);
         }
 
         if (!$queryBuilder instanceof QueryBuilderInterface) {
@@ -233,16 +218,6 @@ class QueryFilterManager implements QueryFilterManagerInterface
         }
 
         return $queryBuilder;
-    }
-
-    /**
-     * @param DoctrineQueryBuilder $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     */
-    private function createQueryBuilderProxy(DoctrineQueryBuilder $queryBuilder): QueryBuilderInterface
-    {
-        return new QueryBuilder($queryBuilder);
     }
 
     /**

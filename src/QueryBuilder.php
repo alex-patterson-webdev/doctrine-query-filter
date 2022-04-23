@@ -16,10 +16,9 @@ use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
  */
 final class QueryBuilder implements QueryBuilderInterface
 {
-    /**
-     * @var DoctrineQueryBuilder
-     */
     private DoctrineQueryBuilder $queryBuilder;
+
+    private string $rootAlias = '';
 
     /**
      * @param DoctrineQueryBuilder $queryBuilder
@@ -50,7 +49,19 @@ final class QueryBuilder implements QueryBuilderInterface
      */
     public function getRootAlias(): string
     {
+        if (!empty($this->rootAlias)) {
+            return $this->rootAlias;
+        }
+
         return $this->queryBuilder->getRootAliases()[0] ?? '';
+    }
+
+    /**
+     * @param string $rootAlias
+     */
+    public function setRootAlias(string $rootAlias): void
+    {
+        $this->rootAlias = $rootAlias;
     }
 
     /**
