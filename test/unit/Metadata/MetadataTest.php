@@ -14,20 +14,14 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Metadata\Metadata
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Metadata
  */
 final class MetadataTest extends TestCase
 {
     /**
      * @var ClassMetadata<object>&MockObject
      */
-    private $classMetadata;
+    private ClassMetadata $classMetadata;
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         $this->classMetadata = $this->createMock(ClassMetadata::class);
@@ -105,9 +99,8 @@ final class MetadataTest extends TestCase
         $className = 'FooClassName';
         $fieldName = 'fooFieldName';
 
-        $exceptionMessage = 'This is a test mapping exception message';
         $exceptionCode = 456;
-        $exception = new MappingException($exceptionMessage, $exceptionCode);
+        $exception = new MappingException('This is a test mapping exception message', $exceptionCode);
 
         $this->classMetadata->expects($this->once())
             ->method('getFieldMapping')
@@ -121,12 +114,7 @@ final class MetadataTest extends TestCase
         $this->expectException(MetadataException::class);
         $this->expectExceptionCode($exceptionCode);
         $this->expectExceptionMessage(
-            sprintf(
-                'Unable to find field mapping for field \'%s::%s\': %s',
-                $className,
-                $fieldName,
-                $exceptionMessage
-            )
+            sprintf('Unable to find field mapping for field \'%s::%s\'', $className, $fieldName)
         );
 
         $metadata->getFieldMapping($fieldName);
@@ -233,7 +221,7 @@ final class MetadataTest extends TestCase
     }
 
     /**
-     * Assert a boolean TRUE is returned when calling hasAssociation() with an known relationship
+     * Assert a boolean TRUE is returned when calling hasAssociation() with a known relationship
      */
     public function testHasAssociationWillReturnTrueForExistingField(): void
     {
@@ -262,8 +250,7 @@ final class MetadataTest extends TestCase
         $fieldName = 'barFieldName';
 
         $exceptionCode = 999;
-        $exceptionMessage = 'This is a test association mapping exception message';
-        $exception = new MappingException($exceptionMessage, $exceptionCode);
+        $exception = new MappingException('This is a test association mapping exception message', $exceptionCode);
 
         $this->classMetadata->expects($this->once())
             ->method('getAssociationMapping')
@@ -277,12 +264,7 @@ final class MetadataTest extends TestCase
         $this->expectException(MetadataException::class);
         $this->expectExceptionCode($exceptionCode);
         $this->expectExceptionMessage(
-            sprintf(
-                'Unable to find association mapping for field \'%s::%s\': %s',
-                $className,
-                $fieldName,
-                $exceptionMessage
-            )
+            sprintf('Unable to find association mapping for field \'%s::%s\'', $className, $fieldName)
         );
 
         $metadata->getAssociationMapping($fieldName);

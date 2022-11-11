@@ -9,19 +9,8 @@ use Arp\DoctrineQueryFilter\Metadata\Typecaster;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
-/**
- * Default filter manager simply creates a filter using the provided $name as the FQCN of the target filter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 final class FilterFactory implements FilterFactoryInterface
 {
-    /**
-     * @var TypecasterInterface
-     */
-    private TypecasterInterface $typecaster;
-
     /**
      * @var array<string, class-string<FilterInterface>>
      */
@@ -47,28 +36,25 @@ final class FilterFactory implements FilterFactoryInterface
     ];
 
     /**
-     * @var array<mixed>
-     */
-    private array $options;
-
-    /**
-     * @param TypecasterInterface|null                     $typecaster
+     * @param TypecasterInterface|null $typecaster
      * @param array<string, class-string<FilterInterface>> $classMap
-     * @param array<mixed>                                 $options
+     * @param array<mixed> $options
      */
-    public function __construct(?TypecasterInterface $typecaster = null, array $classMap = [], array $options = [])
-    {
+    public function __construct(
+        private ?TypecasterInterface $typecaster = null,
+        array $classMap = [],
+        private readonly array $options = []
+    ) {
         $this->typecaster = $typecaster ?? new Typecaster();
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
-        $this->options = $options;
     }
 
     /**
      * Create the $name query filter with the provided $options.
      *
      * @param QueryFilterManagerInterface $manager
-     * @param string                      $name
-     * @param array<mixed>                $options
+     * @param string $name
+     * @param array<mixed> $options
      *
      * @return FilterInterface
      *
@@ -78,7 +64,7 @@ final class FilterFactory implements FilterFactoryInterface
     {
         $className = $this->classMap[$name] ?? $name;
 
-        if (!class_exists($className, true) || !is_a($className, FilterInterface::class, true)) {
+        if (!class_exists($className) || !is_a($className, FilterInterface::class, true)) {
             throw new FilterFactoryException(
                 sprintf(
                     'The query filter \'%s\' must be an object of type \'%s\'; '
@@ -108,7 +94,7 @@ final class FilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * @return array|string[]
+     * @return array<string>
      */
     public function getClassMap(): array
     {
@@ -124,21 +110,11 @@ final class FilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * @param string                        $alias
+     * @param string $alias
      * @param class-string<FilterInterface> $className
      */
     public function addToClassMap(string $alias, string $className): void
     {
         $this->classMap[$alias] = $className;
-    }
-
-    /**
-     * @param TypecasterInterface $typecaster
-     *
-     * @return void
-     */
-    public function setTypecaster(TypecasterInterface $typecaster): void
-    {
-        $this->typecaster = $typecaster;
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Enum;
 
-enum WhereType: string
+enum OrderByDirection: string
 {
-    case AND = 'and';
-    case OR = 'or';
+    case ASC = 'asc';
+    case DESC = 'desc';
 }

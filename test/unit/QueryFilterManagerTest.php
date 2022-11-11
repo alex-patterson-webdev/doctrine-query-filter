@@ -16,55 +16,44 @@ use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use Arp\DoctrineQueryFilter\Sort\SortFactoryInterface;
-use Arp\DoctrineQueryFilter\Sort\SortInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers  \Arp\DoctrineQueryFilter\QueryFilterManager
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\LaminasDoctrine
+ * @covers \Arp\DoctrineQueryFilter\QueryFilterManager
  */
 final class QueryFilterManagerTest extends TestCase
 {
     /**
      * @var FilterFactoryInterface&MockObject
      */
-    private $filterFactory;
+    private FilterFactoryInterface $filterFactory;
 
     /**
      * @var SortFactoryInterface&MockObject
      */
-    private $sortFactory;
+    private SortFactoryInterface $sortFactory;
 
     /**
      * @var EntityManagerInterface&MockObject
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @var QueryBuilderInterface&MockObject
      */
-    private $queryBuilder;
+    private QueryBuilderInterface $queryBuilder;
 
     /**
      * @var ClassMetadata<object>&MockObject
      */
-    private $metadata;
+    private ClassMetadata $metadata;
 
-    /**
-     * @var string
-     */
     private string $entityName;
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         $this->entityName = 'TestEntityName';
@@ -131,9 +120,8 @@ final class QueryFilterManagerTest extends TestCase
             ->method('getEntityManager')
             ->willReturn($this->entityManager);
 
-        $exceptionMessage = 'This is an exception message';
         $exceptionCode = 123;
-        $exception = new \Exception($exceptionMessage, $exceptionCode);
+        $exception = new \Exception('This is an exception message', $exceptionCode);
 
         $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
@@ -142,39 +130,9 @@ final class QueryFilterManagerTest extends TestCase
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionCode($exceptionCode);
-        $this->expectExceptionMessage(
-            sprintf('Failed to fetch entity metadata for class \'%s\': %s', $this->entityName, $exceptionMessage),
-        );
+        $this->expectExceptionMessage(sprintf('Failed to fetch entity metadata for class \'%s\'', $this->entityName));
 
         $manager->filter($this->queryBuilder, $this->entityName, $criteria);
-    }
-
-    /**
-     * Assert that a QueryFilterManagerException is thrown if providing an invalid QueryBuilder instance to filter()
-     *
-     * @throws QueryFilterManagerException
-     */
-    public function testQueryFilterManagerExceptionIsThrownWhenProvidingAnInvalidQueryBuilderToFilter(): void
-    {
-        $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
-
-        $invalidQueryBuilder = new \stdClass();
-        $criteria = [];
-
-        $this->expectException(QueryFilterManagerException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The \'queryBuilder\' argument must be an object of type \'%s\' or \'%s\'; '
-                . '\'%s\' provided in \'%s\'',
-                QueryBuilderInterface::class,
-                DoctrineQueryBuilder::class,
-                get_class($invalidQueryBuilder),
-                QueryFilterManager::class
-            )
-        );
-
-        /** @noinspection PhpParamsInspection */
-        $manager->filter($invalidQueryBuilder, $this->entityName, $criteria);/** @phpstan-ignore-line */
     }
 
     /**
@@ -205,44 +163,6 @@ final class QueryFilterManagerTest extends TestCase
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionMessage(
             sprintf('The required \'name\' configuration option is missing in \'%s\'', QueryFilterManager::class)
-        );
-
-        $manager->filter($this->queryBuilder, $this->entityName, $criteria);
-    }
-
-    /**
-     * Assert that a QueryFilterManagerException if thrown when providing invalid criteria filters to filter()
-     *
-     * @throws QueryFilterManagerException
-     */
-    public function testInvalidFilterWillThrowQueryFilterManagerException(): void
-    {
-        $manager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
-
-        $filter = new \stdClass();
-        $criteria = [
-            'filters' => [
-                $filter,
-            ],
-        ];
-
-        $this->queryBuilder->expects($this->once())
-            ->method('getEntityManager')
-            ->willReturn($this->entityManager);
-
-        $this->entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($this->entityName)
-            ->willReturn($this->metadata);
-
-        $this->expectException(QueryFilterManagerException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
-                FilterInterface::class,
-                gettype($filter),
-                QueryFilterManager::class
-            )
         );
 
         $manager->filter($this->queryBuilder, $this->entityName, $criteria);
@@ -284,9 +204,11 @@ final class QueryFilterManagerTest extends TestCase
             ->with($this->entityName)
             ->willReturn($this->metadata);
 
-        $exceptionMessage = 'This is a test filter factory exception message';
         $exceptionCode = 456;
-        $filterException = new FilterFactoryException($exceptionMessage, $exceptionCode);
+        $filterException = new FilterFactoryException(
+            'This is a test filter factory exception message',
+            $exceptionCode
+        );
 
         $this->filterFactory->expects($this->once())
             ->method('create')
@@ -295,9 +217,7 @@ final class QueryFilterManagerTest extends TestCase
 
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionCode($exceptionCode);
-        $this->expectExceptionMessage(
-            sprintf('Failed to create filter \'%s\': %s', $filterName, $exceptionMessage),
-        );
+        $this->expectExceptionMessage(sprintf('Failed to create filter \'%s\'', $filterName));
 
         $manager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
@@ -330,9 +250,8 @@ final class QueryFilterManagerTest extends TestCase
             ->with($this->entityName)
             ->willReturn($this->metadata);
 
-        $exceptionMessage = 'This is a test filter exception message';
         $exceptionCode = 999;
-        $filterException = new FilterException($exceptionMessage, $exceptionCode);
+        $filterException = new FilterException('This is a test filter exception message', $exceptionCode);
 
         $filters[0]->expects($this->once())
             ->method('filter')
@@ -346,7 +265,7 @@ final class QueryFilterManagerTest extends TestCase
         $this->expectException(QueryFilterManagerException::class);
         $this->expectExceptionCode($exceptionCode);
         $this->expectExceptionMessage(
-            sprintf('Failed to apply query filter for entity \'%s\': %s', $this->entityName, $exceptionMessage)
+            sprintf('Failed to apply query filter for entity \'%s\'', $this->entityName)
         );
 
         $manager->filter($this->queryBuilder, $this->entityName, $criteria);
@@ -407,40 +326,5 @@ final class QueryFilterManagerTest extends TestCase
             ->willReturnOnConsecutiveCalls(...$createdFilters);
 
         $manager->filter($this->queryBuilder, $this->entityName, $criteria);
-    }
-
-    /**
-     * @throws QueryFilterManagerException
-     */
-    public function testEmptySortNameWillThrowQueryFilterManagerException(): void
-    {
-        $filterManager = new QueryFilterManager($this->filterFactory, $this->sortFactory);
-
-        $sortFilter = new \stdClass();
-        $criteria = [
-            'sort' => [
-                $sortFilter
-            ],
-        ];
-
-        $this->queryBuilder->expects($this->once())
-            ->method('getEntityManager')
-            ->willReturn($this->entityManager);
-
-        $this->entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->willReturn($this->metadata);
-
-        $this->expectException(QueryFilterManagerException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
-                SortInterface::class,
-                get_class($sortFilter),
-                QueryFilterManager::class
-            )
-        );
-
-        $filterManager->filter($this->queryBuilder, $this->entityName, $criteria);
     }
 }

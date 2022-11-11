@@ -6,47 +6,26 @@ namespace Arp\DoctrineQueryFilter\Metadata;
 
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Metadata
- */
 interface MetadataInterface
 {
-    /**
-     * @return string
-     */
     public function getName(): string;
 
-    /**
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function hasField(string $fieldName): bool;
 
     /**
      * @param string $fieldName
      *
-     * @return  array<mixed>
+     * @return array<mixed>
      *
      * @throws MetadataException
      */
     public function getFieldMapping(string $fieldName): array;
 
     /**
-     * @param string $fieldName
-     *
-     * @return string
-     *
      * @throws MetadataException
      */
     public function getFieldType(string $fieldName): string;
 
-    /**
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function hasAssociation(string $fieldName): bool;
 
     /**

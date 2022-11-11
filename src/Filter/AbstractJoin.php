@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Enum\JoinConditionType;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
@@ -13,36 +14,31 @@ use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr\Andx as DoctrineAndX;
 use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Composite;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Orx as DoctrineOrX;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 abstract class AbstractJoin extends AbstractFilter
 {
     /**
-     * @param QueryBuilderInterface      $queryBuilder
-     * @param string                     $fieldName
-     * @param string                     $alias
+     * @param QueryBuilderInterface $queryBuilder
+     * @param string $fieldName
+     * @param string $alias
      * @param null|string|Composite|Base $condition
-     * @param string                     $joinType
-     * @param string|null                $indexBy
+     * @param JoinConditionType|null $joinConditionType
+     * @param string|null $indexBy
      */
     abstract protected function applyJoin(
         QueryBuilderInterface $queryBuilder,
         string $fieldName,
         string $alias,
-        $condition = null,
-        string $joinType = Join::WITH,
+        mixed $condition = null,
+        ?JoinConditionType $joinConditionType = null,
         ?string $indexBy = null
     ): void;
 
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>                 $criteria
+     * @param MetadataInterface $metadata
+     * @param array<mixed> $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException
@@ -53,7 +49,9 @@ abstract class AbstractJoin extends AbstractFilter
         $mapping = $this->getAssociationMapping($metadata, $fieldName);
 
         $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
-        $conditions = $criteria['conditions'] ?? [];
+
+        /** @var string|array<string|FilterInterface|array<string, mixed>> $conditions */
+        $conditions = $criteria['conditions'] ?? null;
         $condition = null;
 
         if (is_string($conditions)) {
@@ -77,16 +75,18 @@ abstract class AbstractJoin extends AbstractFilter
             $queryBuilder->getRootAlias() . '.' . $fieldName,
             $queryAlias,
             $condition,
-            $criteria['join_type'] ?? Join::WITH,
+            is_string($criteria['condition_type'])
+                ? JoinConditionType::tryFrom($criteria['condition_type'])
+                : $criteria['condition_type'],
             $criteria['index_by'] ?? null
         );
     }
 
     /**
      * @param MetadataInterface $metadata
-     * @param string            $fieldName
+     * @param string $fieldName
      *
-     * @return  array<mixed>
+     * @return array<mixed>
      *
      * @throws InvalidArgumentException
      */
@@ -101,15 +101,17 @@ abstract class AbstractJoin extends AbstractFilter
                     $metadata->getName(),
                     $fieldName,
                     static::class
-                )
+                ),
+                $e->getCode(),
+                $e
             );
         }
     }
 
     /**
      * @param QueryBuilderInterface $qb
-     * @param string                $targetEntity
-     * @param array<mixed>                 $criteria
+     * @param string $targetEntity
+     * @param array<mixed> $criteria
      *
      * @throws FilterException
      */
@@ -132,11 +134,11 @@ abstract class AbstractJoin extends AbstractFilter
     }
 
     /**
-     * @param array<mixed>  $conditions
+     * @param array<mixed> $conditions
      * @param string $alias
-     * @param array<mixed>  $criteria
+     * @param array<mixed> $criteria
      *
-     * @return  array<mixed>
+     * @return array<mixed>
      */
     private function createJoinFilters(array $conditions, string $alias, array $criteria): array
     {
@@ -149,9 +151,9 @@ abstract class AbstractJoin extends AbstractFilter
 
         return [
             [
-                'name'       => AndX::class,
+                'name' => AndX::class,
                 'conditions' => $conditions,
-                'where'      => $criteria['filters']['where'] ?? null,
+                'where' => $criteria['filters']['where'] ?? null,
             ],
         ];
     }
@@ -160,7 +162,7 @@ abstract class AbstractJoin extends AbstractFilter
      * @param QueryBuilderInterface $queryBuilder
      * @param QueryBuilderInterface $qb
      *
-     * @return DoctrineAndX|DoctrineOrX|null
+     * @return Composite|null
      */
     private function mergeJoinConditions(QueryBuilderInterface $queryBuilder, QueryBuilderInterface $qb): ?Composite
     {

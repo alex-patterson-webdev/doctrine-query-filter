@@ -10,35 +10,16 @@ use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
- */
 abstract class AbstractComparisonTest extends AbstractFilterTest
 {
-    /**
-     * @var FilterInterface
-     */
     protected FilterInterface $filter;
 
-    /**
-     * @var string
-     */
     protected string $filterClassName;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName;
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol;
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         parent::setUp();

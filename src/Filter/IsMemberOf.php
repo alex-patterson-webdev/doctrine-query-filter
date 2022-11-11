@@ -10,20 +10,8 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 final class IsMemberOf extends AbstractExpression
 {
-    /**
-     * @param Expr   $expr
-     * @param string $fieldName
-     * @param string $parameterName
-     * @param string $alias
-     *
-     * @return string
-     */
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
         return (string)$expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);

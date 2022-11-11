@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter\Sort;
 
-use Arp\DoctrineQueryFilter\Enum\SortDirection;
+use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\Sort\Exception\SortException;
@@ -15,25 +15,19 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Sort\Field
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Sort
  */
 final class FieldTest extends TestCase
 {
     /**
      * @var QueryBuilderInterface&MockObject
      */
-    private $queryBuilder;
+    private QueryBuilderInterface $queryBuilder;
 
     /**
      * @var MetadataInterface&MockObject
      */
-    private $metadata;
+    private MetadataInterface $metadata;
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
@@ -76,37 +70,9 @@ final class FieldTest extends TestCase
     }
 
     /**
-     * Assert a SortException is thrown from sort() if the required 'direction' parameter is missing/empty
-     *
-     * @throws SortException
-     * @throws \ReflectionException
-     */
-    public function testSortWillThrowSortExceptionIfRequiredDirectionParameterIsMissing(): void
-    {
-        $sort = new Field();
-
-        $alias = 't';
-        $data = [
-            'field' => 'foo',
-        ];
-
-        $this->queryBuilder->expects($this->once())
-            ->method('getRootAlias')
-            ->willReturn($alias);
-
-        $this->expectException(SortException::class);
-        $this->expectExceptionMessage(
-            sprintf('The required \'direction\' option is missing or empty in \'%s\'', Field::class)
-        );
-
-        $sort->sort($this->queryBuilder, $this->metadata, $data);
-    }
-
-    /**
      * Assert that a SortException is thrown should the provided $direction be invalid
      *
      * @throws SortException
-     * @throws \ReflectionException
      */
     public function testSortWillThrowSortExceptionIfTheDirectionParameterIsInvalid(): void
     {
@@ -114,7 +80,7 @@ final class FieldTest extends TestCase
 
         $alias = 't';
         $data = [
-            'field' => 'foo',
+            'field'     => 'foo',
             'direction' => 'test', // invalid direction value
         ];
 
@@ -124,11 +90,7 @@ final class FieldTest extends TestCase
 
         $this->expectException(SortException::class);
         $this->expectExceptionMessage(
-            sprintf(
-                'The sort \'direction\' option value \'%s\' is invalid in \'%s\'',
-                $data['direction'],
-                Field::class
-            )
+            sprintf('The sort direction provided for field \'%s\' is invalid', $data['field'])
         );
 
         $sort->sort($this->queryBuilder, $this->metadata, $data);
@@ -137,22 +99,24 @@ final class FieldTest extends TestCase
     /**
      * Assert that the expected sort parameters are correct passed to the QueryBuilder
      *
-     * @param string      $field
-     * @param string      $direction
+     * @param string $field
+     * @param OrderByDirection|string|null $direction
      * @param string|null $alias
      *
      * @dataProvider getSortWillApplySortCriteriaData
      *
      * @throws SortException
-     * @throws \ReflectionException
      */
-    public function testSortWillApplySortCriteria(string $field, string $direction, ?string $alias = null): void
-    {
+    public function testSortWillApplySortCriteria(
+        string $field,
+        OrderByDirection|string|null $direction,
+        ?string $alias = null
+    ): void {
         $sort = new Field();
 
         $rootAlias = 'x';
         $data = [
-            'field' => $field,
+            'field'     => $field,
             'direction' => $direction,
         ];
 
@@ -163,6 +127,11 @@ final class FieldTest extends TestCase
                 ->willReturn($rootAlias);
         } else {
             $data['alias'] = $alias;
+        }
+
+        $direction = $data['direction'] ?? null;
+        if (is_string($direction)) {
+            $direction = OrderByDirection::from($direction);
         }
 
         $this->queryBuilder->expects($this->once())
@@ -180,17 +149,17 @@ final class FieldTest extends TestCase
         return [
             [
                 'foo',
-                SortDirection::ASC,
+                OrderByDirection::ASC,
             ],
             [
                 'bar',
-                SortDirection::DESC,
+                OrderByDirection::DESC->value,
             ],
             [
                 'baz',
-                SortDirection::DESC,
+                OrderByDirection::DESC,
                 'abc',
-            ]
+            ],
         ];
     }
 }

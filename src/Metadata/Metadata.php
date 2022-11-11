@@ -8,38 +8,20 @@ use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Metadata
- */
 final class Metadata implements MetadataInterface
 {
     /**
-     * @var ClassMetadata<object>
-     */
-    private ClassMetadata $metadata;
-
-    /**
      * @param ClassMetadata<object> $metadata
      */
-    public function __construct(ClassMetadata $metadata)
+    public function __construct(private readonly ClassMetadata $metadata)
     {
-        $this->metadata = $metadata;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->metadata->getName();
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function hasField(string $fieldName): bool
     {
         return $this->metadata->hasField($fieldName);
@@ -58,12 +40,7 @@ final class Metadata implements MetadataInterface
             return $this->metadata->getFieldMapping($fieldName);
         } catch (MappingException $e) {
             throw new MetadataException(
-                sprintf(
-                    'Unable to find field mapping for field \'%s::%s\': %s',
-                    $this->getName(),
-                    $fieldName,
-                    $e->getMessage()
-                ),
+                sprintf('Unable to find field mapping for field \'%s::%s\'', $this->getName(), $fieldName),
                 $e->getCode(),
                 $e
             );
@@ -71,10 +48,6 @@ final class Metadata implements MetadataInterface
     }
 
     /**
-     * @param string $fieldName
-     *
-     * @return string
-     *
      * @throws MetadataException
      */
     public function getFieldType(string $fieldName): string
@@ -90,11 +63,6 @@ final class Metadata implements MetadataInterface
         return $type;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function hasAssociation(string $fieldName): bool
     {
         return $this->metadata->hasAssociation($fieldName);
@@ -103,7 +71,7 @@ final class Metadata implements MetadataInterface
     /**
      * @param string $fieldName
      *
-     * @return  array<mixed>
+     * @return array<mixed>
      *
      * @throws MetadataException
      */
@@ -113,12 +81,7 @@ final class Metadata implements MetadataInterface
             return $this->metadata->getAssociationMapping($fieldName);
         } catch (MappingException $e) {
             throw new MetadataException(
-                sprintf(
-                    'Unable to find association mapping for field \'%s::%s\': %s',
-                    $this->getName(),
-                    $fieldName,
-                    $e->getMessage()
-                ),
+                sprintf('Unable to find association mapping for field \'%s::%s\'', $this->getName(), $fieldName),
                 $e->getCode(),
                 $e
             );

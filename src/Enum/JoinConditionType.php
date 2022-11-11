@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Enum;
 
-enum WhereType: string
+enum JoinConditionType: string
 {
-    case AND = 'and';
-    case OR = 'or';
+    case ON = 'ON';
+    case WITH = 'WITH';
 }

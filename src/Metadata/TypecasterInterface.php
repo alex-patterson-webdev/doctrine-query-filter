@@ -6,28 +6,24 @@ namespace Arp\DoctrineQueryFilter\Metadata;
 
 use Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Metadata
- */
 interface TypecasterInterface
 {
     /**
      * @param MetadataInterface $metadata
-     * @param string            $fieldName
-     * @param mixed             $value
-     * @param string|null       $type
-     * @param array<mixed>             $options
+     * @param string $fieldName
+     * @param mixed $value
+     * @param string|null $type
+     * @param array<mixed> $options
      *
      * @return mixed
      *
-     * @throws \Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException
+     * @throws TypecastException
      */
     public function typecast(
         MetadataInterface $metadata,
         string $fieldName,
-        $value,
+        mixed $value,
         ?string $type = null,
         array $options = []
-    );
+    ): mixed;
 }

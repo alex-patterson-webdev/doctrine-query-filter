@@ -10,16 +10,12 @@ use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 class IsBetween extends AbstractFilter
 {
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>                 $criteria
+     * @param MetadataInterface $metadata
+     * @param array<mixed> $criteria
      *
      * @throws InvalidArgumentException
      * @throws FilterException
@@ -50,7 +46,7 @@ class IsBetween extends AbstractFilter
             ':' . $toParamName
         );
 
-        if (!isset($criteria['where']) || WhereType::AND === $criteria['where']) {
+        if ($this->getWhereType($criteria) === WhereType::AND) {
             $queryBuilder->andWhere($expression);
         } else {
             $queryBuilder->orWhere($expression);

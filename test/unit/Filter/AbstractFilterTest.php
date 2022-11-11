@@ -11,43 +11,33 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
- */
 abstract class AbstractFilterTest extends TestCase
 {
     /**
      * @var QueryFilterManagerInterface&MockObject
      */
-    protected $queryFilterManager;
+    protected QueryFilterManagerInterface $queryFilterManager;
 
     /**
-     * @var \Arp\DoctrineQueryFilter\Metadata\TypecasterInterface&MockObject
+     * @var TypecasterInterface&MockObject
      */
-    protected $typecaster;
+    protected TypecasterInterface $typecaster;
 
     /**
      * @var QueryBuilderInterface&MockObject
      */
-    protected $queryBuilder;
+    protected QueryBuilderInterface $queryBuilder;
 
     /**
      * @var MetadataInterface&MockObject
      */
-    protected $metadata;
+    protected MetadataInterface $metadata;
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         $this->queryFilterManager = $this->createMock(QueryFilterManagerInterface::class);
-
-        $this->typecaster = $this->createMock(\Arp\DoctrineQueryFilter\Metadata\TypecasterInterface::class);
-
+        $this->typecaster = $this->createMock(TypecasterInterface::class);
         $this->queryBuilder = $this->createMock(QueryBuilderInterface::class);
-
         $this->metadata = $this->createMock(MetadataInterface::class);
     }
 }

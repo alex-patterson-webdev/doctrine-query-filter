@@ -15,16 +15,13 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers  \Arp\DoctrineQueryFilter\Sort\SortFactory
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Sort
  */
 final class SortFactoryTest extends TestCase
 {
     /**
      * @var QueryFilterManagerInterface&MockObject
      */
-    private $queryFilterManager;
+    private QueryFilterManagerInterface $queryFilterManager;
 
     /**
      * Prepare the test case dependencies
@@ -72,7 +69,7 @@ final class SortFactoryTest extends TestCase
     /**
      * Assert that the factory will return a Field sort filter
      *
-     * @param string               $name
+     * @param string $name
      * @param array<string, mixed> $options
      *
      * @dataProvider getFactoryWillCreateFieldSortFilterData
@@ -127,9 +124,7 @@ final class SortFactoryTest extends TestCase
         );
 
         $this->expectException(SortFactoryException::class);
-        $this->expectExceptionMessage(
-            'Failed to create sort filter \'error\': Failed to create sort filter'
-        );
+        $this->expectExceptionMessage('Failed to create sort filter \'error\'');
 
         $factory->create($this->queryFilterManager, 'error');
     }

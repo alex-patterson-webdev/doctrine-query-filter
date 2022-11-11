@@ -40,13 +40,13 @@ final class AndXTest extends AbstractFilterTest
     /**
      * Assert that the andX filter will correctly apply the required filters
      *
-     * @param string|null $whereType
+     * @param string|WhereType|null $whereType
      *
      * @dataProvider getFilterWillApplyTheProvidedConditionsData
      *
      * @throws FilterException
      */
-    public function testFilterWillApplyTheProvidedConditions(?string $whereType): void
+    public function testFilterWillApplyTheProvidedConditions(WhereType|string|null $whereType): void
     {
         $criteria = [
             'conditions' => [
@@ -144,6 +144,7 @@ final class AndXTest extends AbstractFilterTest
         return [
             [null],
             [WhereType::AND],
+            [WhereType::AND->value],
         ];
     }
 }

@@ -4,53 +4,30 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter;
 
+use Arp\DoctrineQueryFilter\Enum\JoinConditionType;
+use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Composite;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Query
- */
 interface QueryBuilderInterface
 {
-    /**
-     * @return QueryBuilderInterface
-     */
     public function createQueryBuilder(): QueryBuilderInterface;
 
-    /**
-     * @return EntityManagerInterface
-     */
     public function getEntityManager(): EntityManagerInterface;
 
-    /**
-     * @return string
-     */
     public function getRootAlias(): string;
 
-    /**
-     * @param string $rootAlias
-     */
     public function setRootAlias(string $rootAlias): void;
 
-    /**
-     * @return Query
-     */
     public function getQuery(): Query;
 
-    /**
-     * Return the wrapped Doctrine query builder instance
-     *
-     * @return DoctrineQueryBuilder
-     */
     public function getWrappedQueryBuilder(): DoctrineQueryBuilder;
 
-    /**
-     * @return Expr
-     */
     public function expr(): Expr;
 
     /**
@@ -58,95 +35,61 @@ interface QueryBuilderInterface
      */
     public function getQueryParts(): array;
 
-    /**
-     * @param mixed ...$args
-     *
-     * @return QueryBuilderInterface
-     */
-    public function orWhere(...$args): QueryBuilderInterface;
+    public function orWhere(mixed ...$args): self;
+
+    public function andWhere(mixed ...$args): self;
 
     /**
-     * @param mixed ...$args
-     *
-     * @return QueryBuilderInterface
-     */
-    public function andWhere(...$args): QueryBuilderInterface;
-
-    /**
-     * @param string      $name
-     * @param string      $alias
-     * @param string      $type
-     * @param mixed       $condition
+     * @param string $name
+     * @param string $alias
+     * @param JoinConditionType|null $conditionType
+     * @param string|Comparison|Composite|null $condition
      * @param string|null $indexBy
      *
-     * @return QueryBuilderInterface
+     * @return self
      */
     public function innerJoin(
         string $name,
         string $alias,
-        string $type,
-        $condition = null,
-        string $indexBy = null
-    ): QueryBuilderInterface;
+        ?JoinConditionType $conditionType = null,
+        mixed $condition = null,
+        ?string $indexBy = null
+    ): self;
 
     /**
-     * @param string      $name
-     * @param string      $alias
-     * @param string      $type
-     * @param mixed       $condition
+     * @param string $name
+     * @param string $alias
+     * @param JoinConditionType|null $conditionType
+     * @param string|Comparison|Composite|null $condition
      * @param string|null $indexBy
      *
-     * @return QueryBuilderInterface
+     * @return self
      */
     public function leftJoin(
         string $name,
         string $alias,
-        string $type,
-        $condition = null,
+        ?JoinConditionType $conditionType = null,
+        mixed $condition = null,
         string $indexBy = null
     ): QueryBuilderInterface;
 
-    /**
-     * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
-     *
-     * @return QueryBuilderInterface
-     */
-    public function orderBy($sort, ?string $direction = null): QueryBuilderInterface;
+    public function orderBy(Expr\OrderBy|string $sort, ?OrderByDirection $direction = null): self;
 
-    /**
-     * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
-     *
-     * @return QueryBuilderInterface
-     */
-    public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface;
+    public function addOrderBy(Expr\OrderBy|string $sort, ?OrderByDirection $direction = null): self;
 
     /**
      * @return ArrayCollection<int, Query\Parameter>
      */
     public function getParameters(): ArrayCollection;
 
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     */
-    public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface;
+    public function mergeParameters(QueryBuilderInterface $queryBuilder): self;
 
     /**
      * @param ArrayCollection<int, Query\Parameter> $parameters
      *
      * @return QueryBuilderInterface
      */
-    public function setParameters(ArrayCollection $parameters): QueryBuilderInterface;
+    public function setParameters(ArrayCollection $parameters): self;
 
-    /**
-     * @param string      $name
-     * @param mixed       $value
-     * @param string|null $type
-     *
-     * @return QueryBuilderInterface
-     */
-    public function setParameter(string $name, $value, ?string $type = null): QueryBuilderInterface;
+    public function setParameter(string $name, mixed $value, ?string $type = null): self;
 }
