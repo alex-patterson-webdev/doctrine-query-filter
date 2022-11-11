@@ -11,6 +11,7 @@ use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\MetadataException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\Query\Expr\Andx as DoctrineAndX;
 use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Composite;
@@ -46,40 +47,61 @@ abstract class AbstractJoin extends AbstractFilter
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
     {
         $fieldName = $this->resolveFieldName($metadata, $criteria);
-        $mapping = $this->getAssociationMapping($metadata, $fieldName);
-
         $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
 
-        /** @var string|array<string|FilterInterface|array<string, mixed>> $conditions */
-        $conditions = $criteria['conditions'] ?? null;
         $condition = null;
-
-        if (is_string($conditions)) {
-            $condition = $conditions;
-        } elseif (is_object($conditions)) {
-            $condition = (string)$conditions;
-        } elseif (is_array($conditions) && !empty($conditions)) {
-            $tempQueryBuilder = $queryBuilder->createQueryBuilder();
-
-            $this->filterJoinCriteria(
-                $tempQueryBuilder,
+        if (isset($criteria['conditions'])) {
+            $mapping = $this->getAssociationMapping($metadata, $fieldName);
+            $condition = $this->getCondition(
+                $queryBuilder,
                 $mapping['targetEntity'],
-                ['filters' => $this->createJoinFilters($conditions, $queryAlias, $criteria)]
+                $queryAlias,
+                $criteria['conditions']
             );
-
-            $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
         }
+
+        $conditionType = is_string($criteria['condition_type'])
+            ? JoinConditionType::tryFrom($criteria['condition_type'])
+            : $criteria['condition_type'];
 
         $this->applyJoin(
             $queryBuilder,
             $queryBuilder->getRootAlias() . '.' . $fieldName,
             $queryAlias,
             $condition,
-            is_string($criteria['condition_type'])
-                ? JoinConditionType::tryFrom($criteria['condition_type'])
-                : $criteria['condition_type'],
+            $conditionType,
             $criteria['index_by'] ?? null
         );
+    }
+
+    /**
+     * @throws FilterException
+     */
+    private function getCondition(
+        QueryBuilderInterface $queryBuilder,
+        string $targetEntity,
+        string $queryAlias,
+        mixed $conditions
+    ): ?string {
+        if (is_string($conditions)) {
+            return $conditions;
+        }
+
+        if ($conditions instanceof Base) {
+            return (string)$conditions;
+        }
+
+        $condition = null;
+        if (is_array($conditions)) {
+            $tempQueryBuilder = $this->filterJoinCriteria(
+                $queryBuilder->createQueryBuilder(),
+                $targetEntity,
+                ['filters' => $this->createJoinFilters($conditions, $queryAlias)]
+            );
+            $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
+        }
+
+        return isset($condition) ? (string)$condition : null;
     }
 
     /**
@@ -113,10 +135,14 @@ abstract class AbstractJoin extends AbstractFilter
      * @param string $targetEntity
      * @param array<mixed> $criteria
      *
+     * @return QueryBuilderInterface
      * @throws FilterException
      */
-    private function filterJoinCriteria(QueryBuilderInterface $qb, string $targetEntity, array $criteria): void
-    {
+    private function filterJoinCriteria(
+        QueryBuilderInterface $qb,
+        string $targetEntity,
+        array $criteria
+    ): QueryBuilderInterface {
         try {
             $this->queryFilterManager->filter($qb, $targetEntity, $criteria);
         } catch (QueryFilterManagerException $e) {
@@ -131,6 +157,8 @@ abstract class AbstractJoin extends AbstractFilter
                 $e
             );
         }
+
+        return $qb;
     }
 
     /**
@@ -140,7 +168,7 @@ abstract class AbstractJoin extends AbstractFilter
      *
      * @return array<mixed>
      */
-    private function createJoinFilters(array $conditions, string $alias, array $criteria): array
+    private function createJoinFilters(array $conditions, string $alias, array $criteria = []): array
     {
         // Use the join alias as the default alias for conditions
         foreach ($conditions as $index => $condition) {

@@ -31,7 +31,7 @@ final class InnerJoin extends AbstractJoin
             $fieldName,
             $alias,
             $joinConditionType,
-            isset($condition) ? (string)$condition : null,
+            $condition ?? null,
             $indexBy
         );
     }
