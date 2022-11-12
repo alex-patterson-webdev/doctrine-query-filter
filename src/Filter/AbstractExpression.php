@@ -33,7 +33,7 @@ abstract class AbstractExpression extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
 
         $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
-        $paramName = $this->createParamName($queryAlias);
+        $paramName = $this->createParamName('field', $fieldName, $queryAlias);
 
         $expression = $this->createExpression($queryBuilder->expr(), $fieldName, $paramName, $queryAlias);
 

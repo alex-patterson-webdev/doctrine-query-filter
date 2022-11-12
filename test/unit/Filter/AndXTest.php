@@ -15,14 +15,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\AndX
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractComposite
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class AndXTest extends AbstractFilterTest
 {
     /**
      * Assert that the filter implements FilterInterface
+     *
+     * @throws FilterException
      */
     public function testImplementsFilterInterface(): void
     {
@@ -30,7 +29,7 @@ final class AndXTest extends AbstractFilterTest
             // no filters provided
         ];
 
-        $filter = new AndX($this->queryFilterManager, $this->typecaster);
+        $filter = new AndX($this->queryFilterManager, $this->typecaster, $this->paramNameGenerator);
 
         $this->queryBuilder->expects($this->never())->method('createQueryBuilder');
 
@@ -67,7 +66,7 @@ final class AndXTest extends AbstractFilterTest
             $criteria['where'] = $whereType;
         }
 
-        $filter = new AndX($this->queryFilterManager, $this->typecaster);
+        $filter = new AndX($this->queryFilterManager, $this->typecaster, $this->paramNameGenerator);
 
         $className = 'FooEntity';
 

@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsLike;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsLike
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsLikeTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsLike::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'like';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = 'LIKE';
 
     /**

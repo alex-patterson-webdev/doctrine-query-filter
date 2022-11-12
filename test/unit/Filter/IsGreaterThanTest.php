@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsGreaterThan;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsGreaterThan
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsGreaterThanTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsGreaterThan::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'gt';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '>';
 
     /**

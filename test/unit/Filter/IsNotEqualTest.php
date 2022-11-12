@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsNotEqual;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsNotEqual
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsNotEqualTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsNotEqual::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'neq';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '!=';
 
     /**

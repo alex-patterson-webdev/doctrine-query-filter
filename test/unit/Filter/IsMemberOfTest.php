@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Enum\WhereType;
+use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\IsMemberOf;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,33 +14,22 @@ use PHPUnit\Framework\MockObject\MockObject;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsMemberOf
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsMemberOfTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsMemberOf::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'isMemberOf';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = 'MEMBER OF';
 
     /**
      * Assert that the IsMemberOf query filter can be applied with the provided $criteria
      *
-     * @param array<mixed>$criteria
+     * @param array<mixed> $criteria
      *
      * @dataProvider getFilterWillApplyFilteringData
+     * @throws FilterException
      */
     public function testFilterWillApplyFiltering(array $criteria): void
     {

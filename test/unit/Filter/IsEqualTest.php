@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsEqual;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsEqual
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsEqualTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsEqual::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'eq';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '=';
 
     /**

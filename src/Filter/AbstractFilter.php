@@ -9,6 +9,7 @@ use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Metadata\ParamNameGeneratorInterface;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
@@ -17,12 +18,14 @@ abstract class AbstractFilter implements FilterInterface
 {
     /**
      * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecasterInterface         $typecaster
-     * @param array<mixed>                $options
+     * @param TypecasterInterface $typecaster
+     * @param ParamNameGeneratorInterface $paramNameGenerator
+     * @param array<mixed> $options
      */
     public function __construct(
         protected QueryFilterManagerInterface $queryFilterManager,
         protected TypecasterInterface $typecaster,
+        protected ParamNameGeneratorInterface $paramNameGenerator,
         protected array $options = []
     ) {
     }
@@ -35,9 +38,9 @@ abstract class AbstractFilter implements FilterInterface
         return $this->options;
     }
 
-    protected function createParamName(string $prefix = ''): string
+    protected function createParamName(string $param, string $fieldName, string $alias): string
     {
-        return uniqid($prefix, false);
+        return $this->paramNameGenerator->generateName($param, $fieldName, $alias);
     }
 
     protected function getAlias(QueryBuilderInterface $queryBuilder, ?string $alias = null): string

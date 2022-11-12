@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
+use Arp\DoctrineQueryFilter\Metadata\ParamNameGeneratorInterface;
 use Arp\DoctrineQueryFilter\Metadata\Typecaster;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
+use Arp\DoctrineQueryFilter\Metadata\UniqidParamNameGenerator;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 final class FilterFactory implements FilterFactoryInterface
@@ -37,15 +39,18 @@ final class FilterFactory implements FilterFactoryInterface
 
     /**
      * @param TypecasterInterface|null $typecaster
+     * @param ParamNameGeneratorInterface|null $paramNameGenerator
      * @param array<string, class-string<FilterInterface>> $classMap
      * @param array<mixed> $options
      */
     public function __construct(
         private ?TypecasterInterface $typecaster = null,
+        private ?ParamNameGeneratorInterface $paramNameGenerator = null,
         array $classMap = [],
         private readonly array $options = []
     ) {
         $this->typecaster = $typecaster ?? new Typecaster();
+        $this->paramNameGenerator = $this->paramNameGenerator ?? new UniqidParamNameGenerator();
         $this->classMap = empty($classMap) ? $this->classMap : $classMap;
     }
 
@@ -83,7 +88,7 @@ final class FilterFactory implements FilterFactoryInterface
 
         try {
             /** @throws \Exception */
-            return new $className($manager, $this->typecaster, $options);
+            return new $className($manager, $this->typecaster, $this->paramNameGenerator, $options);
         } catch (\Exception $e) {
             throw new FilterFactoryException(
                 sprintf('Failed to create query filter \'%s\': %s', $name, $e->getMessage()),

@@ -8,28 +8,31 @@ use Arp\DoctrineQueryFilter\Filter as Filters;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterFactoryException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
 use Arp\DoctrineQueryFilter\Filter\FilterFactoryInterface;
+use Arp\DoctrineQueryFilter\Metadata\ParamNameGeneratorInterface;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers  \Arp\DoctrineQueryFilter\Filter\FilterFactory
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
+ * @covers \Arp\DoctrineQueryFilter\Filter\FilterFactory
  */
 final class FilterFactoryTest extends TestCase
 {
     /**
      * @var QueryFilterManagerInterface&MockObject
      */
-    private $queryFilterManager;
+    private QueryFilterManagerInterface $queryFilterManager;
 
     /**
      * @var TypecasterInterface&MockObject
      */
-    private $typecaster;
+    private TypecasterInterface $typecaster;
+
+    /**
+     * @var ParamNameGeneratorInterface&MockObject
+     */
+    private ParamNameGeneratorInterface $paramNameGenerator;
 
     /**
      * @var array<string, string>
@@ -61,8 +64,8 @@ final class FilterFactoryTest extends TestCase
     public function setUp(): void
     {
         $this->queryFilterManager = $this->createMock(QueryFilterManagerInterface::class);
-
         $this->typecaster = $this->createMock(TypecasterInterface::class);
+        $this->paramNameGenerator = $this->createMock(ParamNameGeneratorInterface::class);
     }
 
     /**
@@ -111,7 +114,7 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert that if the factory resolves to an invalid filter class a QueryFactoryException will be thrown
      *
-     * @param string            $name
+     * @param string $name
      * @param class-string<Filters\FilterInterface>|null $className
      *
      * @throws FilterFactoryException
@@ -123,7 +126,7 @@ final class FilterFactoryTest extends TestCase
     ): void {
         $classMap = isset($className) ? [$name => $className] : [];
 
-        $factory = new FilterFactory($this->typecaster, $classMap);
+        $factory = new FilterFactory($this->typecaster, $this->paramNameGenerator, $classMap);
 
         $this->expectException(FilterFactoryException::class);
         $this->expectExceptionMessage(
@@ -194,7 +197,7 @@ final class FilterFactoryTest extends TestCase
      * Assert the expected query filter is created using the provided $name and $options and optional $classMap.
      *
      * @param class-string $expected
-     * @param string       $name
+     * @param string $name
      * @param array<mixed> $options
      * @param array<mixed> $classMap
      *
@@ -208,7 +211,7 @@ final class FilterFactoryTest extends TestCase
         array $options = [],
         array $classMap = []
     ): void {
-        $factory = new FilterFactory($this->typecaster, $classMap);
+        $factory = new FilterFactory($this->typecaster, $this->paramNameGenerator, $classMap);
 
         $queryFilter = $factory->create($this->queryFilterManager, $name, $options);
 

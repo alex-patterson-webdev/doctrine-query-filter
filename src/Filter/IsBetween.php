@@ -37,8 +37,8 @@ class IsBetween extends AbstractFilter
         $fieldName = $this->resolveFieldName($metadata, $criteria);
         $queryAlias = $this->getAlias($queryBuilder, $criteria['alias'] ?? null);
 
-        $fromParamName = $this->createParamName($queryAlias);
-        $toParamName = $this->createParamName($queryAlias);
+        $fromParamName = $this->createParamName('from', $fieldName, $queryAlias);
+        $toParamName = $this->createParamName('to', $fieldName, $queryAlias);
 
         $expression = $queryBuilder->expr()->between(
             $queryAlias . '.' . $fieldName,
