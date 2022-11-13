@@ -56,37 +56,38 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * @param MetadataInterface $metadata
      * @param array<mixed>      $criteria
-     * @param string            $key
      *
      * @return string
      *
      * @throws InvalidArgumentException
      */
-    protected function resolveFieldName(MetadataInterface $metadata, array $criteria, string $key = 'field'): string
+    protected function resolveFieldName(MetadataInterface $metadata, array $criteria): string
     {
-        if (empty($criteria[$key])) {
+        if (empty($criteria['field'])) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'The required \'%s\' criteria value is missing for filter \'%s\'',
-                    $key,
+                    'The required \'field\' criteria value is missing for filter \'%s\'',
                     static::class
                 )
             );
         }
 
-        if (!$metadata->hasField($criteria[$key]) && !$metadata->hasAssociation($criteria[$key])) {
+        $parts = explode('.', $criteria['field']);
+        $fieldName = array_pop($parts);
+
+        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Unable to apply query filter \'%s\': '
                     . 'The entity class \'%s\' has no field or association named \'%s\'',
                     static::class,
                     $metadata->getName(),
-                    $criteria[$key]
+                    $fieldName
                 )
             );
         }
 
-        return $criteria[$key];
+        return $fieldName;
     }
 
     /**
