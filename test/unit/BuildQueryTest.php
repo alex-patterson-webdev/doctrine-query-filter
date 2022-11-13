@@ -8,7 +8,6 @@ use Arp\DoctrineQueryFilter\Enum\FieldType;
 use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\FilterFactory;
-use Arp\DoctrineQueryFilter\Metadata\ArrayMapNameGenerator;
 use Arp\DoctrineQueryFilter\Metadata\Typecaster;
 use Arp\DoctrineQueryFilter\Metadata\UniqidParamNameGenerator;
 use Arp\DoctrineQueryFilter\QueryFilterManager;
