@@ -13,6 +13,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\InnerJoin
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractJoin
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  */
 final class InnerJoinTest extends AbstractJoinTest
 {

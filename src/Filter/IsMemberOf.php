@@ -20,16 +20,15 @@ final class IsMemberOf extends AbstractExpression
     /**
      * @param MetadataInterface $metadata
      * @param array<mixed> $criteria
-     * @param string $key
      *
      * @return string
      *
      * @throws InvalidArgumentException
      * @throws MetadataException
      */
-    protected function resolveFieldName(MetadataInterface $metadata, array $criteria, string $key = 'field'): string
+    protected function resolveFieldName(MetadataInterface $metadata, array $criteria): string
     {
-        $fieldName = parent::resolveFieldName($metadata, $criteria, $key);
+        $fieldName = parent::resolveFieldName($metadata, $criteria);
 
         if ($metadata->hasAssociation($fieldName)) {
             $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';

@@ -14,9 +14,6 @@ use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Composite;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @covers \Arp\DoctrineQueryFilter\Filter\AbstractJoin
- */
 abstract class AbstractJoinTest extends AbstractFilterTest
 {
     protected AbstractJoin $filter;
