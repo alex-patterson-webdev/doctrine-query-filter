@@ -189,13 +189,13 @@ final class BuildQueryTest extends TestCase
             ->willReturn($name);
 
         $doctrineMetadata->method('hasField')
-            ->willReturnCallback(fn(string $fieldName) => isset($this->fieldMapping[$fieldName]));
+            ->willReturnCallback(fn (string $fieldName) => isset($this->fieldMapping[$fieldName]));
 
         $doctrineMetadata->method('hasAssociation')
-            ->willReturnCallback(fn(string $fieldName) => isset($this->associationMapping[$fieldName]));
+            ->willReturnCallback(fn (string $fieldName) => isset($this->associationMapping[$fieldName]));
 
         $doctrineMetadata->method('getFieldMapping')
-            ->willReturnCallback(fn(string $fieldName) => $this->fieldMapping[$fieldName] ?? []);
+            ->willReturnCallback(fn (string $fieldName) => $this->fieldMapping[$fieldName] ?? []);
 
         return $doctrineMetadata;
     }
@@ -210,10 +210,10 @@ final class BuildQueryTest extends TestCase
         $entityManager = $this->createMock(EntityManager::class);
 
         $entityManager->method('createQueryBuilder')
-            ->willReturnCallback(fn() => $this->createDoctrineQueryBuilder($entityManager));
+            ->willReturnCallback(fn () => $this->createDoctrineQueryBuilder($entityManager));
 
         $entityManager->method('getExpressionBuilder')
-            ->willReturnCallback(static fn() => new Expr());
+            ->willReturnCallback(static fn () => new Expr());
 
         return $entityManager;
     }
