@@ -6,6 +6,6 @@ namespace Arp\DoctrineQueryFilter\Enum;
 
 enum OrderByDirection: string
 {
-    case ASC = 'asc';
-    case DESC = 'desc';
+    case ASC = 'ASC';
+    case DESC = 'DESC';
 }

@@ -4,9 +4,7 @@
 
 # Doctrine Query Filter
 
-## About
-
-This package provides query filtering components for Doctrine ORM. By modeling query filter criteria as reusable objects, 
+A package providing query filtering components for Doctrine ORM. By modeling query filter criteria as reusable objects, 
 it offers a consistent and extendable way of constructing complex DQL statements.
 
 The project has been inspired by the [Laminas Doctrine QueryBuilder](https://github.com/laminas-api-tools/api-tools-doctrine-querybuilder); 
@@ -16,53 +14,55 @@ providing similar functionality without the Laminas Framework dependency.
 
 Installation via [composer](https://getcomposer.org).
 
-    require alex-patterson-webdev/doctrine-query-filter ^0.7
+    require alex-patterson-webdev/doctrine-query-filter ^0.8
 
 ## Usage
 
-Using the `QueryFilterManager` we can create DQL strings from `array` format. The query filter manager will take care of binding the required parameter values.
+Using the `QueryFilterManager` we can create DQL strings from an `array` format. For example, consider the following DQL string.
+
+    SELECT c FROM Customer c WHERE c.forename = 'Fred' AND (c.age BETWEEN 18 AND 30)
+
+We can represent this DQL query using a collection of _filters_, known as our query _criteria_
 
     $criteria = [
         'filters' => [
             [
                 'name' => 'eq',
-                'field' => 'name',
+                'field' => 'forename',
                 'value' => 'Fred',
             ],
             [
                 'name' => 'between',
                 'field' => 'age',
-                'min' => 18,
-                'max' => 30
+                'from' => 18,
+                'to' => 30
             ],
         ],
     ];
 
-    $queryFilterManager = new QueryFilterManager(new FilterFactory());
+By passing this `$criteria` to our `QueryFilterManager` we can generate (and execute) the query in the following way.
 
-    // A Doctrine QueryBuilder instance for a customer
+    // Get our Doctrine query builder instance
     $queryBuilder = $entityManager->getRepository('Customer')->createQueryBuilder('c');
 
+    // Create a new QueryFilterManager (and supply it with a desired FilterFactory instance)
+    $queryFilterManager = new QueryFilterManager(new FilterFactory());
+
     // Apply the filters to the $queryBuilder
-    $queryBuilder = $queryFilterManager->filter(
-        $queryBuilder,
-        Customer::class,
-        $criteria
-    );
+    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
 
-    $query = $queryBuilder->getQuery();
+    // SELECT c FROM Customer c WHERE c.forename = 'Fred' AND (c.age BETWEEN 18 AND 30)
+    echo $queryBuilder->getDQL();
 
-    // SELECT c FROM customer c WHERE c.forename = :name AND (c.age >= :age_min AND c.age <= :age_max)
-    echo $query->getDQL();
-
-    $customers = $query->execute();
+    // Fetch the results
+    $results = $queryBuilder->getQuery()->execute();
 
 ### Composing Filters
 
 When defining more than one filter, conditions will be explicitly `AND` together using the `AndX` composite query filter.
 To instead create an `OR` condition, we must define a `orx` filter and provide it with the required `conditions` array.
 
-    // SELECT u FROM users u WHERE u.active = :active AND (u.username >= :username1 OR u.username <= :username2)
+    // SELECT c FROM Customer c WHERE c.enabled = :enabled AND (c.username = :username1 OR c.username = :username2)
     $criteria = [
         'filters' => [
             [
@@ -145,7 +145,6 @@ There are many types of query filters, the table below defines the defaults avai
 | isin       |         Arp\DoctrineQueryFilter\Filter\IsIn         |               Check if a is IN b               |   `field`, `value`    |
 | isnotin    |       Arp\DoctrineQueryFilter\Filter\IsNotIn        |             Check if a is NOT IN b             |   `field`, `value`    |
 
-
 ## FilterFactory
 
 If you require greater control on the construction of the query filters, it is possible to provide `QueryFilter` 
@@ -162,24 +161,32 @@ instances directly to the `$criteria['filters']` array instead of using the arra
 
 ## Sorting Results
 
-In addition to filtering collections, we can also define how they should be sorted by using the `sort` criteria key. 
-Each sort filter requires a `field` and `direction` key.
+In addition to filtering collections, we can also add sorting by using the `sort` criteria key to add Sort Fillers.
 
-    $criteria = [
+    // SELECT c FROM Customer c WHERE c.id = 123 ORDER BY c.id DESC, c.createdDate ASC
+    $critiera = [
         'filters' => [
-            //....
-        ],
-        'sort' => [
             [
-                'field' => 'age',
-                'direction' => SortDirection::DESC,
+                'name' => 'eq',
+                'field' => 'id',
+                'value' => 123
             ],
-            [
-                'field' => 'createdDate',
-                'direction' => SortDirection::ASC,
+            'sort' => [
+                [
+                    'name' => Field::class, 
+                    'field' => 'id',
+                    'direction' => OrderByDirection::DESC->value
+                ],
+                [
+                    'field' => 'createdDate'
+                ],
             ]
-        ],
+        ]
     ];
+
+Each sort filter requires the `field` key, with an optional `direction` of `ASC` or `DESC`.
+Omitting the `field` key from a sort filter apply a  `Arp\DoctrineQueryFilter\Sort\Field` sort filter by default. In addition,
+omitting the `direction` will by default make the sort direction `ASC`.
 
 ## Unit tests
 
