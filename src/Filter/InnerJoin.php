@@ -15,8 +15,8 @@ final class InnerJoin extends AbstractJoin
      * @param QueryBuilderInterface $queryBuilder
      * @param string $fieldName
      * @param string $alias
-     * @param null|string|Composite|Base $condition
      * @param JoinConditionType|null $joinConditionType
+     * @param null|string|Composite|Base $condition
      * @param string|null $indexBy
      */
     protected function applyJoin(
@@ -31,7 +31,7 @@ final class InnerJoin extends AbstractJoin
             $fieldName,
             $alias,
             $joinConditionType,
-            $condition ?? null,
+            isset($condition) ? (string)$condition : null,
             $indexBy
         );
     }
