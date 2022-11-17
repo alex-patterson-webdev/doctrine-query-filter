@@ -52,7 +52,7 @@ abstract class AbstractJoin extends AbstractFilter
         if (null === $joinAlias) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'The required \'field\' criteria value is missing for filter \'%s\'',
+                    'The required \'alias\' criteria value is missing for filter \'%s\'',
                     static::class
                 )
             );
