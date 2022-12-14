@@ -11,23 +11,14 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\ORM\Query\Expr\Composite;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 abstract class AbstractComposite extends AbstractFilter
 {
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     *
-     * @return Composite
-     */
     abstract protected function createComposite(QueryBuilderInterface $queryBuilder): Composite;
 
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>          $criteria
+     * @param MetadataInterface $metadata
+     * @param array<mixed> $criteria
      *
      * @throws FilterException
      */
@@ -51,7 +42,7 @@ abstract class AbstractComposite extends AbstractFilter
         $compositeExpr = $this->createComposite($queryBuilder);
         $compositeExpr->addMultiple($parts['where']->getParts());
 
-        if (!isset($criteria['where']) || WhereType::AND === $criteria['where']) {
+        if ($this->getWhereType($criteria) === WhereType::AND) {
             $queryBuilder->andWhere($compositeExpr);
         } else {
             $queryBuilder->orWhere($compositeExpr);
@@ -73,19 +64,19 @@ abstract class AbstractComposite extends AbstractFilter
     }
 
     /**
-     * @param QueryBuilderInterface        $qb
-     * @param MetadataInterface            $metadata
-     * @param iterable<mixed>|array<mixed> $conditions
+     * @param QueryBuilderInterface $qb
+     * @param MetadataInterface $metadata
+     * @param iterable<mixed> $conditions
      *
      * @throws FilterException
      */
-    private function applyConditions(QueryBuilderInterface $qb, MetadataInterface $metadata, $conditions): void
+    private function applyConditions(QueryBuilderInterface $qb, MetadataInterface $metadata, iterable $conditions): void
     {
         try {
             $this->queryFilterManager->filter($qb, $metadata->getName(), ['filters' => $conditions]);
         } catch (QueryFilterManagerException $e) {
             throw new FilterException(
-                sprintf('Failed to construct query filter \'%s\' conditions: %s', static::class, $e->getMessage()),
+                sprintf('Failed to construct query filter \'%s\' conditions', static::class),
                 $e->getCode(),
                 $e
             );

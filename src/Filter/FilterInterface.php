@@ -8,16 +8,12 @@ use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 interface FilterInterface
 {
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>                 $criteria
+     * @param MetadataInterface $metadata
+     * @param array<mixed> $criteria
      *
      * @throws FilterException
      */

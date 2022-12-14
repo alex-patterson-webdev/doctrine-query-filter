@@ -19,35 +19,30 @@ use Arp\DoctrineQueryFilter\Sort\SortInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter
- */
 class QueryFilterManager implements QueryFilterManagerInterface
 {
-    private FilterFactoryInterface $filterFactory;
-
-    private SortFactoryInterface $sortFactory;
-
-    public function __construct(FilterFactoryInterface $filterFactory, SortFactoryInterface $sortFactory)
-    {
-        $this->filterFactory = $filterFactory;
-        $this->sortFactory = $sortFactory;
+    public function __construct(
+        private readonly FilterFactoryInterface $filterFactory,
+        private readonly SortFactoryInterface $sortFactory
+    ) {
     }
 
     /**
      * Apply the query filters to the provided query builder instance
      *
      * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
-     * @param string                                     $entityName
-     * @param array<mixed>                               $criteria
+     * @param string $entityName
+     * @param array<mixed> $criteria
      *
      * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder
-    {
+    public function filter(
+        DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder,
+        string $entityName,
+        array $criteria
+    ): DoctrineQueryBuilder {
         $queryBuilder = $this->getQueryBuilder($queryBuilder);
         $metadata = $this->createMetadataProxy($queryBuilder->getEntityManager(), $entityName);
 
@@ -63,18 +58,21 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface        $queryBuilder
-     * @param MetadataInterface            $metadata
+     * @param QueryBuilderInterface $queryBuilder
+     * @param MetadataInterface $metadata
      * @param array<mixed>|FilterInterface $data
      *
      * @throws QueryFilterManagerException
      */
-    private function applyFilter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
-    {
+    private function applyFilter(
+        QueryBuilderInterface $queryBuilder,
+        MetadataInterface $metadata,
+        array|FilterInterface $data
+    ): void {
         if ($data instanceof FilterInterface) {
             $filter = $data;
             $data = [];
-        } elseif (is_array($data)) {
+        } else {
             $filterName = $data['name'] ?? null;
 
             if (empty($filterName)) {
@@ -84,22 +82,13 @@ class QueryFilterManager implements QueryFilterManagerInterface
             }
 
             $filter = $this->createFilter($filterName, $data['options'] ?? []);
-        } else {
-            throw new QueryFilterManagerException(
-                sprintf(
-                    'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
-                    FilterInterface::class,
-                    gettype($data),
-                    static::class
-                )
-            );
         }
 
         try {
             $filter->filter($queryBuilder, $metadata, $data);
         } catch (FilterException $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to apply query filter for entity \'%s\': %s', $metadata->getName(), $e->getMessage()),
+                sprintf('Failed to apply query filter for entity \'%s\'', $metadata->getName()),
                 $e->getCode(),
                 $e
             );
@@ -107,9 +96,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * Create a new filter matching $name with the provided $options
-     *
-     * @param string       $name
+     * @param string $name
      * @param array<mixed> $options
      *
      * @return FilterInterface
@@ -122,7 +109,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
             return $this->filterFactory->create($this, $name, $options);
         } catch (FilterFactoryException $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
+                sprintf('Failed to create filter \'%s\'', $name),
                 $e->getCode(),
                 $e
             );
@@ -130,30 +117,24 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface            $queryBuilder
-     * @param MetadataInterface                $metadata
-     * @param array<mixed>|SortInterface|mixed $data
+     * @param QueryBuilderInterface $queryBuilder
+     * @param MetadataInterface $metadata
+     * @param array<mixed>|SortInterface $data
      *
      * @throws QueryFilterManagerException
      */
-    private function applySort(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, $data): void
-    {
+    private function applySort(
+        QueryBuilderInterface $queryBuilder,
+        MetadataInterface $metadata,
+        array|SortInterface $data
+    ): void {
         if ($data instanceof SortInterface) {
             $sort = $data;
             $data = [];
-        } elseif (is_array($data)) {
+        } else {
             $sort = $this->createSort(
                 empty($data['name']) ? Field::class : $data['name'],
                 $data['options'] ?? []
-            );
-        } else {
-            throw new QueryFilterManagerException(
-                sprintf(
-                    'The \'data\' argument must be an \'array\' or object of type \'%s\'; \'%s\' provided in \'%s\'',
-                    SortInterface::class,
-                    is_object($data) ? get_class($data) : gettype($data),
-                    static::class
-                )
             );
         }
 
@@ -161,7 +142,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
             $sort->sort($queryBuilder, $metadata, $data);
         } catch (SortException $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to apply query sorting for entity \'%s\': %s', $metadata->getName(), $e->getMessage()),
+                sprintf('Failed to apply query sorting for entity \'%s\'', $metadata->getName()),
                 $e->getCode(),
                 $e
             );
@@ -169,9 +150,7 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * Create a new sorting filter matching $name with the provided $options
-     *
-     * @param string       $name
+     * @param string $name
      * @param array<mixed> $options
      *
      * @return SortInterface
@@ -184,57 +163,32 @@ class QueryFilterManager implements QueryFilterManagerInterface
             return $this->sortFactory->create($this, $name, $options);
         } catch (SortFactoryException $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to create filter \'%s\': %s', $name, $e->getMessage()),
+                sprintf('Failed to create filter \'%s\'', $name),
                 $e->getCode(),
                 $e
             );
         }
     }
 
-    /**
-     * @param QueryBuilderInterface|DoctrineQueryBuilder $queryBuilder
-     *
-     * @return QueryBuilderInterface
-     *
-     * @throws QueryFilterManagerException
-     */
-    private function getQueryBuilder($queryBuilder): QueryBuilderInterface
+    private function getQueryBuilder(QueryBuilderInterface|DoctrineQueryBuilder $queryBuilder): QueryBuilderInterface
     {
         if ($queryBuilder instanceof DoctrineQueryBuilder) {
-            $queryBuilder = new QueryBuilder($queryBuilder);
-        }
-
-        if (!$queryBuilder instanceof QueryBuilderInterface) {
-            throw new QueryFilterManagerException(
-                sprintf(
-                    'The \'queryBuilder\' argument must be an object of type \'%s\' or \'%s\'; '
-                    . '\'%s\' provided in \'%s\'',
-                    QueryBuilderInterface::class,
-                    DoctrineQueryBuilder::class,
-                    get_class($queryBuilder),
-                    static::class
-                )
-            );
+            $queryBuilder = new QueryBuilder($queryBuilder, $queryBuilder->getRootAliases()[0] ?? '');
         }
 
         return $queryBuilder;
     }
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param string                 $entityName
-     *
-     * @return MetadataInterface
-     *
      * @throws QueryFilterManagerException
      */
     private function createMetadataProxy(EntityManagerInterface $entityManager, string $entityName): MetadataInterface
     {
         try {
             return new Metadata($entityManager->getClassMetadata($entityName));
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             throw new QueryFilterManagerException(
-                sprintf('Failed to fetch entity metadata for class \'%s\': %s', $entityName, $e->getMessage()),
+                sprintf('Failed to fetch entity metadata for class \'%s\'', $entityName),
                 $e->getCode(),
                 $e
             );

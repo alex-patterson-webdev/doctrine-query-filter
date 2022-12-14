@@ -15,10 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers  \Arp\DoctrineQueryFilter\Metadata\Typecaster
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
+ * @covers \Arp\DoctrineQueryFilter\Metadata\Typecaster
  */
 final class TypecasterTest extends TestCase
 {
@@ -89,7 +86,7 @@ final class TypecasterTest extends TestCase
 
         $this->expectException(TypecastException::class);
         $this->expectExceptionMessage(
-            sprintf('Failed to cast type \'%s\'', $type)
+            sprintf('Failed to cast field name \'%s\' to type \'%s\'', $fieldName, $type)
         );
 
         $typecaster->typecast($this->metadata, $fieldName, $value, $type);
@@ -99,16 +96,15 @@ final class TypecasterTest extends TestCase
     /**
      * Assert that typecast will cast values to their expected format
      *
-     * @param mixed       $expectedValue
-     * @param mixed       $value
-     * @param string|null $type
-     *
      * @dataProvider getTypecastWillCastSimpleValuesToTheirExpectedValueData
      *
      * @throws TypecastException
      */
-    public function testTypecastWillCastSimpleValuesToTheirExpectedValue($expectedValue, $value, ?string $type): void
-    {
+    public function testTypecastWillCastSimpleValuesToTheirExpectedValue(
+        mixed $expectedValue,
+        mixed $value,
+        ?string $type
+    ): void {
         $typecaster = new Typecaster($this->dateTimeFactory, $this->dateTimeImmutableFactory);
 
         $this->assertSame(
@@ -167,14 +163,14 @@ final class TypecasterTest extends TestCase
     }
 
     /**
-     * @param mixed                $value
+     * @param mixed $value
      * @param array<string, mixed> $options
      *
      * @throws TypecastException
      *
      * @dataProvider getTypecastWillCastDateData
      */
-    public function testTypecastWillCastDate($value, array $options = []): void
+    public function testTypecastWillCastDate(mixed $value, array $options = []): void
     {
         $typecaster = new Typecaster($this->dateTimeFactory, $this->dateTimeImmutableFactory);
 
@@ -231,19 +227,19 @@ final class TypecasterTest extends TestCase
                 [
                     'format' => 'Y/m/d H:i:s',
                 ],
-            ]
+            ],
         ];
     }
 
     /**
-     * @param mixed                $value
+     * @param mixed $value
      * @param array<string, mixed> $options
      *
      * @throws TypecastException
      *
      * @dataProvider getTypecastWillCastDateImmutableData
      */
-    public function testTypecastWillCastDateImmutable($value, array $options = []): void
+    public function testTypecastWillCastDateImmutable(mixed $value, array $options = []): void
     {
         $typecaster = new Typecaster($this->dateTimeFactory, $this->dateTimeImmutableFactory);
 
@@ -300,19 +296,19 @@ final class TypecasterTest extends TestCase
                 [
                     'format' => 'Y/m/d H:i:s',
                 ],
-            ]
+            ],
         ];
     }
 
     /**
-     * @param mixed                $value
+     * @param mixed $value
      * @param array<string, mixed> $options
      *
      * @throws TypecastException
      *
      * @dataProvider getTypecastWillCastTimeData
      */
-    public function testTypecastWillCastTime($value, array $options = []): void
+    public function testTypecastWillCastTime(mixed $value, array $options = []): void
     {
         $typecaster = new Typecaster($this->dateTimeFactory, $this->dateTimeImmutableFactory);
 
@@ -372,19 +368,19 @@ final class TypecasterTest extends TestCase
                 [
                     'format' => 'l, h:i:s A',
                 ],
-            ]
+            ],
         ];
     }
 
     /**
-     * @param mixed                $value
+     * @param mixed $value
      * @param array<string, mixed> $options
      *
      * @throws TypecastException
      *
      * @dataProvider getTypecastWillCastTimeImmutableData
      */
-    public function testTypecastWillCastTimeImmutable($value, array $options = []): void
+    public function testTypecastWillCastTimeImmutable(mixed $value, array $options = []): void
     {
         $typecaster = new Typecaster($this->dateTimeFactory, $this->dateTimeImmutableFactory);
 
@@ -444,7 +440,7 @@ final class TypecasterTest extends TestCase
                 [
                     'format' => 'l, h:i:s A',
                 ],
-            ]
+            ],
         ];
     }
 }

@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsLessThanOrEqual
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsLessThanOrEqualTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsLessThanOrEqual::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'lte';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '<=';
 
     /**

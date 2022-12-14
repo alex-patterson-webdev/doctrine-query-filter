@@ -4,48 +4,30 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Filter;
 
+use Arp\DoctrineQueryFilter\Enum\WhereType;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
+use Arp\DoctrineQueryFilter\Metadata\ParamNameGeneratorInterface;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 abstract class AbstractFilter implements FilterInterface
 {
     /**
-     * @var QueryFilterManagerInterface
-     */
-    protected QueryFilterManagerInterface $queryFilterManager;
-
-    /**
-     * @var TypecasterInterface
-     */
-    protected TypecasterInterface $typecaster;
-
-    /**
-     * @var array<mixed>
-     */
-    protected array $options = [];
-
-    /**
      * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecasterInterface         $typecaster
-     * @param array<mixed>                $options
+     * @param TypecasterInterface $typecaster
+     * @param ParamNameGeneratorInterface $paramNameGenerator
+     * @param array<mixed> $options
      */
     public function __construct(
-        QueryFilterManagerInterface $queryFilterManager,
-        TypecasterInterface $typecaster,
-        array $options = []
+        protected QueryFilterManagerInterface $queryFilterManager,
+        protected TypecasterInterface $typecaster,
+        protected ParamNameGeneratorInterface $paramNameGenerator,
+        protected array $options = []
     ) {
-        $this->queryFilterManager = $queryFilterManager;
-        $this->typecaster = $typecaster;
-        $this->options = $options;
     }
 
     /**
@@ -56,68 +38,56 @@ abstract class AbstractFilter implements FilterInterface
         return $this->options;
     }
 
-    /**
-     * Create a new unique parameter name
-     *
-     * @param string $prefix
-     *
-     * @return string
-     */
-    protected function createParamName(string $prefix = ''): string
+    protected function createParamName(string $param, string $fieldName, string $alias): string
     {
-        return uniqid($prefix, false);
+        return $this->paramNameGenerator->generateName($param, $fieldName, $alias);
     }
 
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string|null           $alias
-     *
-     * @return string
-     */
     protected function getAlias(QueryBuilderInterface $queryBuilder, ?string $alias = null): string
     {
-        $alias = empty($alias) ? $queryBuilder->getRootAlias() : $alias;
+        $alias ??= $queryBuilder->getRootAlias();
         if (!empty($alias)) {
             return $alias;
         }
 
-        return $this->options['alias'] ?? 'entity';
+        return $this->options['alias'] ?? 'x';
     }
 
     /**
      * @param MetadataInterface $metadata
      * @param array<mixed>      $criteria
-     * @param string            $key
      *
      * @return string
      *
      * @throws InvalidArgumentException
      */
-    protected function resolveFieldName(MetadataInterface $metadata, array $criteria, string $key = 'field'): string
+    protected function resolveFieldName(MetadataInterface $metadata, array $criteria): string
     {
-        if (empty($criteria[$key])) {
+        if (empty($criteria['field'])) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'The required \'%s\' criteria value is missing for filter \'%s\'',
-                    $key,
+                    'The required \'field\' criteria value is missing for filter \'%s\'',
                     static::class
                 )
             );
         }
 
-        if (!$metadata->hasField($criteria[$key]) && !$metadata->hasAssociation($criteria[$key])) {
+        $parts = explode('.', $criteria['field']);
+        $fieldName = array_pop($parts);
+
+        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Unable to apply query filter \'%s\': '
                     . 'The entity class \'%s\' has no field or association named \'%s\'',
                     static::class,
                     $metadata->getName(),
-                    $criteria[$key]
+                    $fieldName
                 )
             );
         }
 
-        return $criteria[$key];
+        return $fieldName;
     }
 
     /**
@@ -134,23 +104,38 @@ abstract class AbstractFilter implements FilterInterface
     protected function formatValue(
         MetadataInterface $metadata,
         string $fieldName,
-        $value,
+        mixed $value,
         ?string $type = null,
         array $options = []
-    ) {
+    ): mixed {
         try {
             return $this->typecaster->typecast($metadata, $fieldName, $value, $type, $options);
         } catch (TypecastException $e) {
             throw new FilterException(
-                sprintf(
-                    'Failed to format the value for field \'%s::%s\': %s',
-                    $metadata->getName(),
-                    $fieldName,
-                    $e->getMessage()
-                ),
+                sprintf('Failed to format the value for field \'%s::%s\'', $metadata->getName(), $fieldName),
                 $e->getCode(),
                 $e
             );
         }
+    }
+
+    /**
+     * @param array<string, mixed> $criteria
+     *
+     * @return WhereType
+     */
+    protected function getWhereType(array $criteria): WhereType
+    {
+        if (isset($criteria['where'])) {
+            if (is_string($criteria['where'])) {
+                $criteria['where'] = WhereType::tryFrom($criteria['where']);
+            }
+
+            if ($criteria['where'] instanceof WhereType) {
+                return $criteria['where'];
+            }
+        }
+
+        return WhereType::AND;
     }
 }

@@ -10,20 +10,8 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Filter
- */
 final class IsMemberOf extends AbstractExpression
 {
-    /**
-     * @param Expr   $expr
-     * @param string $fieldName
-     * @param string $parameterName
-     * @param string $alias
-     *
-     * @return string
-     */
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
         return (string)$expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);
@@ -31,17 +19,16 @@ final class IsMemberOf extends AbstractExpression
 
     /**
      * @param MetadataInterface $metadata
-     * @param array<mixed>             $criteria
-     * @param string            $key
+     * @param array<mixed> $criteria
      *
      * @return string
      *
      * @throws InvalidArgumentException
      * @throws MetadataException
      */
-    protected function resolveFieldName(MetadataInterface $metadata, array $criteria, string $key = 'field'): string
+    protected function resolveFieldName(MetadataInterface $metadata, array $criteria): string
     {
-        $fieldName = parent::resolveFieldName($metadata, $criteria, $key);
+        $fieldName = parent::resolveFieldName($metadata, $criteria);
 
         if ($metadata->hasAssociation($fieldName)) {
             $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';

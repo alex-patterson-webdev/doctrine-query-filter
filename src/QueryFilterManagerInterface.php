@@ -7,22 +7,22 @@ namespace Arp\DoctrineQueryFilter;
 use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter
- */
 interface QueryFilterManagerInterface
 {
     /**
      * Apply the query filters to the provided query builder instance
      *
      * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
-     * @param string                                     $entityName
-     * @param array<mixed>                                      $criteria
+     * @param string $entityName
+     * @param array<mixed> $criteria
      *
      * @return DoctrineQueryBuilder
      *
      * @throws QueryFilterManagerException
      */
-    public function filter($queryBuilder, string $entityName, array $criteria): DoctrineQueryBuilder;
+    public function filter(
+        DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder,
+        string $entityName,
+        array $criteria
+    ): DoctrineQueryBuilder;
 }

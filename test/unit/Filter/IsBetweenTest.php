@@ -15,9 +15,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 /**
  * @covers  \Arp\DoctrineQueryFilter\Filter\IsBetween
  * @covers  \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsBetweenTest extends AbstractFilterTest
 {
@@ -26,7 +23,7 @@ final class IsBetweenTest extends AbstractFilterTest
      */
     public function testImplementsFilterInterface(): void
     {
-        $filter = new IsBetween($this->queryFilterManager, $this->typecaster);
+        $filter = new IsBetween($this->queryFilterManager, $this->typecaster, $this->paramNameGenerator);
 
         $this->assertInstanceOf(FilterInterface::class, $filter);
     }
@@ -40,7 +37,7 @@ final class IsBetweenTest extends AbstractFilterTest
      */
     public function testFilterWillThrowInvalidArgumentExceptionIfTheRequiredFromCriteriaIsMissing(): void
     {
-        $filter = new IsBetween($this->queryFilterManager, $this->typecaster);
+        $filter = new IsBetween($this->queryFilterManager, $this->typecaster, $this->paramNameGenerator);
 
         $criteria = [
             // Missing 'from' key
@@ -63,7 +60,7 @@ final class IsBetweenTest extends AbstractFilterTest
      */
     public function testFilterWillThrowInvalidArgumentExceptionIfTheRequiredToCriteriaIsMissing(): void
     {
-        $filter = new IsBetween($this->queryFilterManager, $this->typecaster);
+        $filter = new IsBetween($this->queryFilterManager, $this->typecaster, $this->paramNameGenerator);
 
         $criteria = [
             'from' => '2021-03-01 00:00:00',
@@ -90,7 +87,7 @@ final class IsBetweenTest extends AbstractFilterTest
     {
         /** @var IsBetween&MockObject $filter */
         $filter = $this->getMockBuilder(IsBetween::class)
-            ->setConstructorArgs([$this->queryFilterManager, $this->typecaster])
+            ->setConstructorArgs([$this->queryFilterManager, $this->typecaster, $this->paramNameGenerator])
             ->onlyMethods(['createParamName'])
             ->getMock();
 
@@ -127,8 +124,8 @@ final class IsBetweenTest extends AbstractFilterTest
         $filter->expects($this->exactly(2))
             ->method('createParamName')
             ->withConsecutive(
-                [$alias],
-                [$alias]
+                ['from', $fieldName, $alias],
+                ['to', $fieldName, $alias]
             )->willReturnOnConsecutiveCalls(
                 $fromParam,
                 $toParam

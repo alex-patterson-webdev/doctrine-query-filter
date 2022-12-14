@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsLessThan;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsLessThan
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsLessThanTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsLessThan::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'lt';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '<';
 
     /**

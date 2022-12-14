@@ -10,25 +10,13 @@ use Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual;
  * @covers \Arp\DoctrineQueryFilter\Filter\IsGreaterThanOrEqual
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractExpression
  * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
- *
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package ArpTest\DoctrineQueryFilter\Filter
  */
 final class IsGreaterThanOrEqualTest extends AbstractComparisonTest
 {
-    /**
-     * @var string
-     */
     protected string $filterClassName = IsGreaterThanOrEqual::class;
 
-    /**
-     * @var string
-     */
     protected string $expressionMethodName = 'gte';
 
-    /**
-     * @var string
-     */
     protected string $expressionSymbol = '>=';
 
     /**

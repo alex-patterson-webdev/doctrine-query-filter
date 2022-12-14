@@ -4,49 +4,35 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter;
 
+use Arp\DoctrineQueryFilter\Enum\JoinConditionType;
+use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Composite;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Query
- */
 final class QueryBuilder implements QueryBuilderInterface
 {
-    private DoctrineQueryBuilder $queryBuilder;
-
-    private string $rootAlias = '';
-
-    /**
-     * @param DoctrineQueryBuilder $queryBuilder
-     */
-    public function __construct(DoctrineQueryBuilder $queryBuilder)
-    {
-        $this->queryBuilder = $queryBuilder;
+    public function __construct(
+        private readonly DoctrineQueryBuilder $queryBuilder,
+        private string $rootAlias = ''
+    ) {
     }
 
-    /**
-     * @return QueryBuilderInterface
-     */
     public function createQueryBuilder(): QueryBuilderInterface
     {
         return new self($this->getEntityManager()->createQueryBuilder());
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
     public function getEntityManager(): EntityManagerInterface
     {
         return $this->queryBuilder->getEntityManager();
     }
 
-    /**
-     * @return string
-     */
     public function getRootAlias(): string
     {
         if (!empty($this->rootAlias)) {
@@ -56,66 +42,42 @@ final class QueryBuilder implements QueryBuilderInterface
         return $this->queryBuilder->getRootAliases()[0] ?? '';
     }
 
-    /**
-     * @param string $rootAlias
-     */
     public function setRootAlias(string $rootAlias): void
     {
         $this->rootAlias = $rootAlias;
     }
 
-    /**
-     * @return Query
-     */
     public function getQuery(): Query
     {
         return $this->queryBuilder->getQuery();
     }
 
-    /**
-     * Return the wrapped Doctrine query builder instance
-     *
-     * @return DoctrineQueryBuilder
-     */
     public function getWrappedQueryBuilder(): DoctrineQueryBuilder
     {
         return $this->queryBuilder;
     }
 
-    /**
-     * @return Expr
-     */
     public function expr(): Expr
     {
         return $this->queryBuilder->expr();
     }
 
     /**
-     * @return  array<mixed>
+     * @return array<string, mixed>
      */
     public function getQueryParts(): array
     {
         return $this->queryBuilder->getDQLParts();
     }
 
-    /**
-     * @param mixed ...$args
-     *
-     * @return $this
-     */
-    public function orWhere(...$args): QueryBuilderInterface
+    public function orWhere(mixed ...$args): QueryBuilderInterface
     {
         $this->queryBuilder->orWhere(...$args);
 
         return $this;
     }
 
-    /**
-     * @param mixed ...$args
-     *
-     * @return $this
-     */
-    public function andWhere(...$args): QueryBuilderInterface
+    public function andWhere(mixed ...$args): QueryBuilderInterface
     {
         $this->queryBuilder->andWhere(...$args);
 
@@ -123,77 +85,67 @@ final class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param string      $name
-     * @param string      $alias
-     * @param string      $type
-     * @param string|null $condition
+     * @param string $name
+     * @param string $alias
+     * @param JoinConditionType|null $conditionType
+     * @param string|Comparison|Composite|null $condition
      * @param string|null $indexBy
      *
-     * @return $this
+     * @return self
      */
     public function innerJoin(
         string $name,
         string $alias,
-        string $type,
-        $condition = null,
-        string $indexBy = null
-    ): QueryBuilderInterface {
-        $this->queryBuilder->innerJoin($name, $alias, $type, $condition, $indexBy);
+        ?JoinConditionType $conditionType = null,
+        mixed $condition = null,
+        ?string $indexBy = null
+    ): self {
+        $conditionType ??= JoinConditionType::WITH;
+        $this->queryBuilder->innerJoin($name, $alias, $conditionType->value, $condition, $indexBy);
 
         return $this;
     }
 
     /**
-     * @param string      $name
-     * @param string      $alias
-     * @param string      $type
-     * @param string|null $condition
+     * @param string $name
+     * @param string $alias
+     * @param JoinConditionType|null $conditionType
+     * @param string|Comparison|Composite|null $condition
      * @param string|null $indexBy
      *
-     * @return $this
+     * @return self
      */
     public function leftJoin(
         string $name,
         string $alias,
-        string $type,
-        $condition = null,
-        string $indexBy = null
-    ): QueryBuilderInterface {
-        $this->queryBuilder->leftJoin($name, $alias, $type, $condition, $indexBy);
+        ?JoinConditionType $conditionType = null,
+        mixed $condition = null,
+        ?string $indexBy = null
+    ): self {
+        $conditionType ??= JoinConditionType::WITH;
+        $this->queryBuilder->leftJoin($name, $alias, $conditionType->value, $condition, $indexBy);
 
         return $this;
     }
 
-    /**
-     * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
-     *
-     * @return QueryBuilderInterface
-     */
-    public function orderBy($sort, ?string $direction = null): QueryBuilderInterface
+    public function orderBy(Expr\OrderBy|string $sort, ?OrderByDirection $direction = null): self
     {
         if ($sort instanceof Expr\OrderBy) {
             $direction = null;
         }
 
-        $this->queryBuilder->orderBy($sort, $direction);
+        $this->queryBuilder->orderBy($sort, $direction?->value);
 
         return $this;
     }
 
-    /**
-     * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
-     *
-     * @return QueryBuilderInterface
-     */
-    public function addOrderBy($sort, ?string $direction = null): QueryBuilderInterface
+    public function addOrderBy(OrderBy|string $sort, ?OrderByDirection $direction = null): self
     {
         if ($sort instanceof Expr\OrderBy) {
             $direction = null;
         }
 
-        $this->queryBuilder->addOrderBy($sort, $direction);
+        $this->queryBuilder->addOrderBy($sort, $direction?->value);
 
         return $this;
     }
@@ -206,38 +158,21 @@ final class QueryBuilder implements QueryBuilderInterface
         return $this->queryBuilder->getParameters();
     }
 
-    /**
-     * @param ArrayCollection<int, Query\Parameter> $parameters
-     *
-     * @return $this|QueryBuilderInterface
-     */
-    public function setParameters(ArrayCollection $parameters): QueryBuilderInterface
+    public function setParameters(ArrayCollection $parameters): self
     {
         $this->queryBuilder->setParameters($parameters);
 
         return $this;
     }
 
-    /**
-     * @param string      $name
-     * @param mixed       $value
-     * @param string|null $type
-     *
-     * @return $this|QueryBuilderInterface
-     */
-    public function setParameter(string $name, $value, ?string $type = null): QueryBuilderInterface
+    public function setParameter(string $name, mixed $value, ?string $type = null): self
     {
         $this->queryBuilder->setParameter($name, $value, $type);
 
         return $this;
     }
 
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     *
-     * @return $this|QueryBuilderInterface
-     */
-    public function mergeParameters(QueryBuilderInterface $queryBuilder): QueryBuilderInterface
+    public function mergeParameters(QueryBuilderInterface $queryBuilder): self
     {
         $parameters = $this->getParameters();
         foreach ($queryBuilder->getParameters() as $parameter) {

@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace Arp\DoctrineQueryFilter\Sort;
 
-use Arp\DoctrineQueryFilter\Enum\SortDirection;
+use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\Sort\Exception\SortException;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Sort
- */
 final class Field implements SortInterface
 {
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>          $data
+     * @param MetadataInterface $metadata
+     * @param array<string, mixed> $data
      *
      * @throws SortException
-     * @throws \ReflectionException
      */
     public function sort(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $data): void
     {
@@ -33,22 +28,17 @@ final class Field implements SortInterface
             );
         }
 
-        if (empty($data['direction'])) {
-            throw new SortException(
-                sprintf('The required \'direction\' option is missing or empty in \'%s\'', self::class)
-            );
+        $direction = $data['direction'] ?? null;
+        if (is_string($direction)) {
+            try {
+                $direction = OrderByDirection::from($data['direction']);
+            } catch (\Throwable) {
+                throw new SortException(
+                    sprintf('The sort direction provided for field \'%s\' is invalid', $data['field'])
+                );
+            }
         }
 
-        if (!SortDirection::hasValue($data['direction'])) {
-            throw new SortException(
-                sprintf(
-                    'The sort \'direction\' option value \'%s\' is invalid in \'%s\'',
-                    $data['direction'],
-                    self::class
-                )
-            );
-        }
-
-        $queryBuilder->addOrderBy($alias . '.' . $data['field'], $data['direction']);
+        $queryBuilder->addOrderBy($alias . '.' . $data['field'], $direction);
     }
 }

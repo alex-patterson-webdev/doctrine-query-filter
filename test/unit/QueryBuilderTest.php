@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace ArpTest\DoctrineQueryFilter;
 
-use Arp\DoctrineQueryFilter\Enum\SortDirection;
+use Arp\DoctrineQueryFilter\Enum\JoinConditionType;
+use Arp\DoctrineQueryFilter\Enum\OrderByDirection;
 use Arp\DoctrineQueryFilter\QueryBuilder;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -310,15 +311,15 @@ final class QueryBuilderTest extends TestCase
 
         $name = 'foo';
         $alias = 'a';
-        $type = Expr\Join::ON;
+        $conditionType = JoinConditionType::ON;
         $condition = '1 = 1';
         $indexBy = null;
 
         $this->doctrineQueryBuilder->expects($this->once())
             ->method('innerJoin')
-            ->with($name, $alias, $type, $condition, $indexBy);
+            ->with($name, $alias, $conditionType->value, $condition, $indexBy);
 
-        $this->assertSame($queryBuilder, $queryBuilder->innerJoin($name, $alias, $type, $condition, $indexBy));
+        $this->assertSame($queryBuilder, $queryBuilder->innerJoin($name, $alias, $conditionType, $condition, $indexBy));
     }
 
     /**
@@ -330,27 +331,29 @@ final class QueryBuilderTest extends TestCase
 
         $name = 'bar';
         $alias = 'b';
-        $type = Expr\Join::ON;
+        $conditionType = JoinConditionType::WITH;
         $condition = 'a.test = b.hello';
         $indexBy = 'a.name';
 
         $this->doctrineQueryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with($name, $alias, $type, $condition, $indexBy);
+            ->with($name, $alias, $conditionType->value, $condition, $indexBy);
 
-        $this->assertSame($queryBuilder, $queryBuilder->leftJoin($name, $alias, $type, $condition, $indexBy));
+        $this->assertSame($queryBuilder, $queryBuilder->leftJoin($name, $alias, $conditionType, $condition, $indexBy));
     }
 
     /**
      * Assert that calls to orderBy() will proxy to the internal query builder instance
      *
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
+     * @param OrderByDirection|null $direction
      *
      * @dataProvider getOrderByWillProxyToInternalQueryBuilderData
      */
-    public function testOrderByWillProxyToInternalQueryBuilder($sort, ?string $direction = null): void
-    {
+    public function testOrderByWillProxyToInternalQueryBuilder(
+        Expr\OrderBy|string $sort,
+        ?OrderByDirection $direction = null
+    ): void {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
         $this->assertSame($queryBuilder, $queryBuilder->orderBy($sort, $direction));
@@ -360,12 +363,14 @@ final class QueryBuilderTest extends TestCase
      * Assert that calls to addOrderBy() will proxy to the internal query builder instance
      *
      * @param Expr\OrderBy|string $sort
-     * @param string|null         $direction
+     * @param OrderByDirection|null $direction
      *
      * @dataProvider getOrderByWillProxyToInternalQueryBuilderData
      */
-    public function testAddOrderByWillProxyToInternalQueryBuilder($sort, ?string $direction = null): void
-    {
+    public function testAddOrderByWillProxyToInternalQueryBuilder(
+        Expr\OrderBy|string $sort,
+        ?OrderByDirection $direction = null
+    ): void {
         $queryBuilder = new QueryBuilder($this->doctrineQueryBuilder);
 
         $this->assertSame($queryBuilder, $queryBuilder->addOrderBy($sort, $direction));
@@ -381,19 +386,19 @@ final class QueryBuilderTest extends TestCase
         return [
             [
                 'a.test',
-                SortDirection::DESC,
+                OrderByDirection::DESC,
             ],
             [
                 'b.foo',
-                null
+                null,
             ],
             [
-                $expr->asc('a.bar')
+                $expr->asc('a.bar'),
             ],
             [
                 $expr->desc('a.baz'),
-                null
-            ]
+                null,
+            ],
         ];
     }
 

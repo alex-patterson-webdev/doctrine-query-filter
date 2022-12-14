@@ -8,16 +8,12 @@ use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 use Arp\DoctrineQueryFilter\Sort\Exception\SortException;
 
-/**
- * @author  Alex Patterson <alex.patterson.webdev@gmail.com>
- * @package Arp\DoctrineQueryFilter\Sort
- */
 interface SortInterface
 {
     /**
      * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface     $metadata
-     * @param array<mixed>          $data
+     * @param MetadataInterface $metadata
+     * @param array<mixed> $data
      *
      * @throws SortException
      */
