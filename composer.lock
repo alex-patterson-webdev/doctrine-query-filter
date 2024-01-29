@@ -4,21 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6cd776c88950644d338893131e827e2",
+    "content-hash": "967f4561b88827e2cca8973c7bcd888a",
     "packages": [
         {
             "name": "alex-patterson-webdev/date-time",
             "version": "0.6.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/alex-patterson-webdev/date-time.git",
+                "url": "ssh://git@gitlab.alpat.co.uk:2222/library/date-time.git",
                 "reference": "8594a3c73d6633552c8c6325b4f29aa8696ca0fc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/alex-patterson-webdev/date-time/zipball/8594a3c73d6633552c8c6325b4f29aa8696ca0fc",
-                "reference": "8594a3c73d6633552c8c6325b4f29aa8696ca0fc",
-                "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
@@ -40,7 +34,45 @@
                     "Arp\\DateTime\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "ArpTest\\DateTime\\": "test/unit/"
+                }
+            },
+            "scripts": {
+                "arp:test": [
+                    "@arp:check",
+                    "@arp:lint",
+                    "@arp:analyse",
+                    "@arp:unit-test-with-coverage"
+                ],
+                "arp:test-dev": [
+                    "@arp:check",
+                    "@arp:lint",
+                    "@arp:fix",
+                    "@arp:analyse",
+                    "@arp:unit-test"
+                ],
+                "arp:check": [
+                    "php vendor/bin/phpcs -s --standard=phpcs.xml --colors src/ test/"
+                ],
+                "arp:lint": [
+                    "php vendor/bin/php-cs-fixer fix --dry-run --verbose --config=.php-cs-fixer.dist"
+                ],
+                "arp:fix": [
+                    "php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist"
+                ],
+                "arp:analyse": [
+                    "php vendor/bin/phpstan analyse -c phpstan.neon --level=7"
+                ],
+                "arp:unit-test": [
+                    "php vendor/bin/phpunit"
+                ],
+                "arp:unit-test-with-coverage": [
+                    "@putenv XDEBUG_MODE=coverage",
+                    "php vendor/bin/phpunit --coverage-clover=test/coverage/clover.xml"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -51,10 +83,6 @@
                 }
             ],
             "description": "DateTime factory components for PHP",
-            "support": {
-                "issues": "https://github.com/alex-patterson-webdev/date-time/issues",
-                "source": "https://github.com/alex-patterson-webdev/date-time/tree/0.6.1"
-            },
             "time": "2023-04-11T00:55:56+00:00"
         },
         {
