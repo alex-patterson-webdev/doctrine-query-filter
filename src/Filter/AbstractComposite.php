@@ -16,10 +16,6 @@ abstract class AbstractComposite extends AbstractFilter
     abstract protected function createComposite(QueryBuilderInterface $queryBuilder): Composite;
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface $metadata
-     * @param array<mixed> $criteria
-     *
      * @throws FilterException
      */
     public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
@@ -64,10 +60,6 @@ abstract class AbstractComposite extends AbstractFilter
     }
 
     /**
-     * @param QueryBuilderInterface $qb
-     * @param MetadataInterface $metadata
-     * @param iterable<mixed> $conditions
-     *
      * @throws FilterException
      */
     private function applyConditions(QueryBuilderInterface $qb, MetadataInterface $metadata, iterable $conditions): void

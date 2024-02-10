@@ -11,19 +11,11 @@ use Doctrine\ORM\Query\Expr\Composite;
 
 final class InnerJoin extends AbstractJoin
 {
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string $fieldName
-     * @param string $alias
-     * @param JoinConditionType|null $joinConditionType
-     * @param null|string|Composite|Base $condition
-     * @param string|null $indexBy
-     */
     protected function applyJoin(
         QueryBuilderInterface $queryBuilder,
         string $fieldName,
         string $alias,
-        $condition = null,
+        string|Composite|Base|null $condition = null,
         ?JoinConditionType $joinConditionType = null,
         ?string $indexBy = null
     ): void {

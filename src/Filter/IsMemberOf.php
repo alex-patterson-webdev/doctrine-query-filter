@@ -18,11 +18,6 @@ final class IsMemberOf extends AbstractExpression
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param array<mixed> $criteria
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      * @throws MetadataException
      */

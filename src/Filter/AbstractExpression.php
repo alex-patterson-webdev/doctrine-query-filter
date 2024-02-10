@@ -21,10 +21,6 @@ abstract class AbstractExpression extends AbstractFilter
     ): string;
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface $metadata
-     * @param array<mixed> $criteria
-     *
      * @throws InvalidArgumentException
      * @throws FilterException
      */
