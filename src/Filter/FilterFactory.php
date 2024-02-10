@@ -36,8 +36,8 @@ final class FilterFactory implements FilterFactoryInterface
         'in' => IsIn::class,
         'not_in' => IsNotIn::class,
         'begins_with' => BeginsWith::class,
-        'ends_with' => BeginsWith::class,
-        'empty' => BeginsWith::class,
+        'ends_with' => EndsWith::class,
+        'empty' => IsEmpty::class,
     ];
 
     /**

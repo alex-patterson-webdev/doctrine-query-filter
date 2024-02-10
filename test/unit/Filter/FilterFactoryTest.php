@@ -19,48 +19,39 @@ use PHPUnit\Framework\TestCase;
  */
 final class FilterFactoryTest extends TestCase
 {
-    /**
-     * @var QueryFilterManagerInterface&MockObject
-     */
-    private QueryFilterManagerInterface $queryFilterManager;
+    private QueryFilterManagerInterface&MockObject $queryFilterManager;
 
-    /**
-     * @var TypecasterInterface&MockObject
-     */
-    private TypecasterInterface $typecaster;
+    private TypecasterInterface&MockObject $typecaster;
 
-    /**
-     * @var ParamNameGeneratorInterface&MockObject
-     */
-    private ParamNameGeneratorInterface $paramNameGenerator;
+    private ParamNameGeneratorInterface&MockObject $paramNameGenerator;
 
     /**
      * @var array<string, string>
      */
     private array $defaultClassMap = [
-        'eq'        => Filters\IsEqual::class,
-        'neq'       => Filters\IsNotEqual::class,
-        'gt'        => Filters\IsGreaterThan::class,
-        'gte'       => Filters\IsGreaterThanOrEqual::class,
-        'lt'        => Filters\IsLessThan::class,
-        'lte'       => Filters\IsLessThanOrEqual::class,
-        'null'      => Filters\IsNull::class,
-        'notnull'   => Filters\IsNotNull::class,
-        'memberof'  => Filters\IsMemberOf::class,
-        'between'   => Filters\IsBetween::class,
-        'andx'      => Filters\AndX::class,
-        'orx'       => Filters\OrX::class,
-        'leftjoin'  => Filters\LeftJoin::class,
-        'innerjoin' => Filters\InnerJoin::class,
-        'like'      => Filters\IsLike::class,
-        'notlike'   => Filters\IsNotLike::class,
-        'in'        => Filters\IsIn::class,
-        'notin'     => Filters\IsNotIn::class,
+        'eq' => Filters\IsEqual::class,
+        'neq' => Filters\IsNotEqual::class,
+        'gt' => Filters\IsGreaterThan::class,
+        'gte' => Filters\IsGreaterThanOrEqual::class,
+        'lt' => Filters\IsLessThan::class,
+        'lte' => Filters\IsLessThanOrEqual::class,
+        'is_null' => Filters\IsNull::class,
+        'not_null' => Filters\IsNotNull::class,
+        'member_of' => Filters\IsMemberOf::class,
+        'between' => Filters\IsBetween::class,
+        'and' => Filters\AndX::class,
+        'or' => Filters\OrX::class,
+        'left_join' => Filters\LeftJoin::class,
+        'inner_join' => Filters\InnerJoin::class,
+        'like' => Filters\IsLike::class,
+        'not_like' => Filters\IsNotLike::class,
+        'in' => Filters\IsIn::class,
+        'not_in' => Filters\IsNotIn::class,
+        'begins_with' => Filters\BeginsWith::class,
+        'ends_with' => Filters\EndsWith::class,
+        'empty' => Filters\IsEmpty::class,
     ];
 
-    /**
-     * Prepare the test case dependencies
-     */
     public function setUp(): void
     {
         $this->queryFilterManager = $this->createMock(QueryFilterManagerInterface::class);
@@ -196,11 +187,6 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert the expected query filter is created using the provided $name and $options and optional $classMap.
      *
-     * @param class-string $expected
-     * @param string $name
-     * @param array<mixed> $options
-     * @param array<mixed> $classMap
-     *
      * @dataProvider getCreateWillReturnFilterInstanceData
      *
      * @throws FilterFactoryException
@@ -215,20 +201,16 @@ final class FilterFactoryTest extends TestCase
 
         $queryFilter = $factory->create($this->queryFilterManager, $name, $options);
 
-        /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf($expected, $queryFilter);
     }
 
-    /**
-     * @return array<mixed><mixed>
-     */
     public function getCreateWillReturnFilterInstanceData(): array
     {
         return [
-            [Filters\AndX::class, 'andx'],
+            [Filters\AndX::class, 'and'],
             [Filters\AndX::class, Filters\AndX::class],
 
-            [Filters\OrX::class, 'orx'],
+            [Filters\OrX::class, 'or'],
             [Filters\OrX::class, Filters\OrX::class],
 
             [Filters\IsEqual::class, 'eq'],
@@ -249,19 +231,19 @@ final class FilterFactoryTest extends TestCase
             [Filters\IsLessThanOrEqual::class, 'lte'],
             [Filters\IsLessThanOrEqual::class, Filters\IsLessThanOrEqual::class],
 
-            [Filters\IsMemberOf::class, 'memberof'],
+            [Filters\IsMemberOf::class, 'member_of'],
             [Filters\IsMemberOf::class, Filters\IsMemberOf::class],
 
-            [Filters\IsNull::class, 'null'],
+            [Filters\IsNull::class, 'is_null'],
             [Filters\IsNull::class, Filters\IsNull::class],
 
-            [Filters\IsNotNull::class, 'notnull'],
+            [Filters\IsNotNull::class, 'not_null'],
             [Filters\IsNotNull::class, Filters\IsNotNull::class],
 
-            [Filters\InnerJoin::class, 'innerjoin'],
+            [Filters\InnerJoin::class, 'inner_join'],
             [Filters\InnerJoin::class, Filters\InnerJoin::class],
 
-            [Filters\LeftJoin::class, 'leftjoin'],
+            [Filters\LeftJoin::class, 'left_join'],
             [Filters\LeftJoin::class, Filters\LeftJoin::class],
         ];
     }
