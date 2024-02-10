@@ -154,9 +154,6 @@ final class FilterFactoryTest extends TestCase
         $factory->create($this->queryFilterManager, $name);
     }
 
-    /**
-     * @return array<mixed><mixed>
-     */
     public function getCreateWillThrowAFilterFactoryExceptionIfTheResolvedClassNameIsInvalidData(): array
     {
         return [
@@ -187,6 +184,8 @@ final class FilterFactoryTest extends TestCase
     /**
      * Assert the expected query filter is created using the provided $name and $options and optional $classMap.
      *
+     * @param class-string $expected
+     *
      * @dataProvider getCreateWillReturnFilterInstanceData
      *
      * @throws FilterFactoryException
@@ -201,6 +200,7 @@ final class FilterFactoryTest extends TestCase
 
         $queryFilter = $factory->create($this->queryFilterManager, $name, $options);
 
+        /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf($expected, $queryFilter);
     }
 
