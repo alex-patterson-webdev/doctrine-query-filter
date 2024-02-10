@@ -20,14 +20,6 @@ final class Typecaster implements TypecasterInterface
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param string            $fieldName
-     * @param mixed             $value
-     * @param string|null       $type
-     * @param array<mixed>      $options
-     *
-     * @return mixed
-     *
      * @throws TypecastException
      */
     public function typecast(
@@ -57,12 +49,6 @@ final class Typecaster implements TypecasterInterface
     }
 
     /**
-     * @param mixed        $value
-     * @param string       $type
-     * @param array<mixed> $options
-     *
-     * @return mixed
-     *
      * @throws DateTimeFactoryException
      */
     private function castValue(mixed $value, string $type, array $options): mixed
@@ -73,10 +59,10 @@ final class Typecaster implements TypecasterInterface
         $fieldType = FieldType::tryFrom($type);
 
         return match ($fieldType) {
-            FieldType::STRING => (string)$value,
-            FieldType::INTEGER, FieldType::SMALLINT => (int)$value,
-            FieldType::BOOLEAN => (bool)$value,
-            FieldType::DECIMAL, FieldType::FLOAT => (float)$value,
+            FieldType::STRING => (string) $value,
+            FieldType::INTEGER, FieldType::SMALLINT => (int) $value,
+            FieldType::BOOLEAN => (bool) $value,
+            FieldType::DECIMAL, FieldType::FLOAT => (float) $value,
             FieldType::DATETIME_MUTABLE => $castDateTime
                 ? $this->castDateTime($value, $format ?? 'Y-m-d H:i:s')
                 : $value,

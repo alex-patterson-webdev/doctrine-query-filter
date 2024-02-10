@@ -45,17 +45,10 @@
       "@arp:analyse",
       "@arp:unit-test-with-coverage"
     ],
-    "arp:test-dev": [
-      "@arp:check",
-      "@arp:lint",
-      "@arp:fix",
-      "@arp:analyse",
-      "@arp:unit-test"
-    ],
     "arp:check": "php vendor/bin/phpcs -s --standard=phpcs.xml --colors src/ test/",
     "arp:lint": "php vendor/bin/php-cs-fixer fix --dry-run --verbose --config=.php-cs-fixer.dist",
     "arp:fix": "php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist",
-    "arp:analyse": "php vendor/bin/phpstan analyse -c phpstan.neon --level=7",
+    "arp:analyse": "php vendor/bin/phpstan analyse -c phpstan.neon",
     "arp:unit-test": "php vendor/bin/phpunit",
     "arp:unit-test-with-coverage": [
       "@putenv XDEBUG_MODE=coverage",

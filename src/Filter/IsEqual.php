@@ -10,6 +10,6 @@ final class IsEqual extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->eq($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->eq($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

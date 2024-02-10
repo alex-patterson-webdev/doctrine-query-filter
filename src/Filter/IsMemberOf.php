@@ -14,7 +14,7 @@ final class IsMemberOf extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);
+        return (string) $expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);
     }
 
     /**

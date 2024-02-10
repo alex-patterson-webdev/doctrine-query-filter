@@ -88,7 +88,7 @@ abstract class AbstractJoin extends AbstractFilter
         }
 
         if ($conditions instanceof Base) {
-            return (string)$conditions;
+            return (string) $conditions;
         }
 
         $condition = null;
@@ -101,7 +101,7 @@ abstract class AbstractJoin extends AbstractFilter
             $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
         }
 
-        return isset($condition) ? (string)$condition : null;
+        return isset($condition) ? (string) $condition : null;
     }
 
     /**

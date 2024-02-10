@@ -10,6 +10,6 @@ final class IsLike extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->like($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->like($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

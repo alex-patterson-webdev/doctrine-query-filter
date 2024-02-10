@@ -23,7 +23,7 @@ final class LeftJoin extends AbstractJoin
             $fieldName,
             $alias,
             $joinConditionType,
-            isset($condition) ? (string)$condition : null,
+            isset($condition) ? (string) $condition : null,
             $indexBy
         );
     }
