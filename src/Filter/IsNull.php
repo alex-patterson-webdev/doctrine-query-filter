@@ -10,6 +10,6 @@ final class IsNull extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->isNull($alias . '.' . $fieldName);
+        return (string) $expr->isNull($alias . '.' . $fieldName);
     }
 }

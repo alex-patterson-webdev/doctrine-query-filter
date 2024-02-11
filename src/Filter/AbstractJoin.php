@@ -18,28 +18,16 @@ use Doctrine\ORM\Query\Expr\Orx as DoctrineOrX;
 
 abstract class AbstractJoin extends AbstractFilter
 {
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string $fieldName
-     * @param string $alias
-     * @param null|string|Composite|Base $condition
-     * @param JoinConditionType|null $joinConditionType
-     * @param string|null $indexBy
-     */
     abstract protected function applyJoin(
         QueryBuilderInterface $queryBuilder,
         string $fieldName,
         string $alias,
-        mixed $condition = null,
+        string|Composite|Base|null $condition = null,
         ?JoinConditionType $joinConditionType = null,
         ?string $indexBy = null
     ): void;
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface $metadata
-     * @param array<mixed> $criteria
-     *
      * @throws InvalidArgumentException
      * @throws FilterException
      */
@@ -100,7 +88,7 @@ abstract class AbstractJoin extends AbstractFilter
         }
 
         if ($conditions instanceof Base) {
-            return (string)$conditions;
+            return (string) $conditions;
         }
 
         $condition = null;
@@ -113,15 +101,10 @@ abstract class AbstractJoin extends AbstractFilter
             $condition = $this->mergeJoinConditions($queryBuilder, $tempQueryBuilder);
         }
 
-        return isset($condition) ? (string)$condition : null;
+        return isset($condition) ? (string) $condition : null;
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param string $fieldName
-     *
-     * @return array<mixed>
-     *
      * @throws InvalidArgumentException
      */
     private function getAssociationMapping(MetadataInterface $metadata, string $fieldName): array
@@ -143,11 +126,6 @@ abstract class AbstractJoin extends AbstractFilter
     }
 
     /**
-     * @param QueryBuilderInterface $qb
-     * @param string $targetEntity
-     * @param array<mixed> $criteria
-     *
-     * @return QueryBuilderInterface
      * @throws FilterException
      */
     private function filterJoinCriteria(
@@ -160,10 +138,9 @@ abstract class AbstractJoin extends AbstractFilter
         } catch (QueryFilterManagerException $e) {
             throw new FilterException(
                 sprintf(
-                    'Failed to apply query filter \'%s\' conditions for target entity \'%s\': %s',
+                    'Failed to apply query filter \'%s\' conditions for target entity \'%s\'',
                     static::class,
                     $targetEntity,
-                    $e->getMessage()
                 ),
                 $e->getCode(),
                 $e
@@ -173,13 +150,6 @@ abstract class AbstractJoin extends AbstractFilter
         return $qb;
     }
 
-    /**
-     * @param array<mixed> $conditions
-     * @param string $alias
-     * @param array<mixed> $criteria
-     *
-     * @return array<mixed>
-     */
     private function createJoinFilters(array $conditions, string $alias, array $criteria = []): array
     {
         // Use the join alias as the default alias for conditions

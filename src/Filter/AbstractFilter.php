@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arp\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Enum\WhereType;
+use Arp\DoctrineQueryFilter\Exception\QueryFilterManagerException;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\Exception\InvalidArgumentException;
 use Arp\DoctrineQueryFilter\Metadata\Exception\TypecastException;
@@ -16,12 +17,6 @@ use Arp\DoctrineQueryFilter\QueryFilterManagerInterface;
 
 abstract class AbstractFilter implements FilterInterface
 {
-    /**
-     * @param QueryFilterManagerInterface $queryFilterManager
-     * @param TypecasterInterface $typecaster
-     * @param ParamNameGeneratorInterface $paramNameGenerator
-     * @param array<mixed> $options
-     */
     public function __construct(
         protected QueryFilterManagerInterface $queryFilterManager,
         protected TypecasterInterface $typecaster,
@@ -30,9 +25,6 @@ abstract class AbstractFilter implements FilterInterface
     ) {
     }
 
-    /**
-     * @return array<mixed>
-     */
     public function getOptions(): array
     {
         return $this->options;
@@ -54,11 +46,6 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param array<mixed>      $criteria
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      */
     protected function resolveFieldName(MetadataInterface $metadata, array $criteria): string
@@ -82,7 +69,7 @@ abstract class AbstractFilter implements FilterInterface
                     . 'The entity class \'%s\' has no field or association named \'%s\'',
                     static::class,
                     $metadata->getName(),
-                    $fieldName
+                    $fieldName,
                 )
             );
         }
@@ -91,14 +78,6 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param string            $fieldName
-     * @param mixed             $value
-     * @param string|null       $type
-     * @param array<mixed>      $options
-     *
-     * @return mixed
-     *
      * @throws FilterException
      */
     protected function formatValue(
@@ -119,11 +98,6 @@ abstract class AbstractFilter implements FilterInterface
         }
     }
 
-    /**
-     * @param array<string, mixed> $criteria
-     *
-     * @return WhereType
-     */
     protected function getWhereType(array $criteria): WhereType
     {
         if (isset($criteria['where'])) {
@@ -137,5 +111,37 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return WhereType::AND;
+    }
+
+    /**
+     * @throws FilterException
+     */
+    protected function applyFilters(
+        QueryBuilderInterface $queryBuilder,
+        MetadataInterface $metadata,
+        array $filters,
+    ): void {
+        foreach ($filters as $filter) {
+            $this->applyFilter($queryBuilder, $metadata, $filter);
+        }
+    }
+
+    /**
+     * @throws FilterException
+     */
+    protected function applyFilter(
+        QueryBuilderInterface $queryBuilder,
+        MetadataInterface $metadata,
+        array $criteria,
+    ): void {
+        try {
+            $this->queryFilterManager->applyFilter($queryBuilder, $metadata, $criteria);
+        } catch (QueryFilterManagerException $e) {
+            throw new FilterException(
+                sprintf('Failed to apply query filter for entity \'%s\'', $metadata->getName()),
+                $e->getCode(),
+                $e,
+            );
+        }
     }
 }

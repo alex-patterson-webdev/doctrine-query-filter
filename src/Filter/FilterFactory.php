@@ -17,31 +17,31 @@ final class FilterFactory implements FilterFactoryInterface
      * @var array<string, class-string<FilterInterface>>
      */
     private array $classMap = [
-        'eq'        => IsEqual::class,
-        'neq'       => IsNotEqual::class,
-        'gt'        => IsGreaterThan::class,
-        'gte'       => IsGreaterThanOrEqual::class,
-        'lt'        => IsLessThan::class,
-        'lte'       => IsLessThanOrEqual::class,
-        'null'      => IsNull::class,
-        'notnull'   => IsNotNull::class,
-        'memberof'  => IsMemberOf::class,
-        'between'   => IsBetween::class,
-        'andx'      => AndX::class,
-        'orx'       => OrX::class,
-        'leftjoin'  => LeftJoin::class,
-        'innerjoin' => InnerJoin::class,
-        'like'      => IsLike::class,
-        'notlike'   => IsNotLike::class,
-        'in'        => IsIn::class,
-        'notin'     => IsNotIn::class,
+        'eq' => IsEqual::class,
+        'neq' => IsNotEqual::class,
+        'gt' => IsGreaterThan::class,
+        'gte' => IsGreaterThanOrEqual::class,
+        'lt' => IsLessThan::class,
+        'lte' => IsLessThanOrEqual::class,
+        'is_null' => IsNull::class,
+        'not_null' => IsNotNull::class,
+        'member_of' => IsMemberOf::class,
+        'between' => IsBetween::class,
+        'and' => AndX::class,
+        'or' => OrX::class,
+        'left_join' => LeftJoin::class,
+        'inner_join' => InnerJoin::class,
+        'like' => IsLike::class,
+        'not_like' => IsNotLike::class,
+        'in' => IsIn::class,
+        'not_in' => IsNotIn::class,
+        'begins_with' => BeginsWith::class,
+        'ends_with' => EndsWith::class,
+        'empty' => IsEmpty::class,
     ];
 
     /**
-     * @param TypecasterInterface|null $typecaster
-     * @param ParamNameGeneratorInterface|null $paramNameGenerator
      * @param array<string, class-string<FilterInterface>> $classMap
-     * @param array<mixed> $options
      */
     public function __construct(
         private ?TypecasterInterface $typecaster = null,
@@ -56,12 +56,6 @@ final class FilterFactory implements FilterFactoryInterface
 
     /**
      * Create the $name query filter with the provided $options.
-     *
-     * @param QueryFilterManagerInterface $manager
-     * @param string $name
-     * @param array<mixed> $options
-     *
-     * @return FilterInterface
      *
      * @throws FilterFactoryException
      */
@@ -98,24 +92,17 @@ final class FilterFactory implements FilterFactoryInterface
         }
     }
 
-    /**
-     * @return array<string>
-     */
     public function getClassMap(): array
     {
         return $this->classMap;
     }
 
-    /**
-     * @param array<mixed> $classMap
-     */
     public function setClassMap(array $classMap): void
     {
         $this->classMap = $classMap;
     }
 
     /**
-     * @param string $alias
      * @param class-string<FilterInterface> $className
      */
     public function addToClassMap(string $alias, string $className): void

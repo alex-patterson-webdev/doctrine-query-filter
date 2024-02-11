@@ -13,10 +13,6 @@ interface MetadataInterface
     public function hasField(string $fieldName): bool;
 
     /**
-     * @param string $fieldName
-     *
-     * @return array<mixed>
-     *
      * @throws MetadataException
      */
     public function getFieldMapping(string $fieldName): array;
@@ -29,10 +25,6 @@ interface MetadataInterface
     public function hasAssociation(string $fieldName): bool;
 
     /**
-     * @param string $fieldName
-     *
-     * @return array<mixed>
-     *
      * @throws MetadataException
      */
     public function getAssociationMapping(string $fieldName): array;

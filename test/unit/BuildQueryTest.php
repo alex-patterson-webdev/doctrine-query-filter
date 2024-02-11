@@ -67,10 +67,6 @@ final class BuildQueryTest extends TestCase
     /**
      * @dataProvider getFilterCriteriaData
      *
-     * @param array<mixed> $criteria
-     * @param string $expectedDql
-     * @param array<mixed> $expectedParams
-     *
      * @throws QueryFilterManagerException
      */
     public function testFilterCriteria(array $criteria, string $expectedDql, array $expectedParams = []): void
@@ -106,9 +102,6 @@ final class BuildQueryTest extends TestCase
         }
     }
 
-    /**
-     * @return array<mixed>
-     */
     public function getFilterCriteriaData(): array
     {
         return [
@@ -129,7 +122,7 @@ final class BuildQueryTest extends TestCase
                 [
                     'filters' => [
                         ['name' => 'eq', 'field' => 'enabled', 'value' => true],
-                        ['name' => 'orx',
+                        ['name' => 'or',
                             'conditions' => [
                                 ['name' => 'eq', 'field' => 'username', 'value' => 'Fred'],
                                 ['name' => 'eq', 'field' => 'username', 'value' => 'bob'],
@@ -161,7 +154,7 @@ final class BuildQueryTest extends TestCase
                 [
                     'filters' => [
                         [
-                            'name' => 'orx',
+                            'name' => 'or',
                             'conditions' => [
                                 ['name' => 'like', 'field' => 'forename', 'value' => '%Bob%'],
                                 ['name' => 'gt', 'field' => 'age', 'value' => 18],

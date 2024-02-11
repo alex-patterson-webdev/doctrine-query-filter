@@ -11,19 +11,11 @@ use Doctrine\ORM\Query\Expr\Composite;
 
 final class LeftJoin extends AbstractJoin
 {
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string $fieldName
-     * @param string $alias
-     * @param null|string|Composite|Base $condition
-     * @param JoinConditionType|null $joinConditionType
-     * @param string|null $indexBy
-     */
     protected function applyJoin(
         QueryBuilderInterface $queryBuilder,
         string $fieldName,
         string $alias,
-        $condition = null,
+        string|Composite|Base|null $condition = null,
         ?JoinConditionType $joinConditionType = null,
         ?string $indexBy = null
     ): void {
@@ -31,7 +23,7 @@ final class LeftJoin extends AbstractJoin
             $fieldName,
             $alias,
             $joinConditionType,
-            isset($condition) ? (string)$condition : null,
+            isset($condition) ? (string) $condition : null,
             $indexBy
         );
     }

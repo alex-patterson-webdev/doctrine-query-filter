@@ -10,6 +10,6 @@ final class IsLessThanOrEqual extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->lte($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->lte($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

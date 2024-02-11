@@ -30,12 +30,6 @@ class QueryFilterManager implements QueryFilterManagerInterface
     /**
      * Apply the query filters to the provided query builder instance
      *
-     * @param DoctrineQueryBuilder|QueryBuilderInterface $queryBuilder
-     * @param string $entityName
-     * @param array<mixed> $criteria
-     *
-     * @return DoctrineQueryBuilder
-     *
      * @throws QueryFilterManagerException
      */
     public function filter(
@@ -58,13 +52,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface $metadata
-     * @param array<mixed>|FilterInterface $data
-     *
      * @throws QueryFilterManagerException
      */
-    private function applyFilter(
+    public function applyFilter(
         QueryBuilderInterface $queryBuilder,
         MetadataInterface $metadata,
         array|FilterInterface $data
@@ -96,14 +86,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param string $name
-     * @param array<mixed> $options
-     *
-     * @return FilterInterface
-     *
      * @throws QueryFilterManagerException
      */
-    private function createFilter(string $name, array $options = []): FilterInterface
+    public function createFilter(string $name, array $options = []): FilterInterface
     {
         try {
             return $this->filterFactory->create($this, $name, $options);
@@ -117,13 +102,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param MetadataInterface $metadata
-     * @param array<mixed>|SortInterface $data
-     *
      * @throws QueryFilterManagerException
      */
-    private function applySort(
+    public function applySort(
         QueryBuilderInterface $queryBuilder,
         MetadataInterface $metadata,
         array|SortInterface $data
@@ -150,14 +131,9 @@ class QueryFilterManager implements QueryFilterManagerInterface
     }
 
     /**
-     * @param string $name
-     * @param array<mixed> $options
-     *
-     * @return SortInterface
-     *
      * @throws QueryFilterManagerException
      */
-    private function createSort(string $name, array $options = []): SortInterface
+    public function createSort(string $name, array $options = []): SortInterface
     {
         try {
             return $this->sortFactory->create($this, $name, $options);

@@ -10,6 +10,6 @@ final class IsGreaterThanOrEqual extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->gte($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->gte($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

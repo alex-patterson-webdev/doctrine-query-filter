@@ -10,6 +10,6 @@ final class IsNotIn extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->notIn($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->notIn($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

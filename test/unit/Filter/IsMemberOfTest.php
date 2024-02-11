@@ -7,6 +7,7 @@ namespace ArpTest\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Enum\WhereType;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\IsMemberOf;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -24,9 +25,68 @@ final class IsMemberOfTest extends AbstractComparisonTest
     protected string $expressionSymbol = 'MEMBER OF';
 
     /**
+     * @dataProvider getInvalidNonCollectionFieldWillThrowInvalidArgumentExceptionData
+     */
+    public function testInvalidNonCollectionFieldWillThrowInvalidArgumentException(
+        string $fieldName,
+        ?int $associationType
+    ): void {
+        $parts = explode('.', $fieldName);
+        $fieldName = array_pop($parts);
+
+        $this->metadata->expects($this->once())
+            ->method('hasField')
+            ->with($fieldName)
+            ->willReturn(true);
+
+        $this->metadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(true);
+
+        $associationMapping = [
+            'type' => $associationType,
+        ];
+
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->willReturn($associationMapping);
+
+
+        $this->expectException(FilterException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Unable to apply query filter \'%s\': '
+                . 'The field \'%s\' is not a valid collection valued association',
+                IsMemberOf::class,
+                $fieldName,
+            ),
+        );
+
+        $this->filter->filter($this->queryBuilder, $this->metadata, ['field' => $fieldName]);
+    }
+
+    public static function getInvalidNonCollectionFieldWillThrowInvalidArgumentExceptionData(): array
+    {
+        return [
+            [
+                'testFieldName',
+                ClassMetadataInfo::MANY_TO_ONE,
+            ],
+            [
+                'x.testFieldName',
+                ClassMetadataInfo::ONE_TO_ONE,
+            ],
+            [
+                'x.fooFieldName',
+                null,
+            ],
+        ];
+    }
+
+    /**
      * Assert that the IsMemberOf query filter can be applied with the provided $criteria
-     *
-     * @param array<mixed> $criteria
      *
      * @dataProvider getFilterWillApplyFilteringData
      * @throws FilterException
@@ -104,21 +164,11 @@ final class IsMemberOfTest extends AbstractComparisonTest
         $this->filter->filter($this->queryBuilder, $this->metadata, $criteria);
     }
 
-    /**
-     * @param string      $fieldName
-     * @param string|null $alias
-     * @param array<mixed>      $criteria
-     *
-     * @return string
-     */
     protected function getExpressionString(string $fieldName, ?string $alias, array $criteria): string
     {
         return ':param_name ' . $this->expressionSymbol . $alias . '.' . $fieldName;
     }
 
-    /**
-     * @return array<mixed>
-     */
     public function getFilterWillApplyFilteringData(): array
     {
         return [

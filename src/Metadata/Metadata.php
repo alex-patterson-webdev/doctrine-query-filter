@@ -28,10 +28,6 @@ final class Metadata implements MetadataInterface
     }
 
     /**
-     * @param string $fieldName
-     *
-     * @return array<mixed>
-     *
      * @throws MetadataException
      */
     public function getFieldMapping(string $fieldName): array
@@ -69,10 +65,6 @@ final class Metadata implements MetadataInterface
     }
 
     /**
-     * @param string $fieldName
-     *
-     * @return array<mixed>
-     *
      * @throws MetadataException
      */
     public function getAssociationMapping(string $fieldName): array

@@ -10,6 +10,6 @@ final class IsNotLike extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->notLike($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->notLike($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

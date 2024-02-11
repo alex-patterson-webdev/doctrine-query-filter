@@ -10,6 +10,6 @@ final class IsIn extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->in($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->in($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }

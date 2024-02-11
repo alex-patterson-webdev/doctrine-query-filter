@@ -14,15 +14,10 @@ final class IsMemberOf extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);
+        return (string) $expr->isMemberOf(':' . $parameterName, $alias . '.' . $fieldName);
     }
 
     /**
-     * @param MetadataInterface $metadata
-     * @param array<mixed> $criteria
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      * @throws MetadataException
      */
@@ -31,30 +26,20 @@ final class IsMemberOf extends AbstractExpression
         $fieldName = parent::resolveFieldName($metadata, $criteria);
 
         if ($metadata->hasAssociation($fieldName)) {
-            $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';
+            $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? null;
 
-            if (!empty($associationType) && !($associationType & ClassMetadataInfo::TO_ONE)) {
+            if (null !== $associationType && !($associationType & ClassMetadataInfo::TO_ONE)) {
                 return $fieldName;
             }
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Unable to apply query filter \'%s\': '
-                    . 'The field \'%s\' is not a collection valued association',
-                    self::class,
-                    $fieldName
-                )
-            );
         }
 
         throw new InvalidArgumentException(
             sprintf(
                 'Unable to apply query filter \'%s\': '
-                . 'The entity class \'%s\' has no association named \'%s\'',
+                . 'The field \'%s\' is not a valid collection valued association',
                 self::class,
-                $metadata->getName(),
-                $fieldName
-            )
+                $fieldName,
+            ),
         );
     }
 }

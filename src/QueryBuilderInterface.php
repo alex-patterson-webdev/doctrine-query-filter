@@ -30,46 +30,25 @@ interface QueryBuilderInterface
 
     public function expr(): Expr;
 
-    /**
-     * @return array<mixed>
-     */
     public function getQueryParts(): array;
 
     public function orWhere(mixed ...$args): self;
 
     public function andWhere(mixed ...$args): self;
 
-    /**
-     * @param string $name
-     * @param string $alias
-     * @param JoinConditionType|null $conditionType
-     * @param string|Comparison|Composite|null $condition
-     * @param string|null $indexBy
-     *
-     * @return self
-     */
     public function innerJoin(
         string $name,
         string $alias,
         ?JoinConditionType $conditionType = null,
-        mixed $condition = null,
+        string|Comparison|Composite|null $condition = null,
         ?string $indexBy = null
     ): self;
 
-    /**
-     * @param string $name
-     * @param string $alias
-     * @param JoinConditionType|null $conditionType
-     * @param string|Comparison|Composite|null $condition
-     * @param string|null $indexBy
-     *
-     * @return self
-     */
     public function leftJoin(
         string $name,
         string $alias,
         ?JoinConditionType $conditionType = null,
-        mixed $condition = null,
+        string|Comparison|Composite|null $condition = null,
         string $indexBy = null
     ): QueryBuilderInterface;
 

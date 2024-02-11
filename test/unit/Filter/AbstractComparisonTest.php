@@ -40,8 +40,6 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
     /**
      * Assert that the query filter can be applied with the provided $criteria
      *
-     * @param array<mixed> $criteria
-     *
      * @dataProvider getFilterWillApplyFilteringData
      *
      * @throws FilterException
@@ -105,18 +103,8 @@ abstract class AbstractComparisonTest extends AbstractFilterTest
         $this->filter->filter($this->queryBuilder, $this->metadata, $criteria);
     }
 
-    /**
-     * @return array<mixed>
-     */
     abstract public function getFilterWillApplyFilteringData(): array;
 
-    /**
-     * @param string      $fieldName
-     * @param string|null $alias
-     * @param array<mixed>      $criteria
-     *
-     * @return string
-     */
     protected function getExpressionString(string $fieldName, ?string $alias, array $criteria): string
     {
         $expressionString = $alias . '.' . $fieldName . ' ' . $this->expressionSymbol;

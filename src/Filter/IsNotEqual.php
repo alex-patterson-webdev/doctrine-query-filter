@@ -10,6 +10,6 @@ final class IsNotEqual extends AbstractExpression
 {
     protected function createExpression(Expr $expr, string $fieldName, string $parameterName, string $alias): string
     {
-        return (string)$expr->neq($alias . '.' . $fieldName, ':' . $parameterName);
+        return (string) $expr->neq($alias . '.' . $fieldName, ':' . $parameterName);
     }
 }
