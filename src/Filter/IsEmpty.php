@@ -19,16 +19,17 @@ final class IsEmpty extends AbstractFilter
         }
 
         $criteria = [
-            'name' => OrX::class,
+            'name' => 'or',
             'conditions' => [
                 [
-                    'name' => IsNull::class,
+                    'name' => 'is_null',
                     'field' => $criteria['field'],
-                    'value' => null,
+                    'alias' => $criteria['alias'] ?? null,
                 ],
                 [
-                    'name' => IsEqual::class,
+                    'name' => 'eq',
                     'field' => $criteria['field'],
+                    'alias' => $criteria['alias'] ?? null,
                     'value' => '',
                 ],
             ],

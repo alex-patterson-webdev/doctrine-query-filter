@@ -21,7 +21,7 @@ final class EndsWith extends AbstractFilter
         $this->applyFilter(
             $queryBuilder,
             $metadata,
-            array_merge($criteria, ['name' => IsLike::class, 'value' => '%' . $criteria['value']]),
+            array_merge($criteria, ['name' => 'like', 'value' => '%' . $criteria['value']]),
         );
     }
 }
