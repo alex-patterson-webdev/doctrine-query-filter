@@ -116,6 +116,19 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * @throws FilterException
      */
+    protected function applyFilters(
+        QueryBuilderInterface $queryBuilder,
+        MetadataInterface $metadata,
+        array $filters,
+    ): void {
+        foreach ($filters as $filter) {
+            $this->applyFilter($queryBuilder, $metadata, $filter);
+        }
+    }
+
+    /**
+     * @throws FilterException
+     */
     protected function applyFilter(
         QueryBuilderInterface $queryBuilder,
         MetadataInterface $metadata,
