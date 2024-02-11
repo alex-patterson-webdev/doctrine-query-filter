@@ -32,8 +32,6 @@ final class ContainsTest extends MockeryTestCase
     public function setUp(): void
     {
         $this->queryFilterManager = \Mockery::mock(QueryFilterManagerInterface::class);
-        $this->typecaster = \Mockery::mock(TypecasterInterface::class);
-        $this->paramNameGenerator = \Mockery::mock(ParamNameGeneratorInterface::class);
         $this->queryBuilder = \Mockery::mock(QueryBuilderInterface::class);
         $this->metadata = \Mockery::mock(MetadataInterface::class);
 
