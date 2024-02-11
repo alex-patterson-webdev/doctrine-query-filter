@@ -69,7 +69,7 @@ abstract class AbstractFilter implements FilterInterface
                     . 'The entity class \'%s\' has no field or association named \'%s\'',
                     static::class,
                     $metadata->getName(),
-                    $fieldName
+                    $fieldName,
                 )
             );
         }

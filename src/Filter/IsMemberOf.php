@@ -26,30 +26,20 @@ final class IsMemberOf extends AbstractExpression
         $fieldName = parent::resolveFieldName($metadata, $criteria);
 
         if ($metadata->hasAssociation($fieldName)) {
-            $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? '';
+            $associationType = $metadata->getAssociationMapping($fieldName)['type'] ?? null;
 
-            if (!empty($associationType) && !($associationType & ClassMetadataInfo::TO_ONE)) {
+            if (null !== $associationType && !($associationType & ClassMetadataInfo::TO_ONE)) {
                 return $fieldName;
             }
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Unable to apply query filter \'%s\': '
-                    . 'The field \'%s\' is not a collection valued association',
-                    self::class,
-                    $fieldName
-                )
-            );
         }
 
         throw new InvalidArgumentException(
             sprintf(
                 'Unable to apply query filter \'%s\': '
-                . 'The entity class \'%s\' has no association named \'%s\'',
+                . 'The field \'%s\' is not a valid collection valued association',
                 self::class,
-                $metadata->getName(),
-                $fieldName
-            )
+                $fieldName,
+            ),
         );
     }
 }
