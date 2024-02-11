@@ -1,7 +1,8 @@
 build:
   image: default-bionic
   environment:
-    php: 8.2
+    php:
+      version: 8.2
   project_setup:
     override:
       - 'true'
