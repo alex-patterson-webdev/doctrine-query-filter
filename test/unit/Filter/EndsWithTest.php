@@ -17,6 +17,7 @@ use Mockery\MockInterface;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\EndsWith
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  */
 final class EndsWithTest extends MockeryTestCase
 {

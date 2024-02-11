@@ -7,7 +7,6 @@ namespace ArpTest\DoctrineQueryFilter\Filter;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Filter\IsEmpty;
-use Arp\DoctrineQueryFilter\Filter\OrX;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
 use Arp\DoctrineQueryFilter\Metadata\ParamNameGeneratorInterface;
 use Arp\DoctrineQueryFilter\Metadata\TypecasterInterface;
@@ -18,6 +17,7 @@ use Mockery\MockInterface;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\IsEmpty
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  */
 final class IsEmptyTest extends MockeryTestCase
 {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ArpTest\DoctrineQueryFilter\Filter;
 
 use Arp\DoctrineQueryFilter\Filter\Contains;
-use Arp\DoctrineQueryFilter\Filter\EndsWith;
 use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
 use Arp\DoctrineQueryFilter\Filter\FilterInterface;
 use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
@@ -18,6 +17,7 @@ use Mockery\MockInterface;
 
 /**
  * @covers \Arp\DoctrineQueryFilter\Filter\Contains
+ * @covers \Arp\DoctrineQueryFilter\Filter\AbstractFilter
  */
 final class ContainsTest extends MockeryTestCase
 {
