@@ -59,8 +59,8 @@ By passing this `$criteria` to our `QueryFilterManager` we can generate (and exe
 
 ### Combining filters with an OR condition
 
-When defining more than one filter, conditions will be explicitly `AND` together using the `AndX` composite query filter.
-To instead create an `OR` condition, we must define a `orx` filter and provide it with the required `conditions` array.
+When defining more than one filter, conditions will be explicitly "AND" together using the `and` composite query filter.
+To instead create an "OR" condition, we must define a `or` filter and provide it with the required `conditions` array.
 
     // SELECT c FROM Customer c WHERE c.enabled = :enabled AND (c.username = :username1 OR c.username = :username2)
     $criteria = [
@@ -71,7 +71,7 @@ To instead create an `OR` condition, we must define a `orx` filter and provide i
                 'value' => true,
             ],
             [
-                'name' => 'orx',
+                'name' => 'or',
                 'conditions' => [
                     [
                         'name' => 'eq',
@@ -90,7 +90,7 @@ To instead create an `OR` condition, we must define a `orx` filter and provide i
 
 ### Nesting Filters
 
-You can also nest a combination of the `andX` and `orX`, the generated DQL will include the correct grouping.
+You can also nest a combination of the `and` and `or`, the generated DQL will include the correct grouping.
 
     // WHERE x.surname = 'Smith' OR (x.age > 18 AND x.gender = 'Male')
     $criteria = [
@@ -104,7 +104,7 @@ You can also nest a combination of the `andX` and `orX`, the generated DQL will 
                         'value' => 'Smith',
                     ],
                     [
-                        'name' => 'andx',
+                        'name' => 'and',
                         'conditions' => [
                             [
                                 'name' => 'gt',
@@ -129,14 +129,14 @@ The above examples demonstrate the use of the built-in filters. However, these a
 The true power of the `QueryFilterManager` is the ability to create and use custom filters; by extending the `AbstractFilter` class. 
 Custom filters are self-contained and reusable across multiple queries. This allows for a more modular and maintainable approach to build complex queries.
 
-The below example demonstrates how we could utilise the provided filters to create our own `Customer` that accepts optional `$criteria` parameters.
+The below example demonstrates how we could utilise the provided filters to create our own `CustomerSearch` filter that accepts optional `$criteria` parameters.
 
     use Arp\DoctrineQueryFilter\Filter\AbstractFilter;
     use Arp\DoctrineQueryFilter\Filter\Exception\FilterException;
     use Arp\DoctrineQueryFilter\Metadata\MetadataInterface;
     use Arp\DoctrineQueryFilter\QueryBuilderInterface;
 
-    final class Customer extends AbstractFilter
+    final class CustomerSearch extends AbstractFilter
     {
         public function filter(QueryBuilderInterface $queryBuilder, MetadataInterface $metadata, array $criteria): void
         {
@@ -169,7 +169,7 @@ The below example demonstrates how we could utilise the provided filters to crea
                 $filters[] = [
                     'name' => 'gte',
                     'field' => 'age',
-                    'value' => $criteria['age'],
+                    'value' => (int) $criteria['age'],
                 ];
             }
 
@@ -179,21 +179,23 @@ The below example demonstrates how we could utilise the provided filters to crea
 
     // We must register the custom filter with the FilterFactory
     $filterFactory = new FilterFactory();
-    $filterFactory->addFilter('my_customer_filter', CustomFilter::class);
+    $filterFactory->addToClassMap('customer_search', CustomerSearch::class);
 
     $queryFilterManager = new QueryFilterManager($filterFactory);
     $criteria = [
         'filters' => [
             [
-                'name' => 'my_customer_filter',
+                'name' => 'customer_search',
                 'surname' => 'Smith',
                 'age' => 21,
             ],
         ],
     ];
 
-    // SELECT c FROM Customer c WHERE c.status != 'inactive' AND c.surname LIKE 'Smith%' AND c.age >= 21
-    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Customer', $criteria);
+    $queryBuilder = $queryFilterManager->filter($queryBuilder, 'Entity\Customer', $criteria);
+
+    // Executes DQL: SELECT c FROM Customer c WHERE c.status != 'inactive' AND c.surname LIKE 'Smith%' AND c.age >= 21
+    $queryBuilder->getQuery()->execute();
 
 ## Sorting Results
 
@@ -257,12 +259,11 @@ There are many types of query filters already included. The table below defines 
 If you require greater control on the construction of the query filters, it is possible to provide `QueryFilter` 
 instances directly to the `$criteria['filters']` array instead of using the array format.
 
-    $filterFactory = new FilterFactory();
-    $queryFilterManager = new QueryFilterManager($filterFactory);
+    $queryFilterManager = new QueryFilterManager(new FilterFactory());
     $criteria = [
         'filters' => [
-            $filterFactory->create('eq', ['field' => 'surname', 'value => 'Smith']),
-            $filterFactory->create('between', ['field' => 'age', 'from => 18, 'to' => 65]),
+            $queryFilterManager->createFilter('eq', ['field' => 'surname', 'value => 'Smith']),
+            $queryFilterManager->createFilter('between', ['field' => 'age', 'from => 18, 'to' => 65]),
         ],
     ],
 
