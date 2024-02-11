@@ -1,25 +1,16 @@
 build:
   image: default-bionic
   environment:
-    php: 8.1
+    php: 8.2
   project_setup:
     override:
       - 'true'
   tests:
     override:
       - php-scrutinizer-run
-      - command: phpcs-run
+      - command: phpcs-run --standard=phpcs.xml src/
 checks:
   php: true
-coding_style:
-  php:
-    spaces:
-      general:
-        linefeed_character: return-newline
-      before_parentheses:
-        closure_definition: true
-      around_operators:
-        concatenation: true
 filter:
   dependency_paths:
     - "vendor/"
