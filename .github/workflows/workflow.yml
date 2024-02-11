@@ -22,6 +22,10 @@ jobs:
         with:
           php-version: 8.2
 
+      - name: Set Composer environment
+        run: |
+          echo "COMPOSER_ENV=prod" >> $GITHUB_ENV
+
       - name: "Validate composer.json and composer.lock"
         run: composer validate --strict
 
@@ -53,5 +57,5 @@ jobs:
         uses: codecov/codecov-action@v3.1.6
         with:
           files: ./test/coverage/clover.xml
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           verbose: true
