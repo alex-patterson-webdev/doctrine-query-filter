@@ -4,3 +4,5 @@ parameters:
     - src/
     - test/
   checkMissingIterableValueType: false
+includes:
+  - vendor/phpstan/phpstan-mockery/extension.neon
